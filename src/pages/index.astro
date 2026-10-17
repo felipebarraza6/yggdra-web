@@ -1,209 +1,202 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Logo from "../components/Logo.astro";
+import Rune from "../components/Rune.astro";
+import ArchitectureDiagram from "../components/ArchitectureDiagram.astro";
+import ChangeFlowDiagram from "../components/ChangeFlowDiagram.astro";
+import TenantDiagram from "../components/TenantDiagram.astro";
+import ActivityCharts from "../components/ActivityCharts.astro";
 import ModuleMap from "../components/ModuleMap.astro";
-import consumersData from "../../data/consumers.public.json";
-import activityData from "../../data/activity.json";
-
-const consumers = consumersData.consumers;
-const modules = consumersData.modules;
-const activity = activityData.items;
-
-const counts = {
-  total: consumers.length,
-  active: consumers.filter((c) => c.status === "active").length,
-  migrating: consumers.filter((c) => c.status === "migrating").length,
-  legacy: consumers.filter((c) => c.status === "legacy").length,
-  modules: modules.length,
-};
+import { projects, modules, activity, counts } from "../lib/data";
 
 const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout>
   <section class="hero">
-    <div class="wrap hero-inner">
-      <h1>Yggdra</h1>
-      <p class="lede">
-        Plataforma backend transversal multi-tenant: un núcleo compartido,
-        módulos reutilizables y muchas aplicaciones sobre el mismo contrato.
-      </p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href={`${base}#mapa`}>Ver mapa de módulos</a>
-        <a class="btn btn-ghost" href={`${base}#orquestacion`}>Cómo orquestamos</a>
+    <div class="wrap hero-grid">
+      <div>
+        <p class="section-kicker"><Rune name="algiz" /> Yggdra Platform</p>
+        <h1>El árbol que sostiene muchas aplicaciones</h1>
+        <p class="lede">
+          Página explicativa de la plataforma y del oficio detrás: arquitectura
+          multi-tenant, contratos OpenAPI, orquestación de cambios, CI/CD y el
+          inventario vivo de las apps que la consumen.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href={`${base}#tronco`}>Ver el tronco</a>
+          <a class="btn btn-ghost" href={`${base}apps/`}>Explorar ramas</a>
+        </div>
+      </div>
+      <div class="glass panel" style="padding:1.25rem;display:flex;justify-content:center;">
+        <Logo size={260} />
       </div>
     </div>
   </section>
 
-  <section id="modelo">
+  <section id="raices">
     <div class="wrap">
       <div class="section-head">
-        <h2>Modelo de plataforma</h2>
+        <p class="section-kicker"><Rune name="eihwaz" /> Raíces</p>
+        <h2>Infraestructura y aislamiento</h2>
         <p>
-          Yggdra concentra la lógica de negocio en un backend multi-tenant con
-          aislamiento por organización y sucursal. Las aplicaciones consumen
-          módulos reutilizables a través de un contrato OpenAPI versionado,
-          con orquestación de cambios y despliegue continuo.
+          Las raíces sostienen el núcleo: identidad, datos y límites de tenant.
+          Cada organización opera con sucursales aisladas sobre el mismo contrato.
         </p>
       </div>
-      <div class="panel model-points" role="list">
-        <div role="listitem">
-          <h3>Multi-tenant</h3>
-          <p>Aislamiento por organización y sucursal en un mismo núcleo.</p>
-        </div>
-        <div role="listitem">
-          <h3>Módulos reutilizables</h3>
-          <p>Cuentas, sucursales, ventas, finanzas, telemetría y más, según cada producto.</p>
-        </div>
-        <div role="listitem">
-          <h3>Contrato OpenAPI</h3>
-          <p>Interfaz estable entre el backend y las aplicaciones consumidoras.</p>
-        </div>
-        <div role="listitem">
-          <h3>Despliegue continuo</h3>
-          <p>Cambios orquestados con reporte de impacto y promoción coordinada.</p>
-        </div>
-      </div>
-      <div class="panel stats-panel" style="margin-top:1rem;display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));text-align:center;">
+      <TenantDiagram />
+      <div class="glass panel stats-panel" style="margin-top:1rem;">
         <div>
-          <div style="font-family:var(--font-display);font-size:2rem;color:var(--accent-strong);">{counts.total}</div>
-          <div style="color:var(--text-muted);font-size:0.9rem;">apps consumidoras</div>
+          <div class="num">{counts.total}</div>
+          <div class="lbl">apps consumidoras</div>
         </div>
         <div>
-          <div style="font-family:var(--font-display);font-size:2rem;color:var(--accent-strong);">{counts.active}</div>
-          <div style="color:var(--text-muted);font-size:0.9rem;">activas</div>
+          <div class="num">{counts.active}</div>
+          <div class="lbl">activas</div>
         </div>
         <div>
-          <div style="font-family:var(--font-display);font-size:2rem;color:var(--warn);">{counts.migrating}</div>
-          <div style="color:var(--text-muted);font-size:0.9rem;">en migración</div>
+          <div class="num" style="color:var(--warn);">{counts.migrating}</div>
+          <div class="lbl">en migración</div>
         </div>
         <div>
-          <div style="font-family:var(--font-display);font-size:2rem;color:var(--accent-strong);">{counts.modules}</div>
-          <div style="color:var(--text-muted);font-size:0.9rem;">módulos</div>
+          <div class="num">{counts.modules}</div>
+          <div class="lbl">módulos</div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="mapa">
+  <section id="tronco">
     <div class="wrap">
       <div class="section-head">
+        <p class="section-kicker"><Rune name="ansuz" /> Tronco</p>
+        <h2>API, módulos y contrato</h2>
+        <p>
+          El tronco es la capa compartida: módulos reutilizables expuestos por
+          un contrato OpenAPI. Las aplicaciones no reinventan el dominio; lo
+          consumen con tipado, proxy o integración planificada.
+        </p>
+      </div>
+      <ArchitectureDiagram />
+      <div class="model-points" style="margin-top:1rem;">
+        <article class="glass panel">
+          <h3>Multi-tenant</h3>
+          <p>Organización y sucursal como unidades de aislamiento.</p>
+        </article>
+        <article class="glass panel">
+          <h3>Módulos</h3>
+          <p>Cuentas, ventas, finanzas, telemetría y más, según cada rama.</p>
+        </article>
+        <article class="glass panel">
+          <h3>OpenAPI</h3>
+          <p>Contrato estable entre plataforma y aplicaciones.</p>
+        </article>
+        <article class="glass panel">
+          <h3>Observabilidad</h3>
+          <p>Impacto de cada cambio medido contra el mapa de consumidores.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="ramas">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="section-kicker"><Rune name="raidho" /> Ramas</p>
         <h2>Mapa app ↔ módulos</h2>
         <p>
-          Relación entre cada aplicación consumidora y los módulos de Yggdra
-          que utiliza. Disponible como matriz o grafo, con filtros por nombre
-          y estado.
+          Cada rama es una aplicación que se apoya en parte del tronco.
+          La matriz y el grafo muestran esa relación; cada ficha enlaza a su página.
         </p>
       </div>
-      <ModuleMap consumers={consumers} modules={modules} />
+      <ModuleMap consumers={projects} modules={modules} base={base} />
+      <p style="margin-top:1rem;">
+        <a class="btn btn-ghost" href={`${base}apps/`}>Ver todas las aplicaciones</a>
+        <a class="btn btn-ghost" href={`${base}modulos/`} style="margin-left:0.5rem;">Ver módulos</a>
+      </p>
     </div>
   </section>
 
-  <section id="productos">
+  <section id="nornas">
     <div class="wrap">
       <div class="section-head">
-        <h2>Productos y clientes</h2>
+        <p class="section-kicker"><Rune name="sowilo" /> Nornas</p>
+        <h2>Orquestación e impacto</h2>
         <p>
-          Inventario público de productos que operan sobre Yggdra: cliente
-          visible cuando corresponde, estado operativo y módulos consumidos.
+          Antes de llegar a producción, cada cambio se lee contra el destino
+          de las ramas: qué módulos toca y qué aplicaciones deben ajustarse.
         </p>
+      </div>
+      <ChangeFlowDiagram />
+      <div class="steps" style="margin-top:1rem;">
+        <article class="step glass panel">
+          <h3>Reporte automático</h3>
+          <p>El pull request genera impacto sobre las apps consumidoras de los módulos afectados.</p>
+        </article>
+        <article class="step glass panel">
+          <h3>Ajustes por rama</h3>
+          <p>Se coordinan contrato, tipado o interfaz según la severidad del reporte.</p>
+        </article>
+        <article class="step glass panel">
+          <h3>Promoción conjunta</h3>
+          <p>Plataforma y aplicaciones avanzan juntas cuando el impacto está cubierto.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="bifrost">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="section-kicker"><Rune name="algiz" /> Bifröst</p>
+        <h2>Integraciones, despliegue y actividad</h2>
+        <p>
+          El puente entre cambio y producción: CI/CD continuo y un registro
+          público de avances de alto nivel, agrupados por módulo y por semana.
+        </p>
+      </div>
+      <ActivityCharts items={activity} />
+      <div class="glass panel" style="margin-top:1rem;">
+        <h3 style="margin:0 0 1rem;font-family:var(--font-display);font-size:1.1rem;">Avances recientes</h3>
+        <ol class="timeline">
+          {
+            activity.slice(0, 12).map((item) => (
+              <li>
+                <time datetime={item.date}>{item.date}</time>
+                <p class="summary">{item.summary}</p>
+                <a class="mod-chip" href={`${base}modulos/${encodeURIComponent(item.module)}/`}>{item.module}</a>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Aplicaciones destacadas</h2>
+        <p>Selección del inventario público. Cada ficha abre el detalle de módulos y contrato.</p>
       </div>
       <div class="grid-cards">
         {
-          consumers.map((c) => (
-            <article class="product-card" id={`app-${c.id}`}>
+          projects.filter((c) => c.status === "active").slice(0, 6).map((c) => (
+            <a class="product-card glass" href={`${base}apps/${c.id}/`}>
               <div style="display:flex;justify-content:space-between;gap:0.5rem;align-items:flex-start;">
                 <h3>{c.product || c.name}</h3>
                 <span class="badge" data-status={c.statusLabel}>{c.statusLabel}</span>
               </div>
               <p class="meta">
-                {c.company ? (
-                  <>
-                    Cliente: <strong style="color:var(--text);font-weight:600;">{c.company}</strong>
-                  </>
-                ) : (
-                  <span>Cliente por confirmar</span>
-                )}
+                {c.company ? <>Cliente: <strong style="color:var(--text);">{c.company}</strong></> : <span>Cliente por confirmar</span>}
               </p>
               {c.description && <p class="meta" style="margin:0;">{c.description}</p>}
-              {c.domains?.length > 0 && (
-                <ul class="domains">
-                  {c.domains.map((d) => (
-                    <li>
-                      <a href={`https://${d}`} rel="noopener noreferrer" target="_blank">
-                        {d}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div class="modules" aria-label="Módulos">
-                {c.modules.length ? (
-                  c.modules.map((m) => <span class="mod-chip">{m}</span>)
-                ) : (
-                  <span class="meta">Módulos en definición (migración)</span>
-                )}
+              <div class="modules">
+                {c.modules.slice(0, 6).map((m) => <span class="mod-chip">{m}</span>)}
               </div>
-            </article>
+            </a>
           ))
         }
-      </div>
-    </div>
-  </section>
-
-  <section id="avances">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Avances recientes</h2>
-        <p>
-          Resumen público de alto nivel sobre cambios en la plataforma.
-          Sin hashes ni detalle interno.
-        </p>
-      </div>
-      <ol class="timeline">
-        {
-          activity.map((item) => (
-            <li>
-              <time datetime={item.date}>{item.date}</time>
-              <p class="summary">{item.summary}</p>
-              <span class="mod-chip">{item.module}</span>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
-  </section>
-
-  <section id="orquestacion">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Cómo orquestamos</h2>
-        <p>
-          Cada cambio en el backend se evalúa contra el mapa de consumidores
-          antes de llegar a producción, con despliegue continuo coordinado.
-        </p>
-      </div>
-      <div class="steps">
-        <article class="step">
-          <h3>Reporte de impacto</h3>
-          <p>
-            Cada pull request del backend genera un reporte automático sobre
-            las aplicaciones que usan los módulos afectados.
-          </p>
-        </article>
-        <article class="step">
-          <h3>Ajustes por aplicación</h3>
-          <p>
-            Se coordinan cambios de contrato, tipado o interfaz en cada
-            producto impactado, según la severidad del reporte.
-          </p>
-        </article>
-        <article class="step">
-          <h3>Promoción conjunta</h3>
-          <p>
-            Backend y aplicaciones se promueven en conjunto cuando el impacto
-            está cubierto, manteniendo la coherencia del despliegue continuo.
-          </p>
-        </article>
       </div>
     </div>
   </section>

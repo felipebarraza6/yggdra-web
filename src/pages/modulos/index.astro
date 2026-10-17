@@ -1,0 +1,46 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Rune from "../../components/Rune.astro";
+import { allModuleIds, projectsForModule } from "../../lib/data";
+
+const base = import.meta.env.BASE_URL;
+const rows = allModuleIds.map((m) => ({
+  id: m,
+  apps: projectsForModule(m).length,
+}));
+---
+
+<BaseLayout
+  title="Tronco — módulos | Yggdra Platform"
+  description="Módulos de Yggdra Platform y las aplicaciones que los consumen."
+>
+  <section class="page-hero">
+    <div class="wrap">
+      <ul class="breadcrumbs">
+        <li><a href={base}>Inicio</a> /</li>
+        <li>Módulos</li>
+      </ul>
+      <p class="section-kicker"><Rune name="ansuz" /> Tronco</p>
+      <h1>Módulos de la plataforma</h1>
+      <p style="color:var(--text-muted);max-width:40rem;margin:0;">
+        Capas reutilizables del contrato OpenAPI. Cada módulo enlaza a las
+        ramas que lo utilizan.
+      </p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="wrap grid-cards">
+      {
+        rows.map((r) => (
+          <a class="product-card glass" href={`${base}modulos/${encodeURIComponent(r.id)}/`}>
+            <h3 style="font-family:var(--font-mono);font-size:1.05rem;">{r.id}</h3>
+            <p class="meta" style="margin:0;">
+              {r.apps} {r.apps === 1 ? "aplicación" : "aplicaciones"}
+            </p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,200 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Rune from "../../components/Rune.astro";
+import {
+  projects,
+  getProject,
+  activityForModules,
+  githubForProject,
+} from "../../lib/data";
+
+export function getStaticPaths() {
+  return projects.map((p) => ({ params: { id: p.id } }));
+}
+
+const { id } = Astro.params;
+const project = getProject(id!);
+if (!project) {
+  throw new Error(`App no encontrada: ${id}`);
+}
+
+const base = import.meta.env.BASE_URL;
+const related = activityForModules(project.modules, 10);
+const gh = githubForProject(project);
+const title = `${project.product || project.name} | Yggdra Platform`;
+const description =
+  project.description ||
+  `Aplicación ${project.product || project.name} sobre Yggdra Platform.`;
+
+// Diagrama simple app → módulos
+const mods = project.modules;
+const svgH = Math.max(220, 48 + mods.length * 36);
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="page-hero">
+    <div class="wrap">
+      <ul class="breadcrumbs">
+        <li><a href={base}>Inicio</a> /</li>
+        <li><a href={`${base}apps/`}>Ramas</a> /</li>
+        <li>{project.product || project.name}</li>
+      </ul>
+      <p class="section-kicker"><Rune name="raidho" /> Rama</p>
+      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;">
+        <h1 style="margin:0;">{project.product || project.name}</h1>
+        <span class="badge" data-status={project.statusLabel}>{project.statusLabel}</span>
+      </div>
+      <p style="color:var(--text-muted);max-width:40rem;margin:0.75rem 0 0;">
+        {project.description || "Aplicación consumidora de Yggdra Platform."}
+      </p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="wrap two-col">
+      <div class="glass panel">
+        <h2 style="margin:0 0 0.75rem;font-family:var(--font-display);font-size:1.25rem;">Qué es</h2>
+        <dl style="margin:0;display:grid;gap:0.65rem;">
+          <div>
+            <dt style="color:var(--text-muted);font-size:0.85rem;">Cliente</dt>
+            <dd style="margin:0;font-weight:600;">{project.company || "Por confirmar"}</dd>
+          </div>
+          <div>
+            <dt style="color:var(--text-muted);font-size:0.85rem;">Estado</dt>
+            <dd style="margin:0;">{project.statusLabel}</dd>
+          </div>
+          <div>
+            <dt style="color:var(--text-muted);font-size:0.85rem;">Contrato</dt>
+            <dd style="margin:0;">{project.contract?.label || "Consumo del contrato público"}</dd>
+          </div>
+          {
+            project.domains?.length > 0 && (
+              <div>
+                <dt style="color:var(--text-muted);font-size:0.85rem;">Dominios públicos</dt>
+                <dd style="margin:0;">
+                  <ul style="margin:0;padding:0;list-style:none;">
+                    {project.domains.map((d) => (
+                      <li>
+                        <a href={`https://${d}`} rel="noopener noreferrer" target="_blank">{d}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+      </div>
+
+      <div class="glass panel">
+        <h2 style="margin:0 0 0.75rem;font-family:var(--font-display);font-size:1.25rem;">Módulos del tronco</h2>
+        <div class="diagram-wrap">
+          <svg class="diagram" viewBox={`0 0 360 ${svgH}`} role="img" aria-label="Módulos usados por la aplicación">
+            <rect class="node-strong" x="20" y={svgH / 2 - 24} width="120" height="48" rx="12"></rect>
+            <text x="80" y={svgH / 2 + 5} text-anchor="middle" font-size="12" font-weight="600">
+              {(project.product || project.name).slice(0, 14)}
+            </text>
+            {
+              mods.map((m, i) => {
+                const y = 28 + i * 36;
+                return (
+                  <g>
+                    <path class="edge" d={`M140 ${svgH / 2} L200 ${y + 12}`}></path>
+                    <a href={`${base}modulos/${encodeURIComponent(m)}/`}>
+                      <rect class="node" x="200" y={y} width="140" height="28" rx="8"></rect>
+                      <text x="270" y={y + 18} text-anchor="middle" font-size="11">{m}</text>
+                    </a>
+                  </g>
+                );
+              })
+            }
+          </svg>
+        </div>
+        {
+          mods.length === 0 && (
+            <p style="color:var(--text-muted);margin:0;">Módulos en definición (migración).</p>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Cómo consume el contrato</h2>
+        <p>
+          Estilo de integración declarado en el inventario público.
+          Sin rutas internas ni detalle de implementación.
+        </p>
+      </div>
+      <div class="glass panel">
+        <p style="margin:0;">
+          <strong>{project.contract?.style}</strong>
+          — {project.contract?.label}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Cambios recientes que la afectan</h2>
+            <p>Entradas de actividad cuyos módulos intersectan con esta aplicación.</p>
+          </div>
+          <ol class="timeline">
+            {related.map((item) => (
+              <li>
+                <time datetime={item.date}>{item.date}</time>
+                <p class="summary">{item.summary}</p>
+                <a class="mod-chip" href={`${base}modulos/${encodeURIComponent(item.module)}/`}>
+                  {item.module}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    gh && (
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Señal pública del repositorio</h2>
+            <p>Metadatos del repo público asociado, cuando existe.</p>
+          </div>
+          <div class="glass panel">
+            <p style="margin:0 0 0.5rem;">
+              <a href={`https://github.com/${gh.fullName}`} rel="noopener noreferrer" target="_blank">
+                {gh.fullName}
+              </a>
+              {gh.language && <> · {gh.language}</>}
+            </p>
+            {gh.description && <p style="margin:0 0 0.75rem;color:var(--text-muted);">{gh.description}</p>}
+            {gh.updatedAt && (
+              <p style="margin:0;font-size:0.9rem;color:var(--text-muted);">
+                Última actualización pública: {String(gh.updatedAt).slice(0, 10)}
+              </p>
+            )}
+            {gh.commits?.length > 0 && (
+              <ol class="timeline" style="margin-top:1rem;">
+                {gh.commits.slice(0, 5).map((c) => (
+                  <li>
+                    <time datetime={c.date}>{c.date}</time>
+                    <p class="summary">{c.summary}</p>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>

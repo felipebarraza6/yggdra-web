@@ -1,0 +1,72 @@
+---
+interface Item {
+  date: string;
+  summary: string;
+  module: string;
+}
+interface Props {
+  items: Item[];
+}
+const { items } = Astro.props;
+
+const byModule = new Map<string, number>();
+for (const it of items) {
+  byModule.set(it.module, (byModule.get(it.module) || 0) + 1);
+}
+const moduleRows = [...byModule.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 10);
+const maxMod = Math.max(...moduleRows.map(([, n]) => n), 1);
+
+function weekKey(date: string) {
+  const d = new Date(date + "T12:00:00Z");
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const week = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
+const byWeek = new Map<string, number>();
+for (const it of items) {
+  const k = weekKey(it.date);
+  byWeek.set(k, (byWeek.get(k) || 0) + 1);
+}
+const weekRows = [...byWeek.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+const maxWeek = Math.max(...weekRows.map(([, n]) => n), 1);
+---
+
+<div class="two-col">
+  <div class="glass panel">
+    <h3 style="margin:0 0 1rem;font-family:var(--font-display);font-size:1.1rem;">Cambios por módulo</h3>
+    <div class="chart-bars" role="img" aria-label="Gráfico de cambios por módulo">
+      {
+        moduleRows.map(([mod, n]) => (
+          <div class="chart-row">
+            <span class="label">{mod}</span>
+            <div class="bar-track" title={`${n} cambios`}>
+              <div class="bar-fill" style={`width:${(n / maxMod) * 100}%`}></div>
+            </div>
+            <span class="val">{n}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  <div class="glass panel">
+    <h3 style="margin:0 0 1rem;font-family:var(--font-display);font-size:1.1rem;">Cambios por semana</h3>
+    <div class="chart-bars" role="img" aria-label="Gráfico de cambios por semana">
+      {
+        weekRows.map(([week, n]) => (
+          <div class="chart-row">
+            <span class="label">{week}</span>
+            <div class="bar-track" title={`${n} cambios`}>
+              <div class="bar-fill" style={`width:${(n / maxWeek) * 100}%`}></div>
+            </div>
+            <span class="val">{n}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>

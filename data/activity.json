@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedNote": "Avances recientes del backend Yggdra, en lenguaje llano.",
+  "generatedNote": "Avances recientes de Yggdra Platform, en lenguaje llano.",
   "items": [
     {
       "date": "2026-10-17",
@@ -126,6 +126,31 @@
       "date": "2026-10-12",
       "summary": "Bugs Frig B1/B3/B4/B5/B6 — sesiones concurrentes y dashboard",
       "module": "shared"
+    },
+    {
+      "date": "2026-10-12",
+      "summary": "Actualización de la plataforma",
+      "module": "support"
+    },
+    {
+      "date": "2026-10-12",
+      "summary": "Keep ticket category contract non-breaking (relax at runtime only)",
+      "module": "support"
+    },
+    {
+      "date": "2026-10-12",
+      "summary": "Self-service de tickets Frig sin exigir config",
+      "module": "support"
+    },
+    {
+      "date": "2026-10-12",
+      "summary": "Cerrar gaps auditoría reglas configurables",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-11",
+      "summary": "Bajar minutos con gate light por tree SHA y un solo job",
+      "module": "infra"
     }
   ]
 }

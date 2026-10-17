@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Rune from "../../components/Rune.astro";
+import { projects } from "../../lib/data";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="Ramas — aplicaciones | Yggdra Platform"
+  description="Inventario público de aplicaciones que consumen Yggdra Platform."
+>
+  <section class="page-hero">
+    <div class="wrap">
+      <ul class="breadcrumbs">
+        <li><a href={base}>Inicio</a> /</li>
+        <li>Ramas</li>
+      </ul>
+      <p class="section-kicker"><Rune name="raidho" /> Ramas</p>
+      <h1>Aplicaciones sobre Yggdra</h1>
+      <p style="color:var(--text-muted);max-width:40rem;margin:0;">
+        Cada rama es un producto que se apoya en módulos del tronco. Estado,
+        cliente visible y contrato de consumo, sin detalle interno.
+      </p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="wrap grid-cards">
+      {
+        projects.map((c) => (
+          <a class="product-card glass" href={`${base}apps/${c.id}/`}>
+            <div style="display:flex;justify-content:space-between;gap:0.5rem;align-items:flex-start;">
+              <h3>{c.product || c.name}</h3>
+              <span class="badge" data-status={c.statusLabel}>{c.statusLabel}</span>
+            </div>
+            <p class="meta">
+              {c.company ? (
+                <>
+                  Cliente: <strong style="color:var(--text);">{c.company}</strong>
+                </>
+              ) : (
+                <span>Cliente por confirmar</span>
+              )}
+            </p>
+            {c.description && <p class="meta" style="margin:0;">{c.description}</p>}
+            <div class="modules">
+              {c.modules.slice(0, 8).map((m) => (
+                <span class="mod-chip">{m}</span>
+              ))}
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
