@@ -36,9 +36,7 @@
       "status": "active",
       "statusLabel": "activa",
       "domains": [
-        "frig.yggdra.cl",
-        "intranet.macanuobowl.cl",
-        "mani.agenciapatagoniachile.com"
+        "frig.yggdra.cl"
       ],
       "modules": [
         "accounts",
@@ -53,7 +51,7 @@
         "tables",
         "promotions"
       ],
-      "company": "Macanu Bowl · Maní",
+      "company": "Macanuo Bowl · Maní",
       "product": "Frig",
       "description": "POS gastronómico white-label multi-sucursal."
     },

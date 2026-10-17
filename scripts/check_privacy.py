@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 
-# Patrones exactos pedidos + dominios internos de API/staging.
+# Patrones exactos pedidos + dominios internos de API/staging / intranets.
 PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("IP", re.compile(r"\b\d{1,3}(?:\.\d{1,3}){3}\b")),
     ("@", re.compile(r"@")),
@@ -22,8 +22,9 @@ PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("api/apps", re.compile(r"api/apps", re.I)),
     ("src/", re.compile(r"src/", re.I)),
     ("agents-api.*", re.compile(r"agents-api\.", re.I)),
-    ("api.agenciapatagoniachile.com", re.compile(r"api\.agenciapatagoniachile\.com", re.I)),
     ("api.smarthydro.app", re.compile(r"api\.smarthydro\.app", re.I)),
+    ("intranet", re.compile(r"intranet", re.I)),
+    ("agenciapatagoniachile", re.compile(r"agenciapatagoniachile", re.I)),
 ]
 
 

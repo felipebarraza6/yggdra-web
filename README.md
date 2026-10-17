@@ -54,7 +54,7 @@ Este repo es público. **Prohibido** publicar:
 
 - Código del backend, rutas `api/apps/**` o `src/**`
 - Variables de entorno, IPs, tokens, correos
-- Dominios internos de API/staging (`agents-api.*`, `api.agenciapatagoniachile.com`, `api.smarthydro.app`, etc.)
+- Dominios internos de API/staging (`agents-api.*`, `api.smarthydro.app`, etc.), cualquier host con `intranet` o `agenciapatagoniachile`, e intranets de clientes
 - IDs de organizaciones/sucursales o datos de clientes finales
 
 **Sí** se puede: nombre de producto, empresa, dominio público de app en producción, estado (`activa` / `en migración` / `legado`) y nombres de módulo (`accounts`, `recipes`, `iot-telemetry`, …).

@@ -30,19 +30,19 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 
 # Dominios públicos de apps en producción (permitidos). Todo lo demás se filtra.
+# No incluir intranets de clientes ni dominios de agencia/API.
 PUBLIC_APP_DOMAINS = {
     "frig.yggdra.cl",
-    "intranet.macanuobowl.cl",
-    "mani.agenciapatagoniachile.com",
     "cauce.smartapr.cl",
     "90dias.habitofirme.app",
 }
 
 FORBIDDEN_DOMAIN_FRAGMENTS = (
     "agents-api.",
-    "api.agenciapatagoniachile.com",
     "api.smarthydro.app",
     "api.yggdra.cl",
+    "intranet",
+    "agenciapatagoniachile",
 )
 
 STATUS_ES = {
