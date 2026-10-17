@@ -7,11 +7,13 @@ interface Props {
 }
 
 const {
-  title = "Yggdra — backend transversal",
-  description = "Portafolio vivo del backend Yggdra: productos, clientes y módulos que impulsan muchas apps.",
+  title = "Yggdra — plataforma backend multi-tenant",
+  description = "Yggdra es una plataforma backend transversal multi-tenant: módulos reutilizables, contrato OpenAPI, aislamiento por organización y sucursal, y orquestación de cambios con despliegue continuo.",
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
+const canonical = new URL(base, Astro.site).href;
+const ogImage = new URL("favicon.svg", canonical).href;
 ---
 
 <!doctype html>
@@ -22,6 +24,17 @@ const base = import.meta.env.BASE_URL;
     <meta name="description" content={description} />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0c0f14" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:site_name" content="Yggdra" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,7 +50,7 @@ const base = import.meta.env.BASE_URL;
       <div class="wrap nav">
         <a class="brand" href={`${base}`}>
           Yggdra
-          <span>backend transversal</span>
+          <span>plataforma</span>
         </a>
         <nav aria-label="Principal">
           <ul class="nav-links">
@@ -56,10 +69,9 @@ const base = import.meta.env.BASE_URL;
     <footer class="site-footer">
       <div class="wrap">
         <p>
-          <strong>Yggdra</strong> es un backend privado de
-          <strong>Felipe Barraza</strong>, desarrollador independiente.
-          Este sitio es un portafolio público: muestra productos, clientes y
-          módulos, no el código ni la infraestructura interna.
+          <strong>Yggdra</strong> es una plataforma backend privada.
+          Este sitio publica el portafolio de productos, clientes y módulos
+          que la consumen, sin exponer código ni infraestructura interna.
         </p>
         <p>
           Código de esta web:

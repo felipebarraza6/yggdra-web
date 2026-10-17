@@ -24,8 +24,8 @@ const base = import.meta.env.BASE_URL;
     <div class="wrap hero-inner">
       <h1>Yggdra</h1>
       <p class="lede">
-        Un backend transversal que da vida a muchos productos para muchos
-        clientes: un solo núcleo, muchas apps.
+        Plataforma backend transversal multi-tenant: un núcleo compartido,
+        módulos reutilizables y muchas aplicaciones sobre el mismo contrato.
       </p>
       <div class="cta-row">
         <a class="btn btn-primary" href={`${base}#mapa`}>Ver mapa de módulos</a>
@@ -37,15 +37,33 @@ const base = import.meta.env.BASE_URL;
   <section id="modelo">
     <div class="wrap">
       <div class="section-head">
-        <h2>Qué es Yggdra</h2>
+        <h2>Modelo de plataforma</h2>
         <p>
-          Yggdra es la API Django multi-sucursal de Felipe Barraza. No es un
-          producto único: es la capa común —cuentas, sucursales, ventas,
-          finanzas, telemetría, coaching y más— sobre la que corren POS
-          gastronómicos, agua potable rural, apps de entrenadores y paneles IoT.
+          Yggdra concentra la lógica de negocio en un backend multi-tenant con
+          aislamiento por organización y sucursal. Las aplicaciones consumen
+          módulos reutilizables a través de un contrato OpenAPI versionado,
+          con orquestación de cambios y despliegue continuo.
         </p>
       </div>
-      <div class="panel" style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));text-align:center;">
+      <div class="panel model-points" role="list">
+        <div role="listitem">
+          <h3>Multi-tenant</h3>
+          <p>Aislamiento por organización y sucursal en un mismo núcleo.</p>
+        </div>
+        <div role="listitem">
+          <h3>Módulos reutilizables</h3>
+          <p>Cuentas, sucursales, ventas, finanzas, telemetría y más, según cada producto.</p>
+        </div>
+        <div role="listitem">
+          <h3>Contrato OpenAPI</h3>
+          <p>Interfaz estable entre el backend y las aplicaciones consumidoras.</p>
+        </div>
+        <div role="listitem">
+          <h3>Despliegue continuo</h3>
+          <p>Cambios orquestados con reporte de impacto y promoción coordinada.</p>
+        </div>
+      </div>
+      <div class="panel stats-panel" style="margin-top:1rem;display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));text-align:center;">
         <div>
           <div style="font-family:var(--font-display);font-size:2rem;color:var(--accent-strong);">{counts.total}</div>
           <div style="color:var(--text-muted);font-size:0.9rem;">apps consumidoras</div>
@@ -71,8 +89,9 @@ const base = import.meta.env.BASE_URL;
       <div class="section-head">
         <h2>Mapa app ↔ módulos</h2>
         <p>
-          Qué producto usa qué parte de Yggdra. Cambia entre matriz y grafo;
-          filtra por nombre o estado.
+          Relación entre cada aplicación consumidora y los módulos de Yggdra
+          que utiliza. Disponible como matriz o grafo, con filtros por nombre
+          y estado.
         </p>
       </div>
       <ModuleMap consumers={consumers} modules={modules} />
@@ -84,8 +103,8 @@ const base = import.meta.env.BASE_URL;
       <div class="section-head">
         <h2>Productos y clientes</h2>
         <p>
-          Fichas públicas: nombre del producto, empresa visible cuando se
-          conoce, estado y módulos que consume.
+          Inventario público de productos que operan sobre Yggdra: cliente
+          visible cuando corresponde, estado operativo y módulos consumidos.
         </p>
       </div>
       <div class="grid-cards">
@@ -136,7 +155,7 @@ const base = import.meta.env.BASE_URL;
       <div class="section-head">
         <h2>Avances recientes</h2>
         <p>
-          Resumen de alto nivel de cambios en el backend, en lenguaje llano.
+          Resumen público de alto nivel sobre cambios en la plataforma.
           Sin hashes ni detalle interno.
         </p>
       </div>
@@ -159,30 +178,30 @@ const base = import.meta.env.BASE_URL;
       <div class="section-head">
         <h2>Cómo orquestamos</h2>
         <p>
-          Cada cambio del backend se mira contra el mapa de consumidores antes
-          de llegar a producción.
+          Cada cambio en el backend se evalúa contra el mapa de consumidores
+          antes de llegar a producción, con despliegue continuo coordinado.
         </p>
       </div>
       <div class="steps">
         <article class="step">
-          <h3>Impacto automático</h3>
+          <h3>Reporte de impacto</h3>
           <p>
-            Cada PR del backend genera un reporte de impacto sobre las apps
-            que usan los módulos tocados.
+            Cada pull request del backend genera un reporte automático sobre
+            las aplicaciones que usan los módulos afectados.
           </p>
         </article>
         <article class="step">
-          <h3>Ajustes por app</h3>
+          <h3>Ajustes por aplicación</h3>
           <p>
-            Se coordinan cambios de contrato, tipos o pantallas en cada
-            producto afectado —Frig, Cauce, Forja, Proyecto 90 y el resto.
+            Se coordinan cambios de contrato, tipado o interfaz en cada
+            producto impactado, según la severidad del reporte.
           </p>
         </article>
         <article class="step">
           <h3>Promoción conjunta</h3>
           <p>
-            Backend y fronts se promueven en conjunto cuando el impacto está
-            cubierto, para que nadie quede a medias.
+            Backend y aplicaciones se promueven en conjunto cuando el impacto
+            está cubierto, manteniendo la coherencia del despliegue continuo.
           </p>
         </article>
       </div>

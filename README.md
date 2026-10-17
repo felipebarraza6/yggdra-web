@@ -1,20 +1,20 @@
 # Yggdra Web
 
-Sitio público del **backend transversal Yggdra**: portafolio vivo de productos, clientes y módulos.
+Sitio público de la **plataforma Yggdra**: portafolio vivo de productos, clientes y módulos sobre un backend transversal multi-tenant.
 
 - URL: https://felipebarraza6.github.io/yggdra-web/
 - Repo: público (este)
 - Backend: **privado** (`felipebarraza6/yggdra_infra`) — no se publica código, rutas internas, secretos ni dominios de API/staging
 
-Todo el texto visible está en **español de Chile**.
+Todo el texto visible está en **español de Chile** (registro neutro).
 
 ## Qué hay en el sitio
 
-1. Portada — qué es Yggdra y el modelo multi-producto  
+1. Portada — modelo de plataforma (multi-tenant, OpenAPI, orquestación, despliegue continuo)  
 2. Mapa interactivo app ↔ módulos (matriz / grafo)  
 3. Fichas por producto y cliente  
-4. Timeline de avances recientes del backend  
-5. «Cómo orquestamos» — impacto automático por PR → ajustes por app → promoción conjunta  
+4. Timeline de avances recientes  
+5. Orquestación — reporte de impacto automático → ajustes por app → promoción conjunta  
 
 ## Datos públicos
 
@@ -88,7 +88,7 @@ Apps con `company` vacío en `data/clients.json` (no inventar):
 - Yggdra Agents  
 - App Smoking APR (legado)  
 
-También mencionado en el relato de productos pero **aún no** en el inventario público: **Andean Labs** (web de cliente). Agregarlo cuando exista entrada clara en el inventario.
+También pendiente de inventario público: **Andean Labs**. Agregarlo cuando exista entrada clara.
 
 ## Stack
 
