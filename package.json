@@ -8,10 +8,13 @@
     "build": "astro build",
     "preview": "astro preview",
     "data": "python3 scripts/build_public_data.py",
+    "sync:github": "python3 scripts/fetch_github_public.py",
     "privacy": "python3 scripts/check_privacy.py",
     "check": "python3 scripts/check_privacy.py && astro check"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/literata": "^5.3.0",
     "astro": "^4.16.18"
   },
   "engines": {

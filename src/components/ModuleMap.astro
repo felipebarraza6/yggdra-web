@@ -12,10 +12,11 @@ interface Consumer {
 interface Props {
   consumers: Consumer[];
   modules: string[];
+  base?: string;
 }
 
-const { consumers, modules } = Astro.props;
-const payload = JSON.stringify({ consumers, modules });
+const { consumers, modules, base = import.meta.env.BASE_URL } = Astro.props;
+const payload = JSON.stringify({ consumers, modules, base });
 ---
 
 <div class="map-root" data-map={payload}>
@@ -39,7 +40,7 @@ const payload = JSON.stringify({ consumers, modules });
     </label>
   </div>
 
-  <div class="matrix-wrap" data-panel="matrix" role="region" aria-label="Matriz apps y módulos" tabindex="0">
+  <div class="matrix-wrap glass" data-panel="matrix" role="region" aria-label="Matriz apps y módulos" tabindex="0">
     <table class="matrix">
       <thead>
         <tr>
@@ -51,27 +52,13 @@ const payload = JSON.stringify({ consumers, modules });
     </table>
   </div>
 
-  <div class="graph-wrap hidden" data-panel="graph" role="region" aria-label="Grafo apps y módulos">
+  <div class="graph-wrap glass hidden" data-panel="graph" role="region" aria-label="Grafo apps y módulos">
     <svg data-graph viewBox="0 0 920 480" role="img" aria-labelledby="graph-title">
       <title id="graph-title">Relación entre apps y módulos de Yggdra</title>
     </svg>
   </div>
   <p class="visually-hidden" id="map-live" aria-live="polite"></p>
 </div>
-
-<style>
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-</style>
 
 <script>
   type Consumer = {
@@ -89,6 +76,7 @@ const payload = JSON.stringify({ consumers, modules });
     const data = JSON.parse(root.dataset.map || "{}") as {
       consumers: Consumer[];
       modules: string[];
+      base: string;
     };
     const body = root.querySelector("[data-matrix-body]") as HTMLElement;
     const filterInput = root.querySelector("[data-filter]") as HTMLInputElement;
@@ -99,6 +87,7 @@ const payload = JSON.stringify({ consumers, modules });
       matrix: root.querySelector('[data-panel="matrix"]') as HTMLElement,
       graph: root.querySelector('[data-panel="graph"]') as HTMLElement,
     };
+    const base = data.base || "/";
 
     function label(c: Consumer) {
       return c.product || c.name;
@@ -127,7 +116,8 @@ const payload = JSON.stringify({ consumers, modules });
             })
             .join("");
           const company = c.company ? ` · ${c.company}` : "";
-          return `<tr data-id="${c.id}"><th scope="row">${label(c)}${company}</th>${cells}</tr>`;
+          const href = `${base}apps/${c.id}/`;
+          return `<tr data-id="${c.id}"><th scope="row"><a href="${href}">${label(c)}</a>${company}</th>${cells}</tr>`;
         })
         .join("");
       live.textContent = `${rows.length} apps en la matriz.`;
@@ -161,14 +151,14 @@ const payload = JSON.stringify({ consumers, modules });
         .map((c, i) => {
           const y = appYs[i];
           const t = label(c).slice(0, 22);
-          return `<g data-app="${c.id}"><rect class="node-app" x="${appX - 70}" y="${y - 12}" width="140" height="24" rx="8"/><text x="${appX}" y="${y + 4}" text-anchor="middle">${t}</text></g>`;
+          return `<a href="${base}apps/${c.id}/"><g data-app="${c.id}"><rect class="node-app" x="${appX - 70}" y="${y - 12}" width="140" height="24" rx="8"/><text x="${appX}" y="${y + 4}" text-anchor="middle">${t}</text></g></a>`;
         })
         .join("");
 
       const modNodes = mods
         .map((m, i) => {
           const y = modYs[i];
-          return `<g data-mod="${m}"><rect class="node-mod" x="${modX - 70}" y="${y - 12}" width="140" height="24" rx="8"/><text x="${modX}" y="${y + 4}" text-anchor="middle">${m}</text></g>`;
+          return `<a href="${base}modulos/${encodeURIComponent(m)}/"><g data-mod="${m}"><rect class="node-mod" x="${modX - 70}" y="${y - 12}" width="140" height="24" rx="8"/><text x="${modX}" y="${y + 4}" text-anchor="middle">${m}</text></g></a>`;
         })
         .join("");
 

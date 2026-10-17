@@ -1,0 +1,21 @@
+---
+---
+
+<div class="diagram-wrap glass panel">
+  <svg class="diagram" viewBox="0 0 720 280" role="img" aria-labelledby="tenant-title">
+    <title id="tenant-title">Aislamiento por organización y sucursal</title>
+    <rect class="node-strong" x="40" y="30" width="640" height="220" rx="18"/>
+    <text x="360" y="58" text-anchor="middle" font-size="14" font-weight="600">Organización</text>
+    <text class="muted" x="360" y="78" text-anchor="middle" font-size="11">límite de tenant · identidad · permisos</text>
+
+    <rect class="node" x="70" y="110" width="260" height="110" rx="14"/>
+    <text x="200" y="145" text-anchor="middle" font-size="13" font-weight="600">Sucursal A</text>
+    <text class="muted" x="200" y="168" text-anchor="middle" font-size="11">datos y operaciones</text>
+    <text class="muted" x="200" y="188" text-anchor="middle" font-size="11">aislados en contexto</text>
+
+    <rect class="node" x="390" y="110" width="260" height="110" rx="14"/>
+    <text x="520" y="145" text-anchor="middle" font-size="13" font-weight="600">Sucursal B</text>
+    <text class="muted" x="520" y="168" text-anchor="middle" font-size="11">mismo contrato API</text>
+    <text class="muted" x="520" y="188" text-anchor="middle" font-size="11">contexto distinto</text>
+  </svg>
+</div>

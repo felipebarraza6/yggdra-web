@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "updatedAt": "2026-10-17T22:10:06Z",
+  "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
+  "scope": "inventory-only",
+  "repos": [
+    {
+      "name": "frig",
+      "fullName": "felipebarraza6/frig",
+      "description": "FRIG - Punto de venta gastronómico multi-tenant white-label",
+      "language": "TypeScript",
+      "updatedAt": "2026-09-25T05:24:13Z",
+      "commits": [
+        {
+          "date": "2026-09-25",
+          "summary": "Merge de módulos backend + locales — los nuevos (salón 3D, bodegas, informes, etiquetas) siempre visibles"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Release: lint verde + salón 3D + landing"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Dejar el gate de lint en verde para el código 3D/KDS recuperado"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Dejar el gate de lint en verde para el código 3D/KDS recuperado"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Release: salón digital 3D + ecosistema de informes + landing renovada"
+        }
+      ]
+    },
+    {
+      "name": "muninn",
+      "fullName": "felipebarraza6/muninn",
+      "description": "Muninn - Agentes IA Especializados",
+      "language": "TypeScript",
+      "updatedAt": "2026-09-13T21:20:19Z",
+      "commits": [
+        {
+          "date": "2026-09-13",
+          "summary": "Muninn.yggdra.cl siempre muestra landing propio, no branded login"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "Usar FTP propio de Muninn (ftp.yggdra.cl) en CI"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "No-unused-expressions ternary in AgentChatCore"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "Prettier formatting"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "Merge branch 'production' into dev"
+        }
+      ]
+    },
+    {
+      "name": "gungir",
+      "fullName": "felipebarraza6/gungir",
+      "description": "Gungir — comercio general sobre Yggdra (landing + cotizador, Public/Local/Admin)",
+      "language": "TypeScript",
+      "updatedAt": "2026-09-19T04:41:53Z",
+      "commits": [
+        {
+          "date": "2026-09-19",
+          "summary": "Premium Frig-level UX — mark, live preview, demos, plans, contact"
+        },
+        {
+          "date": "2026-09-19",
+          "summary": "Product page like Frig — features and plans for end customers"
+        },
+        {
+          "date": "2026-09-19",
+          "summary": "Remove Yggdra from client-facing landing copy"
+        },
+        {
+          "date": "2026-09-19",
+          "summary": "Gungir as general product; cotizador demo is separate Pages site"
+        },
+        {
+          "date": "2026-09-19",
+          "summary": "Landing completa, login Yggdra, Local/Admin/Cuenta operativos"
+        }
+      ]
+    },
+    {
+      "name": "cotizador-oro",
+      "fullName": "felipebarraza6/cotizador-oro",
+      "description": "Landing cotizador oro (prototipo cliente) — consume Yggdra /api/public/*",
+      "language": "TypeScript",
+      "updatedAt": "2026-09-19T04:33:15Z",
+      "commits": [
+        {
+          "date": "2026-09-19",
+          "summary": "Client-facing copy shows Gungir only, no Yggdra"
+        },
+        {
+          "date": "2026-09-19",
+          "summary": "Initial commit: landing cotizador oro for GitHub Pages"
+        }
+      ]
+    },
+    {
+      "name": "heir",
+      "fullName": "felipebarraza6/heir",
+      "description": "HEIR - plataforma de agenda, pagos y agente conversacional para profesionales de la salud",
+      "language": "TypeScript",
+      "updatedAt": "2026-09-04T23:58:27Z",
+      "commits": [
+        {
+          "date": "2026-09-04",
+          "summary": "README con contrato Yggdra, roles y configuración pre-producción"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Panel profesional (finanzas reales), admin multi-sucursal y routing por rol"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Sesión con roles (superadmin/profesional/paciente) y login real"
+        },
+        {
+          "date": "2026-08-12",
+          "summary": "Init: HEIR demo scaffold with React, Vite and Tailwind"
+        }
+      ]
+    },
+    {
+      "name": "nxord",
+      "fullName": "felipebarraza6/nxord",
+      "description": null,
+      "language": "TypeScript",
+      "updatedAt": "2026-09-05T00:10:02Z",
+      "commits": [
+        {
+          "date": "2026-09-05",
+          "summary": "Remove binary probe"
+        },
+        {
+          "date": "2026-09-05",
+          "summary": "Binary probe (temporary, will be deleted)"
+        },
+        {
+          "date": "2026-09-05",
+          "summary": "Add Home page"
+        },
+        {
+          "date": "2026-09-05",
+          "summary": "Add Alertas page"
+        },
+        {
+          "date": "2026-09-05",
+          "summary": "Add Dispositivos page"
+        }
+      ]
+    },
+    {
+      "name": "nereus_smarthydro",
+      "fullName": "felipebarraza6/nereus_smarthydro",
+      "description": null,
+      "language": "JavaScript",
+      "updatedAt": "2026-10-10T03:41:11Z",
+      "commits": [
+        {
+          "date": "2026-10-10",
+          "summary": "Export from Grok"
+        }
+      ]
+    },
+    {
+      "name": "yggdra-web",
+      "fullName": "felipebarraza6/yggdra-web",
+      "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
+      "language": "Astro",
+      "updatedAt": "2026-10-17T21:57:18Z",
+      "commits": [
+        {
+          "date": "2026-10-17",
+          "summary": "Copy: presentar Yggdra como plataforma corporativa"
+        },
+        {
+          "date": "2026-10-17",
+          "summary": "Sitio público Yggdra (GitHub Pages)"
+        },
+        {
+          "date": "2026-10-17",
+          "summary": "Initial commit"
+        }
+      ]
+    }
+  ]
+}

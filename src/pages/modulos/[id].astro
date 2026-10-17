@@ -1,0 +1,114 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Rune from "../../components/Rune.astro";
+import {
+  allModuleIds,
+  projectsForModule,
+  activityForModules,
+} from "../../lib/data";
+
+export function getStaticPaths() {
+  return allModuleIds.map((id) => ({ params: { id } }));
+}
+
+const { id } = Astro.params;
+const moduleId = id!;
+const apps = projectsForModule(moduleId);
+const related = activityForModules([moduleId], 12);
+const base = import.meta.env.BASE_URL;
+const svgH = Math.max(200, 48 + apps.length * 40);
+---
+
+<BaseLayout
+  title={`Módulo ${moduleId} | Yggdra Platform`}
+  description={`Aplicaciones que consumen el módulo ${moduleId} de Yggdra Platform.`}
+>
+  <section class="page-hero">
+    <div class="wrap">
+      <ul class="breadcrumbs">
+        <li><a href={base}>Inicio</a> /</li>
+        <li><a href={`${base}modulos/`}>Módulos</a> /</li>
+        <li>{moduleId}</li>
+      </ul>
+      <p class="section-kicker"><Rune name="ansuz" /> Módulo</p>
+      <h1 style="font-family:var(--font-mono);">{moduleId}</h1>
+      <p style="color:var(--text-muted);max-width:40rem;margin:0.5rem 0 0;">
+        Parte del tronco de Yggdra Platform. {apps.length}{" "}
+        {apps.length === 1 ? "aplicación lo consume" : "aplicaciones lo consumen"}.
+      </p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="wrap">
+      <div class="glass panel">
+        <h2 style="margin:0 0 0.75rem;font-family:var(--font-display);font-size:1.25rem;">
+          Ramas conectadas
+        </h2>
+        <div class="diagram-wrap">
+          <svg class="diagram" viewBox={`0 0 420 ${svgH}`} role="img" aria-label={`Apps que usan ${moduleId}`}>
+            <rect class="node-strong" x="20" y={svgH / 2 - 20} width="130" height="40" rx="10"></rect>
+            <text x="85" y={svgH / 2 + 5} text-anchor="middle" font-size="12" font-weight="600">{moduleId}</text>
+            {
+              apps.map((app, i) => {
+                const y = 24 + i * 40;
+                const label = (app.product || app.name).slice(0, 18);
+                return (
+                  <g>
+                    <path class="edge" d={`M150 ${svgH / 2} L210 ${y + 14}`}></path>
+                    <a href={`${base}apps/${app.id}/`}>
+                      <rect class="node" x="210" y={y} width="180" height="28" rx="8"></rect>
+                      <text x="300" y={y + 18} text-anchor="middle" font-size="11">{label}</text>
+                    </a>
+                  </g>
+                );
+              })
+            }
+          </svg>
+        </div>
+        {
+          apps.length === 0 && (
+            <p style="color:var(--text-muted);margin:0;">Ninguna app pública declara este módulo aún.</p>
+          )
+        }
+      </div>
+
+      <div class="grid-cards" style="margin-top:1rem;">
+        {
+          apps.map((c) => (
+            <a class="product-card glass" href={`${base}apps/${c.id}/`}>
+              <div style="display:flex;justify-content:space-between;gap:0.5rem;">
+                <h3>{c.product || c.name}</h3>
+                <span class="badge" data-status={c.statusLabel}>{c.statusLabel}</span>
+              </div>
+              <p class="meta" style="margin:0;">
+                {c.company || "Cliente por confirmar"}
+              </p>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Actividad reciente del módulo</h2>
+            <p>Cambios públicos asociados a este módulo.</p>
+          </div>
+          <ol class="timeline">
+            {related.map((item) => (
+              <li>
+                <time datetime={item.date}>{item.date}</time>
+                <p class="summary">{item.summary}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>

@@ -1,5 +1,11 @@
 ---
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/literata/600.css";
+import "@fontsource/literata/700.css";
 import "../styles/global.css";
+import Logo from "../components/Logo.astro";
 
 interface Props {
   title?: string;
@@ -7,13 +13,19 @@ interface Props {
 }
 
 const {
-  title = "Yggdra — plataforma backend multi-tenant",
-  description = "Yggdra es una plataforma backend transversal multi-tenant: módulos reutilizables, contrato OpenAPI, aislamiento por organización y sucursal, y orquestación de cambios con despliegue continuo.",
+  title = "Yggdra Platform — portafolio técnico",
+  description = "Página explicativa de Yggdra Platform: arquitectura multi-tenant, módulos, orquestación de cambios y las aplicaciones que la consumen.",
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
-const canonical = new URL(base, Astro.site).href;
-const ogImage = new URL("favicon.svg", canonical).href;
+const path = Astro.url.pathname;
+const canonical = new URL(path.replace(/\/$/, "") + "/", Astro.site).href;
+const ogImage = new URL("logo.svg", new URL(base, Astro.site)).href;
+
+function isCurrent(href: string) {
+  if (href === base || href === `${base}`) return path === base || path === `${base}` || path === "/";
+  return path.startsWith(href);
+}
 ---
 
 <!doctype html>
@@ -22,12 +34,12 @@ const ogImage = new URL("favicon.svg", canonical).href;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0c0f14" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#eef3f1" />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CL" />
-    <meta property="og:site_name" content="Yggdra" />
+    <meta property="og:site_name" content="Yggdra Platform" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -36,29 +48,27 @@ const ogImage = new URL("favicon.svg", canonical).href;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
     <title>{title}</title>
   </head>
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
     <header class="site-header">
       <div class="wrap nav">
-        <a class="brand" href={`${base}`}>
-          Yggdra
-          <span>plataforma</span>
+        <a class="brand" href={base}>
+          <Logo size={32} />
+          <span class="brand-text">
+            <strong>Yggdra Platform</strong>
+            <span>portafolio técnico</span>
+          </span>
         </a>
         <nav aria-label="Principal">
           <ul class="nav-links">
-            <li><a href={`${base}#modelo`}>Modelo</a></li>
-            <li><a href={`${base}#mapa`}>Mapa</a></li>
-            <li><a href={`${base}#productos`}>Productos</a></li>
-            <li><a href={`${base}#avances`}>Avances</a></li>
-            <li><a href={`${base}#orquestacion`}>Orquestación</a></li>
+            <li><a href={`${base}#raices`} aria-current={isCurrent(`${base}#raices`) ? "page" : undefined}>Raíces</a></li>
+            <li><a href={`${base}#tronco`}>Tronco</a></li>
+            <li><a href={`${base}apps/`}>Ramas</a></li>
+            <li><a href={`${base}#nornas`}>Nornas</a></li>
+            <li><a href={`${base}#bifrost`}>Bifröst</a></li>
+            <li><a href={`${base}modulos/`}>Módulos</a></li>
           </ul>
         </nav>
       </div>
@@ -69,14 +79,16 @@ const ogImage = new URL("favicon.svg", canonical).href;
     <footer class="site-footer">
       <div class="wrap">
         <p>
-          <strong>Yggdra</strong> es una plataforma backend privada.
-          Este sitio publica el portafolio de productos, clientes y módulos
-          que la consumen, sin exponer código ni infraestructura interna.
+          <strong>Yggdra Platform</strong> es una plataforma backend privada
+          multi-tenant. Este sitio explica su arquitectura y el inventario
+          público de aplicaciones que la consumen, sin exponer código ni
+          infraestructura interna.
         </p>
         <p>
           Código de esta web:
           <a href="https://github.com/felipebarraza6/yggdra-web">yggdra-web</a>.
         </p>
+        <p class="credit-foot">creado por Felipe Barraza</p>
       </div>
     </footer>
   </body>
