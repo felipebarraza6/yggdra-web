@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Yggdra">
+  <rect width="64" height="64" rx="14" fill="#0c0f14"/>
+  <path d="M32 10 L48 20 V40 L32 50 L16 40 V20 Z" fill="none" stroke="#3d9b8f" stroke-width="2.5"/>
+  <circle cx="32" cy="30" r="5" fill="#5bc4b6"/>
+  <path d="M32 35 V48 M24 28 L16 24 M40 28 L48 24" stroke="#5bc4b6" stroke-width="2" stroke-linecap="round"/>
+</svg>

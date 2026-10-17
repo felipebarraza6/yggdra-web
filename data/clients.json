@@ -1,0 +1,95 @@
+{
+  "_comment": "Mapeo editable app id → cliente/empresa visible. Dejar company vacío si no está claro. No inventar.",
+  "clients": {
+    "frig": {
+      "product": "Frig",
+      "company": "Macanuo Bowl · Maní",
+      "description": "POS gastronómico white-label multi-sucursal."
+    },
+    "nxrd_apr": {
+      "product": "Cauce",
+      "company": "SmartAPR",
+      "description": "Gestión de agua potable rural, cobros y telemetría."
+    },
+    "forja": {
+      "product": "Forja",
+      "company": "",
+      "description": "App para entrenadores personales y coaching."
+    },
+    "proyecto-90": {
+      "product": "Proyecto 90",
+      "company": "Hábito Firme",
+      "description": "Programa de hábitos y entrenamiento a 90 días."
+    },
+    "muninn": {
+      "product": "Muninn",
+      "company": "",
+      "description": "Estudio y agentes de IA sobre Yggdra."
+    },
+    "ikolu-void": {
+      "product": "Ikolu Void",
+      "company": "",
+      "description": "Agentes de IA y automatización."
+    },
+    "gungir": {
+      "product": "Gungir",
+      "company": "",
+      "description": "Comercio y cotizaciones."
+    },
+    "cotizador-oro": {
+      "product": "Cotizador de oro",
+      "company": "",
+      "description": "Cotizaciones públicas de oro."
+    },
+    "heir": {
+      "product": "HEIR",
+      "company": "",
+      "description": "Salud, agenda y pagos."
+    },
+    "nxord": {
+      "product": "Nxord",
+      "company": "SmartHydro",
+      "description": "Telemetría hídrica y alertas para APR."
+    },
+    "nereus_smarthydro": {
+      "product": "Nereus",
+      "company": "SmartHydro",
+      "description": "Panel operativo SmartHydro sobre Yggdra."
+    },
+    "agent_desktop": {
+      "product": "Agent Desktop",
+      "company": "SmartHydro",
+      "description": "Escritorio de agentes (migración a Yggdra)."
+    },
+    "agent_console": {
+      "product": "Agent Console",
+      "company": "SmartHydro",
+      "description": "Consola de agentes (migración a Yggdra)."
+    },
+    "erp_legacy_sh": {
+      "product": "ERP Legacy SmartHydro",
+      "company": "SmartHydro",
+      "description": "ERP legado en migración hacia Yggdra."
+    },
+    "smarthydro_agents": {
+      "product": "SmartHydro Agents",
+      "company": "SmartHydro",
+      "description": "Despliegue de agentes SmartHydro."
+    },
+    "yggdra_agents": {
+      "product": "Yggdra Agents",
+      "company": "",
+      "description": "Despliegue de agentes sobre la plataforma Yggdra."
+    },
+    "ikolu3": {
+      "product": "Ikolu3",
+      "company": "SmartHydro",
+      "description": "ERP SmartHydro en transición."
+    },
+    "app_smoking_apr": {
+      "product": "App Smoking APR",
+      "company": "",
+      "description": "Aplicación legado de recetas e inventario."
+    }
+  }
+}

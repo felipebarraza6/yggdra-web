@@ -1,0 +1,71 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Yggdra — backend transversal",
+  description = "Portafolio vivo del backend Yggdra: productos, clientes y módulos que impulsan muchas apps.",
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0c0f14" />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <header class="site-header">
+      <div class="wrap nav">
+        <a class="brand" href={`${base}`}>
+          Yggdra
+          <span>backend transversal</span>
+        </a>
+        <nav aria-label="Principal">
+          <ul class="nav-links">
+            <li><a href={`${base}#modelo`}>Modelo</a></li>
+            <li><a href={`${base}#mapa`}>Mapa</a></li>
+            <li><a href={`${base}#productos`}>Productos</a></li>
+            <li><a href={`${base}#avances`}>Avances</a></li>
+            <li><a href={`${base}#orquestacion`}>Orquestación</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="contenido">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          <strong>Yggdra</strong> es un backend privado de
+          <strong>Felipe Barraza</strong>, desarrollador independiente.
+          Este sitio es un portafolio público: muestra productos, clientes y
+          módulos, no el código ni la infraestructura interna.
+        </p>
+        <p>
+          Código de esta web:
+          <a href="https://github.com/felipebarraza6/yggdra-web">yggdra-web</a>.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

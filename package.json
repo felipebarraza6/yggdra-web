@@ -1,0 +1,20 @@
+{
+  "name": "yggdra-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "data": "python3 scripts/build_public_data.py",
+    "privacy": "python3 scripts/check_privacy.py",
+    "check": "python3 scripts/check_privacy.py && astro check"
+  },
+  "dependencies": {
+    "astro": "^4.16.18"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
