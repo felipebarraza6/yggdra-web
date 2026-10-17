@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-17T22:10:06Z",
+  "updatedAt": "2026-10-17T22:23:55Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -9,7 +9,9 @@
       "fullName": "felipebarraza6/frig",
       "description": "FRIG - Punto de venta gastronómico multi-tenant white-label",
       "language": "TypeScript",
+      "createdAt": "2026-08-11T05:55:15Z",
       "updatedAt": "2026-09-25T05:24:13Z",
+      "pushedAt": "2026-10-17T21:37:35Z",
       "commits": [
         {
           "date": "2026-09-25",
@@ -30,6 +32,106 @@
         {
           "date": "2026-09-25",
           "summary": "Release: salón digital 3D + ecosistema de informes + landing renovada"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Servidor estático para out/ (export) y extractor de fuentes desde sourcemaps"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Reflejar el ecosistema nuevo (salón 3D, informes, bodegas, etiquetas, tótem)"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Reconciliar versiones entre archivos recuperados (SalonFocus, label PDF, monto cuotas)"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Recover(3d): restaurar archivos nuevos de la sesión 3D/UX (salón Three.js, kds, bodegas, informes) extraídos de sourcemaps de .next"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Recover(wip): restaurar sesión del 24-sep (experiencia visual 3D + overhaul UX) recuperada de stash eliminado"
+        },
+        {
+          "date": "2026-09-24",
+          "summary": "Merge branch 'feat/contract-sync' into dev"
+        },
+        {
+          "date": "2026-09-24",
+          "summary": "Actualizar SHA del schema OpenAPI (post-regeneración backend)"
+        },
+        {
+          "date": "2026-09-24",
+          "summary": "Blindaje de contrato API backend↔frontend"
+        },
+        {
+          "date": "2026-09-22",
+          "summary": "Align de with master (CI triggers fix)"
+        },
+        {
+          "date": "2026-09-22",
+          "summary": "Merge master into production (CI triggers fix)"
+        },
+        {
+          "date": "2026-09-22",
+          "summary": "Update CI workflow to include production branch"
+        },
+        {
+          "date": "2026-09-22",
+          "summary": "Fix CI workflow branch ignore configuration"
+        },
+        {
+          "date": "2026-09-22",
+          "summary": "Align de with master (deploy gate)"
+        },
+        {
+          "date": "2026-09-22",
+          "summary": "Merge master into production (deploy gate → production)"
+        },
+        {
+          "date": "2026-09-22",
+          "summary": "Deploy FTP desde production"
+        },
+        {
+          "date": "2026-09-21",
+          "summary": "Align master with de"
+        },
+        {
+          "date": "2026-09-21",
+          "summary": "Align de with master"
+        },
+        {
+          "date": "2026-09-21",
+          "summary": "Align master with de"
+        },
+        {
+          "date": "2026-09-21",
+          "summary": "Merge master into de (align after sync)"
+        },
+        {
+          "date": "2026-09-21",
+          "summary": "Merge de into master (sync + CI fixes)"
+        },
+        {
+          "date": "2026-09-21",
+          "summary": "Merge master into de (sync cosmic-layer fix)"
+        },
+        {
+          "date": "2026-09-21",
+          "summary": "Merge pull request #1 from felipebarraza6/fix/sync-package-lock-next-16.3.5"
+        },
+        {
+          "date": "2026-09-21",
+          "summary": "Avoid setState in effects for discounts and order pay"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Dejar el gate de lint en verde para el código 3D/KDS recuperado"
+        },
+        {
+          "date": "2026-09-25",
+          "summary": "Dejar el gate de lint en verde para el código 3D/KDS recuperado"
         }
       ]
     },
@@ -38,7 +140,9 @@
       "fullName": "felipebarraza6/muninn",
       "description": "Muninn - Agentes IA Especializados",
       "language": "TypeScript",
+      "createdAt": "2026-07-09T13:21:01Z",
       "updatedAt": "2026-09-13T21:20:19Z",
+      "pushedAt": "2026-09-13T21:20:17Z",
       "commits": [
         {
           "date": "2026-09-13",
@@ -59,6 +163,106 @@
         {
           "date": "2026-09-13",
           "summary": "Merge branch 'production' into dev"
+        },
+        {
+          "date": "2026-08-04",
+          "summary": "Branch theme + UI refinements"
+        },
+        {
+          "date": "2026-08-03",
+          "summary": "Bug fixes de auditoría + split agent-chat-core + tab Reglas"
+        },
+        {
+          "date": "2026-08-03",
+          "summary": "Style: format business-home.tsx"
+        },
+        {
+          "date": "2026-08-03",
+          "summary": "Dashboard dinámico con widgets configurables y mejoras de permisos"
+        },
+        {
+          "date": "2026-07-31",
+          "summary": "Intervalos de polling conservadores (10s live / 30s idle) para no saturar el rate-limit del API"
+        },
+        {
+          "date": "2026-07-31",
+          "summary": "Polling adaptativo de mensajes y no reintentar 429 (rate-limit)"
+        },
+        {
+          "date": "2026-07-31",
+          "summary": "Forzar overflow nativo en viewport de ScrollArea con !important (Radix sobrescribe inline style)"
+        },
+        {
+          "date": "2026-07-31",
+          "summary": "Viewport de ScrollArea siempre scrolleable nativamente (overflow auto) + flex column para altura limitada"
+        },
+        {
+          "date": "2026-07-31",
+          "summary": "Limitar altura de ChatThread para evitar auto-scroll infinito"
+        },
+        {
+          "date": "2026-07-31",
+          "summary": "Auto-scroll en bandeja de conversaciones"
+        },
+        {
+          "date": "2026-07-31",
+          "summary": "Chat doble-envio, creacion inmediata de conversaciones, archivado en bandeja y scroll del analisis de mensajes"
+        },
+        {
+          "date": "2026-07-30",
+          "summary": "Prettier formatting en tests"
+        },
+        {
+          "date": "2026-07-30",
+          "summary": "Prettier formatting en tests"
+        },
+        {
+          "date": "2026-07-30",
+          "summary": "Prettier formatting en tests y useDataVolumes"
+        },
+        {
+          "date": "2026-07-30",
+          "summary": "Release: production readiness v2 - auth guards, tests, chat fixes, cron icon"
+        },
+        {
+          "date": "2026-07-30",
+          "summary": "Production readiness - auth guards, tests, missing endpoints, chat fixes, knowledge cron icon"
+        },
+        {
+          "date": "2026-07-30",
+          "summary": "Production readiness - auth guards, tests, missing endpoints, chat fixes, knowledge cron icon"
+        },
+        {
+          "date": "2026-07-30",
+          "summary": "Cronjob persistencia, chat navegacion, filtro conversaciones, titulo editable"
+        },
+        {
+          "date": "2026-07-29",
+          "summary": "Cambios misceláneos en auth, login y tema"
+        },
+        {
+          "date": "2026-07-29",
+          "summary": "Mejora completa de UI y persistencia"
+        },
+        {
+          "date": "2026-07-29",
+          "summary": "Mejorar UI paso 1 con selector de aplicación y preview simplificado"
+        },
+        {
+          "date": "2026-07-28",
+          "summary": "Wizard completo con descubrir campos, credenciales, test mapeado y bloqueo de pasos"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "Prettier formatting"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "Merge branch 'production' into dev"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "No-unused-expressions ternary in AgentChatCore"
         }
       ]
     },
@@ -67,7 +271,9 @@
       "fullName": "felipebarraza6/gungir",
       "description": "Gungir — comercio general sobre Yggdra (landing + cotizador, Public/Local/Admin)",
       "language": "TypeScript",
+      "createdAt": "2026-09-19T03:56:35Z",
       "updatedAt": "2026-09-19T04:41:53Z",
+      "pushedAt": "2026-09-19T04:41:49Z",
       "commits": [
         {
           "date": "2026-09-19",
@@ -88,6 +294,14 @@
         {
           "date": "2026-09-19",
           "summary": "Landing completa, login Yggdra, Local/Admin/Cuenta operativos"
+        },
+        {
+          "date": "2026-09-19",
+          "summary": "Repo público, seed_gungir y endpoints de coti en Yggdra"
+        },
+        {
+          "date": "2026-09-19",
+          "summary": "Initial commit: Gungir — comercio general sobre Yggdra"
         }
       ]
     },
@@ -96,7 +310,9 @@
       "fullName": "felipebarraza6/cotizador-oro",
       "description": "Landing cotizador oro (prototipo cliente) — consume Yggdra /api/public/*",
       "language": "TypeScript",
+      "createdAt": "2026-09-19T04:31:14Z",
       "updatedAt": "2026-09-19T04:33:15Z",
+      "pushedAt": "2026-09-19T04:33:11Z",
       "commits": [
         {
           "date": "2026-09-19",
@@ -113,7 +329,9 @@
       "fullName": "felipebarraza6/heir",
       "description": "HEIR - plataforma de agenda, pagos y agente conversacional para profesionales de la salud",
       "language": "TypeScript",
+      "createdAt": "2026-08-12T04:32:26Z",
       "updatedAt": "2026-09-04T23:58:27Z",
+      "pushedAt": "2026-09-04T23:58:23Z",
       "commits": [
         {
           "date": "2026-09-04",
@@ -138,7 +356,9 @@
       "fullName": "felipebarraza6/nxord",
       "description": null,
       "language": "TypeScript",
+      "createdAt": "2026-09-04T23:18:46Z",
       "updatedAt": "2026-09-05T00:10:02Z",
+      "pushedAt": "2026-09-05T00:09:58Z",
       "commits": [
         {
           "date": "2026-09-05",
@@ -159,6 +379,106 @@
         {
           "date": "2026-09-05",
           "summary": "Add Dispositivos page"
+        },
+        {
+          "date": "2026-09-05",
+          "summary": "Add Login page"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add Dashboard page"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add Apr and Tarificacion pages"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add README and public SVG assets"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add package.json, tsconfigs and tailwind config"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui sidebar"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui menubar"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui context-menu"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui chart"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui calendar"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Fix carousel.tsx (restore onKeyDownCapture wrapper div)"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui navigation-menu and carousel"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui sheet and select"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui table, tabs, textarea, toggle-group, toggle, tooltip"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui resizable, scroll-area, separator, skeleton, slider, sonner, spinner, switch"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui input-otp, item, pagination, popover, progress, radio-group"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui field and input-group"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui form, hover-card, input, kbd, label"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui dropdown-menu"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui drawer and empty"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui command and dialog"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui components batch 3 (card, checkbox, collapsible)"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui components batch 2 (badge, breadcrumb, button-group, button)"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add ui components batch 1 (accordion, alert-dialog, alert, aspect-ratio, avatar)"
+        },
+        {
+          "date": "2026-09-04",
+          "summary": "Add tarificacion Documentos"
         }
       ]
     },
@@ -167,7 +487,9 @@
       "fullName": "felipebarraza6/nereus_smarthydro",
       "description": null,
       "language": "JavaScript",
+      "createdAt": "2026-10-10T03:40:57Z",
       "updatedAt": "2026-10-10T03:41:11Z",
+      "pushedAt": "2026-10-10T03:41:06Z",
       "commits": [
         {
           "date": "2026-10-10",
@@ -180,8 +502,14 @@
       "fullName": "felipebarraza6/yggdra-web",
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
-      "updatedAt": "2026-10-17T21:57:18Z",
+      "createdAt": "2026-10-17T21:44:38Z",
+      "updatedAt": "2026-10-17T22:16:39Z",
+      "pushedAt": "2026-10-17T22:16:36Z",
       "commits": [
+        {
+          "date": "2026-10-17",
+          "summary": "Yggdra Platform v3 — portafolio técnico (solo inventario)"
+        },
         {
           "date": "2026-10-17",
           "summary": "Copy: presentar Yggdra como plataforma corporativa"

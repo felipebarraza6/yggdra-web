@@ -98,11 +98,16 @@ Señal **solo** de repos **públicos** que aparecen en el inventario
       "fullName": "felipebarraza6/frig",
       "description": "string o null",
       "language": "TypeScript",
+      "createdAt": "2026-08-11T05:55:15Z",
       "updatedAt": "2026-10-17T12:00:00Z",
+      "pushedAt": "2026-10-17T12:00:00Z",
       "commits": [{ "date": "2026-10-17", "summary": "…" }]
     }
   ]
 }
+
+`createdAt` / `pushedAt` alimentan la vista **Historia** (trayectoria y
+días de trabajo público por rama).
 ```
 
 Los repos privados del ecosistema **no** se listan aquí: su ficha en el sitio
