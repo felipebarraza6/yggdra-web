@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "generatedNote": "Avances recientes del backend Yggdra, en lenguaje llano.",
+  "items": [
+    {
+      "date": "2026-10-17",
+      "summary": "Restringir acceso global de admins provisionados (P90/Forja)",
+      "module": "accounts"
+    },
+    {
+      "date": "2026-10-17",
+      "summary": "Inventario de consumidores y reporte de impacto en PRs",
+      "module": "orquestación"
+    },
+    {
+      "date": "2026-10-17",
+      "summary": "Generador oficial etiqueta nutricional RSA DS 977",
+      "module": "recipes"
+    },
+    {
+      "date": "2026-10-17",
+      "summary": "Cerrar escrituras entre sucursales (C6)",
+      "module": "recipes"
+    },
+    {
+      "date": "2026-10-17",
+      "summary": "Cálculo nutricional determinista (C1–C3, I5–I7)",
+      "module": "recipes"
+    },
+    {
+      "date": "2026-10-17",
+      "summary": "Correo de invitación al crear/asignar usuarios",
+      "module": "accounts"
+    },
+    {
+      "date": "2026-10-17",
+      "summary": "Eliminar FieldError por Branch.owner en search",
+      "module": "branches"
+    },
+    {
+      "date": "2026-10-16",
+      "summary": "Módulo backend multi-coach (el módulo correspondiente",
+      "module": "forja"
+    },
+    {
+      "date": "2026-10-15",
+      "summary": "Usar fecha local Chile en vigencias y “hoy” de negocio",
+      "module": "shared"
+    },
+    {
+      "date": "2026-10-15",
+      "summary": "Fechas locales Chile en caja stale y cuotas",
+      "module": "shared"
+    },
+    {
+      "date": "2026-10-14",
+      "summary": "Adherencia de entrenamiento por semana según reglas de Marce",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-14",
+      "summary": "Modo light en PR a production si el tree ya pasó full",
+      "module": "infra"
+    },
+    {
+      "date": "2026-10-14",
+      "summary": "Bandeja de mensajes del equipo (GET /messages/inbox)",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-14",
+      "summary": "Usar el plan nutricional cuando ningún tramo aplica ese día",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-14",
+      "summary": "Metas por tramo prevalecen sobre el plan nutricional",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-13",
+      "summary": "GET panel/config read-only para alumno",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-13",
+      "summary": "Nunca escribir nginx host; compose con backup/rollback",
+      "module": "infra"
+    },
+    {
+      "date": "2026-10-13",
+      "summary": "CD nginx auto-detect seguro y conf SSE literal",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-13",
+      "summary": "SSE async bajo Daphne + nginx reload en CD",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-13",
+      "summary": "SSE en tiempo real para mensajería",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-13",
+      "summary": "Score ponderado de macros, metas por tramo y mensajería",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-12",
+      "summary": "Cash_in/cash_out para cualquier miembro activo de la sucursal",
+      "module": "finance"
+    },
+    {
+      "date": "2026-10-12",
+      "summary": "Missing_alert_min_days=0 apaga badge missing_report",
+      "module": "coaching"
+    },
+    {
+      "date": "2026-10-12",
+      "summary": "Cerrar public_create AllowAny y limitar create sin config",
+      "module": "support"
+    },
+    {
+      "date": "2026-10-12",
+      "summary": "Bugs Frig B1/B3/B4/B5/B6 — sesiones concurrentes y dashboard",
+      "module": "shared"
+    }
+  ]
+}

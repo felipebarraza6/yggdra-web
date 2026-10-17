@@ -1,0 +1,15 @@
+name: Privacy gate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  privacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if data/*.json has forbidden patterns
+        run: python3 scripts/check_privacy.py

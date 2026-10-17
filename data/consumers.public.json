@@ -1,0 +1,323 @@
+{
+  "version": 1,
+  "generatedNote": "Inventario público de apps que usan Yggdra. Sin rutas internas ni credenciales.",
+  "modules": [
+    "accounts",
+    "branches",
+    "recipes",
+    "inventory",
+    "sales",
+    "finance",
+    "customers",
+    "suppliers",
+    "plan-checkout",
+    "tables",
+    "promotions",
+    "crm",
+    "support",
+    "iot-telemetry",
+    "water",
+    "forja",
+    "coaching",
+    "public",
+    "ai-agents",
+    "workflows",
+    "scheduling",
+    "analytics",
+    "campaigns",
+    "services",
+    "api-v1",
+    "smarthydro"
+  ],
+  "consumers": [
+    {
+      "id": "frig",
+      "name": "FRIG (POS gastronómico white-label)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [
+        "frig.yggdra.cl",
+        "intranet.macanuobowl.cl",
+        "mani.agenciapatagoniachile.com"
+      ],
+      "modules": [
+        "accounts",
+        "branches",
+        "recipes",
+        "inventory",
+        "sales",
+        "finance",
+        "customers",
+        "suppliers",
+        "plan-checkout",
+        "tables",
+        "promotions"
+      ],
+      "company": "Macanu Bowl · Maní",
+      "product": "Frig",
+      "description": "POS gastronómico white-label multi-sucursal."
+    },
+    {
+      "id": "nxrd_apr",
+      "name": "Cauce (APR / agua potable rural)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [
+        "cauce.smartapr.cl"
+      ],
+      "modules": [
+        "accounts",
+        "branches",
+        "inventory",
+        "sales",
+        "finance",
+        "customers",
+        "suppliers",
+        "crm",
+        "support",
+        "iot-telemetry",
+        "water"
+      ],
+      "company": "SmartAPR",
+      "product": "Cauce",
+      "description": "Gestión de agua potable rural, cobros y telemetría."
+    },
+    {
+      "id": "forja",
+      "name": "Forja (personal trainers)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [],
+      "modules": [
+        "forja",
+        "accounts"
+      ],
+      "company": "",
+      "product": "Forja",
+      "description": "App para entrenadores personales y coaching."
+    },
+    {
+      "id": "proyecto-90",
+      "name": "Proyecto 90 días (P90)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [
+        "90dias.habitofirme.app"
+      ],
+      "modules": [
+        "coaching",
+        "accounts",
+        "public"
+      ],
+      "company": "Hábito Firme",
+      "product": "Proyecto 90",
+      "description": "Programa de hábitos y entrenamiento a 90 días."
+    },
+    {
+      "id": "muninn",
+      "name": "Muninn (agentes IA y estudio)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [],
+      "modules": [
+        "accounts",
+        "branches",
+        "ai-agents",
+        "workflows",
+        "scheduling",
+        "analytics"
+      ],
+      "company": "",
+      "product": "Muninn",
+      "description": "Estudio y agentes de IA sobre Yggdra."
+    },
+    {
+      "id": "ikolu-void",
+      "name": "Ikolu Void (agentes IA)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [],
+      "modules": [
+        "ai-agents",
+        "accounts",
+        "campaigns",
+        "services",
+        "scheduling"
+      ],
+      "company": "",
+      "product": "Ikolu Void",
+      "description": "Agentes de IA y automatización."
+    },
+    {
+      "id": "gungir",
+      "name": "Gungir (comercio / cotizador)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [],
+      "modules": [
+        "public",
+        "sales",
+        "accounts"
+      ],
+      "company": "",
+      "product": "Gungir",
+      "description": "Comercio y cotizaciones."
+    },
+    {
+      "id": "cotizador-oro",
+      "name": "Cotizador de oro (casa-oro)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [],
+      "modules": [
+        "public"
+      ],
+      "company": "",
+      "product": "Cotizador de oro",
+      "description": "Cotizaciones públicas de oro."
+    },
+    {
+      "id": "heir",
+      "name": "HEIR (salud / agenda y pagos)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [],
+      "modules": [
+        "finance",
+        "accounts",
+        "branches"
+      ],
+      "company": "",
+      "product": "HEIR",
+      "description": "Salud, agenda y pagos."
+    },
+    {
+      "id": "nxord",
+      "name": "Nxord (telemetría hídrica / APR)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [],
+      "modules": [
+        "iot-telemetry",
+        "finance",
+        "customers",
+        "accounts"
+      ],
+      "company": "SmartHydro",
+      "product": "Nxord",
+      "description": "Telemetría hídrica y alertas para APR."
+    },
+    {
+      "id": "nereus_smarthydro",
+      "name": "Nereus (panel SmartHydro sobre Yggdra)",
+      "status": "active",
+      "statusLabel": "activa",
+      "domains": [],
+      "modules": [
+        "accounts",
+        "branches",
+        "sales",
+        "finance",
+        "suppliers",
+        "crm",
+        "support"
+      ],
+      "company": "SmartHydro",
+      "product": "Nereus",
+      "description": "Panel operativo SmartHydro sobre Yggdra."
+    },
+    {
+      "id": "agent_desktop",
+      "name": "Agent Desktop (Tauri / SmartHydro)",
+      "status": "migrating",
+      "statusLabel": "en migración",
+      "domains": [],
+      "modules": [
+        "api-v1",
+        "smarthydro"
+      ],
+      "company": "SmartHydro",
+      "product": "Agent Desktop",
+      "description": "Escritorio de agentes (migración a Yggdra)."
+    },
+    {
+      "id": "agent_console",
+      "name": "Agent Console (Tauri / SmartHydro)",
+      "status": "migrating",
+      "statusLabel": "en migración",
+      "domains": [],
+      "modules": [
+        "api-v1"
+      ],
+      "company": "SmartHydro",
+      "product": "Agent Console",
+      "description": "Consola de agentes (migración a Yggdra)."
+    },
+    {
+      "id": "erp_legacy_sh",
+      "name": "ERP Legacy SmartHydro",
+      "status": "migrating",
+      "statusLabel": "en migración",
+      "domains": [],
+      "modules": [
+        "api-v1"
+      ],
+      "company": "SmartHydro",
+      "product": "ERP Legacy SmartHydro",
+      "description": "ERP legado en migración hacia Yggdra."
+    },
+    {
+      "id": "smarthydro_agents",
+      "name": "SmartHydro Agents (deploy)",
+      "status": "migrating",
+      "statusLabel": "en migración",
+      "domains": [],
+      "modules": [
+        "api-v1"
+      ],
+      "company": "SmartHydro",
+      "product": "SmartHydro Agents",
+      "description": "Despliegue de agentes SmartHydro."
+    },
+    {
+      "id": "yggdra_agents",
+      "name": "Yggdra Agents (deploy)",
+      "status": "migrating",
+      "statusLabel": "en migración",
+      "domains": [],
+      "modules": [
+        "api-v1"
+      ],
+      "company": "",
+      "product": "Yggdra Agents",
+      "description": "Despliegue de agentes sobre la plataforma Yggdra."
+    },
+    {
+      "id": "ikolu3",
+      "name": "Ikolu3 (ERP SmartHydro)",
+      "status": "migrating",
+      "statusLabel": "en migración",
+      "domains": [],
+      "modules": [
+        "ai-agents"
+      ],
+      "company": "SmartHydro",
+      "product": "Ikolu3",
+      "description": "ERP SmartHydro en transición."
+    },
+    {
+      "id": "app_smoking_apr",
+      "name": "App Smoking APR (legacy)",
+      "status": "legacy",
+      "statusLabel": "legado",
+      "domains": [],
+      "modules": [
+        "recipes",
+        "inventory"
+      ],
+      "company": "",
+      "product": "App Smoking APR",
+      "description": "Aplicación legado de recetas e inventario."
+    }
+  ]
+}

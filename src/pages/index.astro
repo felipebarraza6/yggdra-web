@@ -1,0 +1,191 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ModuleMap from "../components/ModuleMap.astro";
+import consumersData from "../../data/consumers.public.json";
+import activityData from "../../data/activity.json";
+
+const consumers = consumersData.consumers;
+const modules = consumersData.modules;
+const activity = activityData.items;
+
+const counts = {
+  total: consumers.length,
+  active: consumers.filter((c) => c.status === "active").length,
+  migrating: consumers.filter((c) => c.status === "migrating").length,
+  legacy: consumers.filter((c) => c.status === "legacy").length,
+  modules: modules.length,
+};
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <h1>Yggdra</h1>
+      <p class="lede">
+        Un backend transversal que da vida a muchos productos para muchos
+        clientes: un solo núcleo, muchas apps.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href={`${base}#mapa`}>Ver mapa de módulos</a>
+        <a class="btn btn-ghost" href={`${base}#orquestacion`}>Cómo orquestamos</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="modelo">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Qué es Yggdra</h2>
+        <p>
+          Yggdra es la API Django multi-sucursal de Felipe Barraza. No es un
+          producto único: es la capa común —cuentas, sucursales, ventas,
+          finanzas, telemetría, coaching y más— sobre la que corren POS
+          gastronómicos, agua potable rural, apps de entrenadores y paneles IoT.
+        </p>
+      </div>
+      <div class="panel" style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));text-align:center;">
+        <div>
+          <div style="font-family:var(--font-display);font-size:2rem;color:var(--accent-strong);">{counts.total}</div>
+          <div style="color:var(--text-muted);font-size:0.9rem;">apps consumidoras</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:2rem;color:var(--accent-strong);">{counts.active}</div>
+          <div style="color:var(--text-muted);font-size:0.9rem;">activas</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:2rem;color:var(--warn);">{counts.migrating}</div>
+          <div style="color:var(--text-muted);font-size:0.9rem;">en migración</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:2rem;color:var(--accent-strong);">{counts.modules}</div>
+          <div style="color:var(--text-muted);font-size:0.9rem;">módulos</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="mapa">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Mapa app ↔ módulos</h2>
+        <p>
+          Qué producto usa qué parte de Yggdra. Cambia entre matriz y grafo;
+          filtra por nombre o estado.
+        </p>
+      </div>
+      <ModuleMap consumers={consumers} modules={modules} />
+    </div>
+  </section>
+
+  <section id="productos">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Productos y clientes</h2>
+        <p>
+          Fichas públicas: nombre del producto, empresa visible cuando se
+          conoce, estado y módulos que consume.
+        </p>
+      </div>
+      <div class="grid-cards">
+        {
+          consumers.map((c) => (
+            <article class="product-card" id={`app-${c.id}`}>
+              <div style="display:flex;justify-content:space-between;gap:0.5rem;align-items:flex-start;">
+                <h3>{c.product || c.name}</h3>
+                <span class="badge" data-status={c.statusLabel}>{c.statusLabel}</span>
+              </div>
+              <p class="meta">
+                {c.company ? (
+                  <>
+                    Cliente: <strong style="color:var(--text);font-weight:600;">{c.company}</strong>
+                  </>
+                ) : (
+                  <span>Cliente por confirmar</span>
+                )}
+              </p>
+              {c.description && <p class="meta" style="margin:0;">{c.description}</p>}
+              {c.domains?.length > 0 && (
+                <ul class="domains">
+                  {c.domains.map((d) => (
+                    <li>
+                      <a href={`https://${d}`} rel="noopener noreferrer" target="_blank">
+                        {d}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div class="modules" aria-label="Módulos">
+                {c.modules.length ? (
+                  c.modules.map((m) => <span class="mod-chip">{m}</span>)
+                ) : (
+                  <span class="meta">Módulos en definición (migración)</span>
+                )}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="avances">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Avances recientes</h2>
+        <p>
+          Resumen de alto nivel de cambios en el backend, en lenguaje llano.
+          Sin hashes ni detalle interno.
+        </p>
+      </div>
+      <ol class="timeline">
+        {
+          activity.map((item) => (
+            <li>
+              <time datetime={item.date}>{item.date}</time>
+              <p class="summary">{item.summary}</p>
+              <span class="mod-chip">{item.module}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section id="orquestacion">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Cómo orquestamos</h2>
+        <p>
+          Cada cambio del backend se mira contra el mapa de consumidores antes
+          de llegar a producción.
+        </p>
+      </div>
+      <div class="steps">
+        <article class="step">
+          <h3>Impacto automático</h3>
+          <p>
+            Cada PR del backend genera un reporte de impacto sobre las apps
+            que usan los módulos tocados.
+          </p>
+        </article>
+        <article class="step">
+          <h3>Ajustes por app</h3>
+          <p>
+            Se coordinan cambios de contrato, tipos o pantallas en cada
+            producto afectado —Frig, Cauce, Forja, Proyecto 90 y el resto.
+          </p>
+        </article>
+        <article class="step">
+          <h3>Promoción conjunta</h3>
+          <p>
+            Backend y fronts se promueven en conjunto cuando el impacto está
+            cubierto, para que nadie quede a medias.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
