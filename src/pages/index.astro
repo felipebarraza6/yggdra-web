@@ -6,8 +6,9 @@ import ArchitectureDiagram from "../components/ArchitectureDiagram.astro";
 import ChangeFlowDiagram from "../components/ChangeFlowDiagram.astro";
 import TenantDiagram from "../components/TenantDiagram.astro";
 import ActivityCharts from "../components/ActivityCharts.astro";
+import HistoryView from "../components/HistoryView.astro";
 import ModuleMap from "../components/ModuleMap.astro";
-import { projects, modules, activity, counts } from "../lib/data";
+import { projects, modules, activity, counts, githubRepos } from "../lib/data";
 
 const base = import.meta.env.BASE_URL;
 ---
@@ -145,19 +146,34 @@ const base = import.meta.env.BASE_URL;
     </div>
   </section>
 
+  <section id="historia">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="section-kicker"><Rune name="eihwaz" /> Historia</p>
+        <h2>Cuánto tiempo lleva este oficio</h2>
+        <p>
+          Trayectoria pública del ecosistema: cuándo nació cada rama visible,
+          cuántos días abarca el trabajo documentado y dónde se concentró la
+          intensidad. Sin arrogancia: solo el rastro medible.
+        </p>
+      </div>
+      <HistoryView projects={projects} repos={githubRepos} activity={activity} base={base} />
+    </div>
+  </section>
+
   <section id="bifrost">
     <div class="wrap">
       <div class="section-head">
         <p class="section-kicker"><Rune name="algiz" /> Bifröst</p>
-        <h2>Integraciones, despliegue y actividad</h2>
+        <h2>Integraciones, despliegue y actividad reciente</h2>
         <p>
-          El puente entre cambio y producción: CI/CD continuo y un registro
-          público de avances de alto nivel, agrupados por módulo y por semana.
+          El puente entre cambio y producción: CI/CD continuo y el registro
+          reciente de avances de la plataforma, por módulo y por semana.
         </p>
       </div>
       <ActivityCharts items={activity} />
       <div class="glass panel" style="margin-top:1rem;">
-        <h3 style="margin:0 0 1rem;font-family:var(--font-display);font-size:1.1rem;">Avances recientes</h3>
+        <h3 style="margin:0 0 1rem;font-family:var(--font-display);font-size:1.1rem;">Avances recientes del tronco</h3>
         <ol class="timeline">
           {
             activity.slice(0, 12).map((item) => (

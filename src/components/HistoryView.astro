@@ -1,0 +1,335 @@
+---
+/**
+ * Vista histórica del esfuerzo: cuánto tiempo lleva el ecosistema Yggdra
+ * (creación de ramas públicas + actividad de plataforma).
+ */
+interface ActivityItem {
+  date: string;
+  summary: string;
+  module: string;
+}
+interface GithubRepo {
+  name: string;
+  fullName: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  pushedAt?: string | null;
+  language?: string | null;
+  commits?: { date: string; summary: string }[];
+}
+interface Project {
+  id: string;
+  product?: string;
+  name: string;
+  statusLabel: string;
+  company?: string;
+  repo?: string | null;
+}
+
+interface Props {
+  projects: Project[];
+  repos: GithubRepo[];
+  activity: ActivityItem[];
+  base?: string;
+}
+
+const { projects, repos, activity, base = import.meta.env.BASE_URL } = Astro.props;
+
+function day(iso: string | null | undefined) {
+  if (!iso) return null;
+  return iso.slice(0, 10);
+}
+
+function parse(d: string) {
+  return new Date(d + "T12:00:00Z").getTime();
+}
+
+const repoByName = new Map(repos.map((r) => [r.name, r]));
+
+type Lane = {
+  id: string;
+  label: string;
+  company: string;
+  status: string;
+  start: string;
+  end: string;
+  public: boolean;
+  href: string;
+  language: string;
+};
+
+const lanes: Lane[] = [];
+for (const p of projects) {
+  const repoName = p.repo?.split("/")[1] || p.id;
+  const gh = repoByName.get(repoName);
+  const start = day(gh?.createdAt);
+  const end = day(gh?.pushedAt || gh?.updatedAt) || day(activity[0]?.date);
+  if (!start || !end) {
+    // Privada / sin fecha pública: no inventamos fechas
+    continue;
+  }
+  lanes.push({
+    id: p.id,
+    label: p.product || p.name,
+    company: p.company || "",
+    status: p.statusLabel,
+    start,
+    end: end < start ? start : end,
+    public: true,
+    href: `${base}apps/${p.id}/`,
+    language: gh?.language || "",
+  });
+}
+
+lanes.sort((a, b) => a.start.localeCompare(b.start));
+
+const allDates = [
+  ...lanes.flatMap((l) => [l.start, l.end]),
+  ...activity.map((a) => a.date),
+  ...repos.flatMap((r) => (r.commits || []).map((c) => c.date)),
+].filter(Boolean) as string[];
+
+const minDate = allDates.length ? allDates.reduce((a, b) => (a < b ? a : b)) : "";
+const maxDate = allDates.length ? allDates.reduce((a, b) => (a > b ? a : b)) : "";
+const spanMs = minDate && maxDate ? parse(maxDate) - parse(minDate) : 0;
+const spanDays = Math.max(1, Math.round(spanMs / 86400000) + 1);
+const spanWeeks = Math.max(1, Math.round(spanDays / 7));
+const spanMonths = Math.max(1, Math.round(spanDays / 30.44));
+
+const privateCount = projects.length - lanes.length;
+const platformChanges = activity.length;
+
+// Densidad mensual (actividad plataforma + commits públicos)
+const monthCounts = new Map<string, number>();
+function bumpMonth(d: string, n = 1) {
+  const k = d.slice(0, 7);
+  monthCounts.set(k, (monthCounts.get(k) || 0) + n);
+}
+for (const a of activity) bumpMonth(a.date);
+for (const r of repos) {
+  for (const c of r.commits || []) bumpMonth(c.date);
+}
+const months = [...monthCounts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+const maxMonth = Math.max(...months.map(([, n]) => n), 1);
+
+function pct(d: string) {
+  if (!minDate || !maxDate || spanMs <= 0) return 0;
+  return Math.min(100, Math.max(0, ((parse(d) - parse(minDate)) / spanMs) * 100));
+}
+
+function barStyle(start: string, end: string) {
+  const left = pct(start);
+  const right = pct(end);
+  const width = Math.max(1.2, right - left);
+  return `left:${left}%;width:${width}%;`;
+}
+
+const fmt = (d: string) => {
+  const [y, m, dayNum] = d.split("-");
+  const monthsEs = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  return `${parseInt(dayNum, 10)} ${monthsEs[parseInt(m, 10) - 1]} ${y}`;
+};
+
+// Hitos: primera app pública, picos de actividad, web pública
+const milestones: { date: string; label: string }[] = [];
+if (lanes[0]) {
+  milestones.push({
+    date: lanes[0].start,
+    label: `Primera rama pública documentada: ${lanes[0].label}`,
+  });
+}
+const peak = months.reduce((best, cur) => (cur[1] > best[1] ? cur : best), ["", 0]);
+if (peak[0]) {
+  milestones.push({
+    date: `${peak[0]}-15`,
+    label: `Mes con más actividad pública (${peak[1]} señales)`,
+  });
+}
+const web = repoByName.get("yggdra-web");
+if (web?.createdAt) {
+  milestones.push({
+    date: day(web.createdAt)!,
+    label: "Publicación del portafolio Yggdra Platform",
+  });
+}
+if (maxDate) {
+  milestones.push({ date: maxDate, label: "Última señal pública registrada" });
+}
+milestones.sort((a, b) => a.date.localeCompare(b.date));
+---
+
+<div class="history">
+  <div class="glass panel stats-panel history-stats">
+    <div>
+      <div class="num">{spanDays}</div>
+      <div class="lbl">días de trayectoria pública</div>
+    </div>
+    <div>
+      <div class="num">{spanMonths}</div>
+      <div class="lbl">meses aproximados</div>
+    </div>
+    <div>
+      <div class="num">{lanes.length}</div>
+      <div class="lbl">ramas con historial público</div>
+    </div>
+    <div>
+      <div class="num">{platformChanges}</div>
+      <div class="lbl">avances de plataforma listados</div>
+    </div>
+  </div>
+
+  <p class="history-lead">
+    {
+      minDate && maxDate ? (
+        <>
+          Desde el <strong>{fmt(minDate)}</strong> hasta el <strong>{fmt(maxDate)}</strong>
+          ({spanWeeks} semanas) se observa el trabajo público del ecosistema Yggdra:
+          creación de aplicaciones, iteraciones y cambios de plataforma.
+          {privateCount > 0 && (
+            <>
+              {" "}
+              {privateCount} {privateCount === 1 ? "aplicación" : "aplicaciones"} del
+              inventario no muestran fechas porque su repositorio es privado o no
+              está en GitHub público.
+            </>
+          )}
+        </>
+      ) : (
+        <>Aún no hay fechas públicas suficientes para trazar la trayectoria.</>
+      )
+    }
+  </p>
+
+  <div class="glass panel history-lanes" role="img" aria-label="Líneas de tiempo por aplicación">
+    <div class="history-axis">
+      <span>{minDate ? fmt(minDate) : ""}</span>
+      <span>hoy · {maxDate ? fmt(maxDate) : ""}</span>
+    </div>
+    <ul class="lane-list">
+      {
+        lanes.map((lane) => (
+          <li class="lane">
+            <div class="lane-meta">
+              <a href={lane.href}>{lane.label}</a>
+              <span class="lane-sub">
+                {lane.company ? `${lane.company} · ` : ""}
+                {fmt(lane.start)} → {fmt(lane.end)}
+                {lane.language ? ` · ${lane.language}` : ""}
+              </span>
+            </div>
+            <div class="lane-track">
+              <div class="lane-bar" style={barStyle(lane.start, lane.end)} title={`${lane.label}: ${lane.start} → ${lane.end}`}></div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="two-col" style="margin-top:1rem;">
+    <div class="glass panel">
+      <h3 class="history-h">Intensidad por mes</h3>
+      <p class="history-note">Suma de avances de plataforma y commits públicos del inventario.</p>
+      <div class="chart-bars" role="img" aria-label="Actividad pública por mes">
+        {
+          months.map(([month, n]) => (
+            <div class="chart-row">
+              <span class="label">{month}</span>
+              <div class="bar-track" title={`${n} señales`}>
+                <div class="bar-fill" style={`width:${(n / maxMonth) * 100}%`}></div>
+              </div>
+              <span class="val">{n}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    <div class="glass panel">
+      <h3 class="history-h">Hitos</h3>
+      <ol class="timeline">
+        {
+          milestones.map((m) => (
+            <li>
+              <time datetime={m.date}>{fmt(m.date)}</time>
+              <p class="summary">{m.label}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</div>
+
+<style>
+  .history-lead {
+    color: var(--text-muted);
+    max-width: 46rem;
+    margin: 1rem 0 1.25rem;
+  }
+  .history-stats {
+    margin-bottom: 0.25rem;
+  }
+  .history-h {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+  }
+  .history-note {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+  .history-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .lane-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+  }
+  .lane-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    margin-bottom: 0.25rem;
+  }
+  .lane-meta a {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .lane-meta a:hover {
+    color: var(--accent-strong);
+  }
+  .lane-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .lane-track {
+    position: relative;
+    height: 0.7rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 8%, white);
+    overflow: hidden;
+  }
+  .lane-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #4a9a8e, var(--accent-strong));
+    min-width: 0.5rem;
+  }
+  @media (max-width: 640px) {
+    .lane-sub {
+      font-size: 0.72rem;
+    }
+  }
+</style>

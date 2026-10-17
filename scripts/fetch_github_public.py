@@ -28,8 +28,8 @@ PLATFORM_SITE_REPO = f"{OWNER}/yggdra-web"
 FORBIDDEN = re.compile(
     r"("
     r"@|"
-    r"\btoken\b|"
-    r"\bsecret\b|"
+    r"token|"
+    r"secret|"
     r"api/apps|"
     r"src/|"
     r"agents-api\.|"
@@ -106,30 +106,42 @@ def inventory_repos() -> list[str]:
     return out
 
 
-def recent_commits(full_name: str, token: str | None, limit: int = 5) -> list[dict]:
-    raw = api_get(f"https://api.github.com/repos/{full_name}/commits?per_page={limit}", token)
-    if not isinstance(raw, list):
-        return []
+def recent_commits(full_name: str, token: str | None, limit: int = 30) -> list[dict]:
+    """Hasta `limit` commits públicos, paginando de a 30."""
     out: list[dict] = []
-    for item in raw:
-        commit = item.get("commit") or {}
-        msg = (commit.get("message") or "").split("\n", 1)[0]
-        summary = clean_text(msg)
-        if not summary:
-            continue
-        summary = re.sub(
-            r"^(feat|fix|ci|cd|chore|docs|refactor|perf|test)(\([^)]+\))?:\s*",
-            "",
-            summary,
-            flags=re.I,
+    page = 1
+    while len(out) < limit and page <= 3:
+        per = min(30, limit - len(out))
+        raw = api_get(
+            f"https://api.github.com/repos/{full_name}/commits?per_page={per}&page={page}",
+            token,
         )
-        summary = re.sub(r"\s*\(#\d+\)\s*$", "", summary).strip()
-        if summary:
-            summary = summary[0].upper() + summary[1:]
-        date = ((commit.get("author") or {}).get("date") or "")[:10]
-        if not date:
-            continue
-        out.append({"date": date, "summary": summary})
+        if not isinstance(raw, list) or not raw:
+            break
+        for item in raw:
+            commit = item.get("commit") or {}
+            msg = (commit.get("message") or "").split("\n", 1)[0]
+            summary = clean_text(msg)
+            if not summary:
+                continue
+            summary = re.sub(
+                r"^(feat|fix|ci|cd|chore|docs|refactor|perf|test)(\([^)]+\))?:\s*",
+                "",
+                summary,
+                flags=re.I,
+            )
+            summary = re.sub(r"\s*\(#\d+\)\s*$", "", summary).strip()
+            if summary:
+                summary = summary[0].upper() + summary[1:]
+            date = ((commit.get("author") or {}).get("date") or "")[:10]
+            if not date:
+                continue
+            out.append({"date": date, "summary": summary})
+            if len(out) >= limit:
+                break
+        if len(raw) < per:
+            break
+        page += 1
     return out
 
 
@@ -141,12 +153,17 @@ def fetch_public_repo(full_name: str, token: str | None) -> dict | None:
         # Privado: no publicar actividad GitHub; el inventario ya cubre la ficha.
         return None
     name = meta.get("name") or full_name.split("/")[-1]
+    created = meta.get("created_at")
+    updated = meta.get("updated_at")
+    pushed = meta.get("pushed_at")
     return {
         "name": name,
         "fullName": meta.get("full_name") or full_name,
         "description": clean_text(meta.get("description")),
         "language": meta.get("language"),
-        "updatedAt": meta.get("updated_at"),
+        "createdAt": created,
+        "updatedAt": updated,
+        "pushedAt": pushed,
         "commits": recent_commits(full_name, token),
     }
 

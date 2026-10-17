@@ -34,11 +34,18 @@ for (const it of items) {
 }
 const weekRows = [...byWeek.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 const maxWeek = Math.max(...weekRows.map(([, n]) => n), 1);
+
+const dates = items.map((i) => i.date).sort();
+const from = dates[0];
+const to = dates[dates.length - 1];
 ---
 
 <div class="two-col">
   <div class="glass panel">
-    <h3 style="margin:0 0 1rem;font-family:var(--font-display);font-size:1.1rem;">Cambios por módulo</h3>
+    <h3 style="margin:0 0 0.35rem;font-family:var(--font-display);font-size:1.1rem;">Cambios de plataforma por módulo</h3>
+    <p style="margin:0 0 1rem;color:var(--text-muted);font-size:0.88rem;">
+      {items.length} avances documentados{from && to ? ` · ${from} → ${to}` : ""}.
+    </p>
     <div class="chart-bars" role="img" aria-label="Gráfico de cambios por módulo">
       {
         moduleRows.map(([mod, n]) => (
@@ -54,7 +61,10 @@ const maxWeek = Math.max(...weekRows.map(([, n]) => n), 1);
     </div>
   </div>
   <div class="glass panel">
-    <h3 style="margin:0 0 1rem;font-family:var(--font-display);font-size:1.1rem;">Cambios por semana</h3>
+    <h3 style="margin:0 0 0.35rem;font-family:var(--font-display);font-size:1.1rem;">Ritmo semanal (plataforma)</h3>
+    <p style="margin:0 0 1rem;color:var(--text-muted);font-size:0.88rem;">
+      Cómo se concentró el trabajo reciente del tronco.
+    </p>
     <div class="chart-bars" role="img" aria-label="Gráfico de cambios por semana">
       {
         weekRows.map(([week, n]) => (
