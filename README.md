@@ -6,6 +6,8 @@ multi-tenant y de las aplicaciones que la consumen.
 - URL: https://felipebarraza6.github.io/yggdra-web/
 - Marca: **Yggdra Platform**
 - Backend: **privado** — este repo no publica código, rutas internas ni secretos
+- **Alcance:** solo Yggdra y las apps del inventario (consumidoras o en migración).
+  Nada de repos ajenos al ecosistema.
 
 Texto en **español de Chile** (registro neutro). No es una página de venta:
 explica el oficio (arquitectura, contratos, orquestación, CI/CD, telemetría).
@@ -53,11 +55,13 @@ python3 scripts/check_privacy.py
 `repository_dispatch` con `event_type: yggdra-update` regenera/despliega Pages
 (ver `.github/workflows/pages.yml`).
 
-### Sync diario de repos públicos
+### Sync diario de repos públicos (solo inventario)
 
-`.github/workflows/github-public-sync.yml` consulta la API pública de GitHub
-(repos públicos del owner) con `GITHUB_TOKEN`, escribe `data/github.public.json`,
-pasa el gate de privacidad y hace commit si hay cambios.
+`.github/workflows/github-public-sync.yml` recorre `projects[].repo` del
+inventario, consulta la API pública con `GITHUB_TOKEN` y escribe
+`data/github.public.json` **únicamente** para repos públicos de ese listado
+(+ `yggdra-web`). Los privados quedan solo con los datos del inventario.
+Pasa el gate de privacidad y hace commit si hay cambios.
 
 ## Privacidad
 

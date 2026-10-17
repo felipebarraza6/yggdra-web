@@ -1,42 +1,9 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-17T22:03:34Z",
-  "generatedNote": "Metadatos públicos de repositorios. Sin credenciales ni rutas internas.",
+  "updatedAt": "2026-10-17T22:10:06Z",
+  "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
+  "scope": "inventory-only",
   "repos": [
-    {
-      "name": "yggdra-web",
-      "fullName": "felipebarraza6/yggdra-web",
-      "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
-      "language": "Astro",
-      "updatedAt": "2026-10-17T21:57:18Z",
-      "commits": [
-        {
-          "date": "2026-10-17",
-          "summary": "Copy: presentar Yggdra como plataforma corporativa"
-        },
-        {
-          "date": "2026-10-17",
-          "summary": "Sitio público Yggdra (GitHub Pages)"
-        },
-        {
-          "date": "2026-10-17",
-          "summary": "Initial commit"
-        }
-      ]
-    },
-    {
-      "name": "nereus_smarthydro",
-      "fullName": "felipebarraza6/nereus_smarthydro",
-      "description": null,
-      "language": "JavaScript",
-      "updatedAt": "2026-10-10T03:41:11Z",
-      "commits": [
-        {
-          "date": "2026-10-10",
-          "summary": "Export from Grok"
-        }
-      ]
-    },
     {
       "name": "frig",
       "fullName": "felipebarraza6/frig",
@@ -63,6 +30,35 @@
         {
           "date": "2026-09-25",
           "summary": "Release: salón digital 3D + ecosistema de informes + landing renovada"
+        }
+      ]
+    },
+    {
+      "name": "muninn",
+      "fullName": "felipebarraza6/muninn",
+      "description": "Muninn - Agentes IA Especializados",
+      "language": "TypeScript",
+      "updatedAt": "2026-09-13T21:20:19Z",
+      "commits": [
+        {
+          "date": "2026-09-13",
+          "summary": "Muninn.yggdra.cl siempre muestra landing propio, no branded login"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "Usar FTP propio de Muninn (ftp.yggdra.cl) en CI"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "No-unused-expressions ternary in AgentChatCore"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "Prettier formatting"
+        },
+        {
+          "date": "2026-09-13",
+          "summary": "Merge branch 'production' into dev"
         }
       ]
     },
@@ -113,31 +109,27 @@
       ]
     },
     {
-      "name": "muninn",
-      "fullName": "felipebarraza6/muninn",
-      "description": "Muninn - Agentes IA Especializados",
+      "name": "heir",
+      "fullName": "felipebarraza6/heir",
+      "description": "HEIR - plataforma de agenda, pagos y agente conversacional para profesionales de la salud",
       "language": "TypeScript",
-      "updatedAt": "2026-09-13T21:20:19Z",
+      "updatedAt": "2026-09-04T23:58:27Z",
       "commits": [
         {
-          "date": "2026-09-13",
-          "summary": "Muninn.yggdra.cl siempre muestra landing propio, no branded login"
+          "date": "2026-09-04",
+          "summary": "README con contrato Yggdra, roles y configuración pre-producción"
         },
         {
-          "date": "2026-09-13",
-          "summary": "Usar FTP propio de Muninn (ftp.yggdra.cl) en CI"
+          "date": "2026-09-04",
+          "summary": "Panel profesional (finanzas reales), admin multi-sucursal y routing por rol"
         },
         {
-          "date": "2026-09-13",
-          "summary": "No-unused-expressions ternary in AgentChatCore"
+          "date": "2026-09-04",
+          "summary": "Sesión con roles (superadmin/profesional/paciente) y login real"
         },
         {
-          "date": "2026-09-13",
-          "summary": "Prettier formatting"
-        },
-        {
-          "date": "2026-09-13",
-          "summary": "Merge branch 'production' into dev"
+          "date": "2026-08-12",
+          "summary": "Init: HEIR demo scaffold with React, Vite and Tailwind"
         }
       ]
     },
@@ -171,27 +163,36 @@
       ]
     },
     {
-      "name": "heir",
-      "fullName": "felipebarraza6/heir",
-      "description": "HEIR - plataforma de agenda, pagos y agente conversacional para profesionales de la salud",
-      "language": "TypeScript",
-      "updatedAt": "2026-09-04T23:58:27Z",
+      "name": "nereus_smarthydro",
+      "fullName": "felipebarraza6/nereus_smarthydro",
+      "description": null,
+      "language": "JavaScript",
+      "updatedAt": "2026-10-10T03:41:11Z",
       "commits": [
         {
-          "date": "2026-09-04",
-          "summary": "README con contrato Yggdra, roles y configuración pre-producción"
+          "date": "2026-10-10",
+          "summary": "Export from Grok"
+        }
+      ]
+    },
+    {
+      "name": "yggdra-web",
+      "fullName": "felipebarraza6/yggdra-web",
+      "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
+      "language": "Astro",
+      "updatedAt": "2026-10-17T21:57:18Z",
+      "commits": [
+        {
+          "date": "2026-10-17",
+          "summary": "Copy: presentar Yggdra como plataforma corporativa"
         },
         {
-          "date": "2026-09-04",
-          "summary": "Panel profesional (finanzas reales), admin multi-sucursal y routing por rol"
+          "date": "2026-10-17",
+          "summary": "Sitio público Yggdra (GitHub Pages)"
         },
         {
-          "date": "2026-09-04",
-          "summary": "Sesión con roles (superadmin/profesional/paciente) y login real"
-        },
-        {
-          "date": "2026-08-12",
-          "summary": "Init: HEIR demo scaffold with React, Vite and Tailwind"
+          "date": "2026-10-17",
+          "summary": "Initial commit"
         }
       ]
     }

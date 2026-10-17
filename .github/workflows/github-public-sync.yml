@@ -1,4 +1,7 @@
-name: Sync public GitHub activity
+name: Sync public GitHub activity (inventario Yggdra)
+
+# Solo repos públicos listados en data/projects.json (+ yggdra-web).
+# Repos privados del ecosistema no se consultan.
 
 on:
   schedule:
@@ -18,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch public repo metadata
+      - name: Fetch public metadata for inventory repos only
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/fetch_github_public.py
@@ -35,5 +38,5 @@ jobs:
             echo "Sin cambios en github.public.json"
             exit 0
           fi
-          git commit -m "data: sync actividad pública de repos"
+          git commit -m "data: sync actividad pública del inventario Yggdra"
           git push
