@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-20T11:30:17Z",
+  "updatedAt": "2026-10-21T11:42:17Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -11,7 +11,7 @@
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
       "updatedAt": "2026-09-25T05:24:13Z",
-      "pushedAt": "2026-10-20T01:40:55Z",
+      "pushedAt": "2026-10-21T02:49:15Z",
       "commits": [
         {
           "date": "2026-09-25",
@@ -486,11 +486,115 @@
       "name": "nereus_smarthydro",
       "fullName": "felipebarraza6/nereus_smarthydro",
       "description": null,
-      "language": "JavaScript",
+      "language": "TypeScript",
       "createdAt": "2026-10-10T03:40:57Z",
-      "updatedAt": "2026-10-19T20:11:40Z",
-      "pushedAt": "2026-10-19T20:11:35Z",
+      "updatedAt": "2026-10-20T20:31:58Z",
+      "pushedAt": "2026-10-20T20:31:51Z",
       "commits": [
+        {
+          "date": "2026-10-20",
+          "summary": "Regenerar routeTree con las rutas nuevas"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Home en light glass con tarjetas de modulo"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Descripciones del home para Agua, Documentos y Auditoria"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Shell con menu movil lateral y sidebar glass"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Entradas de navegacion para Agua, Documentos y Auditoria"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Provisionar vincula el contrato por su proyecto de telemetria"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulo Telemetria con paneles de dispositivos y alertas"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Soporte con detalle de ticket ampliado"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulo Servicios con contratos, membresias y trabajos"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Ficha Cliente 360 con tarjetas de resumen"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulos Ventas y Compras con detalle de pedidos y proveedores"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulo Inventario (productos, stock, almacenes, mediciones y certificados)"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Ficha de equipo en Activos"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulo Finanzas (tesoreria, impuestos, ingresos y egresos, reportes)"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulos Usuarios y Sucursales (panel de usuarios, mi cuenta, organizacion)"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulo Documentos (carpetas, archivos, permisos y subida)"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulo Auditoria con kit de vistas de solo lectura"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modulo Agua potable (medidores, lecturas, tarifas y facturacion)"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Modo demo con semillas y acciones por dominio"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Indicadores de negocio calculados en cliente con paneles analiticos"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Recursos ERP divididos por dominio"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Vinculo contrato-dispositivo via proyecto de telemetria"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Capa ERP sobre la API Yggdra (upload, paginado y tipos)"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Scripts de inspeccion y cobertura de la API"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Apuntar la API base a gateway.smarthydro.app"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Ignorar artefactos de build de Vercel y capturas QA locales"
+        },
         {
           "date": "2026-10-19",
           "summary": "Actualiza la salida de build de Vercel"
@@ -502,6 +606,10 @@
         {
           "date": "2026-10-10",
           "summary": "Export from Grok"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Home en light glass con tarjetas de modulo"
         }
       ]
     },
@@ -511,9 +619,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-10-19T13:04:18Z",
-      "pushedAt": "2026-10-19T13:04:14Z",
+      "updatedAt": "2026-10-20T11:30:23Z",
+      "pushedAt": "2026-10-20T11:30:19Z",
       "commits": [
+        {
+          "date": "2026-10-20",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-10-19",
           "summary": "Data: sync actividad pública del inventario Yggdra"
