@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-22T11:45:24Z",
+  "updatedAt": "2026-10-23T11:32:49Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -11,7 +11,7 @@
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
       "updatedAt": "2026-09-25T05:24:13Z",
-      "pushedAt": "2026-10-21T23:48:07Z",
+      "pushedAt": "2026-10-23T00:48:41Z",
       "commits": [
         {
           "date": "2026-09-25",
@@ -141,9 +141,49 @@
       "description": "Muninn - Agentes IA Especializados",
       "language": "TypeScript",
       "createdAt": "2026-07-09T13:21:01Z",
-      "updatedAt": "2026-10-22T04:13:40Z",
-      "pushedAt": "2026-10-22T04:13:35Z",
+      "updatedAt": "2026-10-22T23:53:09Z",
+      "pushedAt": "2026-10-22T23:53:04Z",
       "commits": [
+        {
+          "date": "2026-10-22",
+          "summary": "Merge pull request #27 from felipebarraza6/feat/agent-store"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "Tienda pública de agentes (/agentes) con clone, publish y revisión SA"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "Merge pull request #26 from felipebarraza6/fix/session-persistence"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "Resumen superadmin usa /ai-agents/summary/ con filtro Todas"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "Merge pull request #24 from felipebarraza6/feat/sales-readiness"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "No usar la marca by-host en los hosts de Muninn"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "Publicar cuenta gratis, precio por agente y runas"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "Merge pull request #23 from felipebarraza6/feat/sales-readiness"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "Dejar Muninn listo para una conversación comercial"
+        },
+        {
+          "date": "2026-10-22",
+          "summary": "Separar staging (Pages) y producción (FTP)"
+        },
         {
           "date": "2026-10-22",
           "summary": "SetEnvIf Request_URI para LiteSpeed (frame-ancestors * en /embed/)"
@@ -217,52 +257,12 @@
           "summary": "Auto-scroll en bandeja de conversaciones"
         },
         {
-          "date": "2026-07-31",
-          "summary": "Chat doble-envio, creacion inmediata de conversaciones, archivado en bandeja y scroll del analisis de mensajes"
+          "date": "2026-10-22",
+          "summary": "Merge pull request #26 from felipebarraza6/fix/session-persistence"
         },
         {
-          "date": "2026-07-30",
-          "summary": "Prettier formatting en tests"
-        },
-        {
-          "date": "2026-07-30",
-          "summary": "Prettier formatting en tests"
-        },
-        {
-          "date": "2026-07-30",
-          "summary": "Prettier formatting en tests y useDataVolumes"
-        },
-        {
-          "date": "2026-07-30",
-          "summary": "Release: production readiness v2 - auth guards, tests, chat fixes, cron icon"
-        },
-        {
-          "date": "2026-07-30",
-          "summary": "Production readiness - auth guards, tests, missing endpoints, chat fixes, knowledge cron icon"
-        },
-        {
-          "date": "2026-07-30",
-          "summary": "Production readiness - auth guards, tests, missing endpoints, chat fixes, knowledge cron icon"
-        },
-        {
-          "date": "2026-07-30",
-          "summary": "Cronjob persistencia, chat navegacion, filtro conversaciones, titulo editable"
-        },
-        {
-          "date": "2026-07-29",
-          "summary": "Cambios misceláneos en auth, login y tema"
-        },
-        {
-          "date": "2026-09-13",
-          "summary": "Muninn.yggdra.cl siempre muestra landing propio, no branded login"
-        },
-        {
-          "date": "2026-09-13",
-          "summary": "Usar FTP propio de Muninn (ftp.yggdra.cl) en CI"
-        },
-        {
-          "date": "2026-09-13",
-          "summary": "No-unused-expressions ternary in AgentChatCore"
+          "date": "2026-10-22",
+          "summary": "Resumen superadmin usa /ai-agents/summary/ con filtro Todas"
         }
       ]
     },
@@ -488,9 +488,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-10-21T11:42:21Z",
-      "pushedAt": "2026-10-21T11:42:17Z",
+      "updatedAt": "2026-10-22T11:45:28Z",
+      "pushedAt": "2026-10-22T11:45:25Z",
       "commits": [
+        {
+          "date": "2026-10-22",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-10-21",
           "summary": "Data: sync actividad pública del inventario Yggdra"
