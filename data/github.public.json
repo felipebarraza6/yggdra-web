@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-24T10:52:56Z",
+  "updatedAt": "2026-10-25T11:19:06Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -10,128 +10,128 @@
       "description": "FRIG - Punto de venta gastronómico multi-tenant white-label",
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
-      "updatedAt": "2026-09-25T05:24:13Z",
-      "pushedAt": "2026-10-24T05:36:38Z",
+      "updatedAt": "2026-10-24T22:58:58Z",
+      "pushedAt": "2026-10-25T02:32:31Z",
       "commits": [
         {
-          "date": "2026-09-25",
-          "summary": "Merge de módulos backend + locales — los nuevos (salón 3D, bodegas, informes, etiquetas) siempre visibles"
+          "date": "2026-10-24",
+          "summary": "Merge dev: menos carga a Yggdra, cache por sucursal, filtros de producto"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Release: lint verde + salón 3D + landing"
+          "date": "2026-10-24",
+          "summary": "Menos carga a Yggdra y cache aislada por sucursal"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Dejar el gate de lint en verde para el código 3D/KDS recuperado"
+          "date": "2026-10-24",
+          "summary": "Merge pull request #53 from felipebarraza6/ci/failure-issues"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Dejar el gate de lint en verde para el código 3D/KDS recuperado"
+          "date": "2026-10-24",
+          "summary": "Prefijar logos con el basePath de Pages"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Release: salón digital 3D + ecosistema de informes + landing renovada"
+          "date": "2026-10-24",
+          "summary": "Publicar dev en GitHub Pages"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Servidor estático para out/ (export) y extractor de fuentes desde sourcemaps"
+          "date": "2026-10-24",
+          "summary": "Abrir/cerrar issues automáticamente cuando falla CI"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Reflejar el ecosistema nuevo (salón 3D, informes, bodegas, etiquetas, tótem)"
+          "date": "2026-10-23",
+          "summary": "Merge pull request #52 from felipebarraza6/dev"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Reconciliar versiones entre archivos recuperados (SalonFocus, label PDF, monto cuotas)"
+          "date": "2026-10-23",
+          "summary": "Merge pull request #51 from felipebarraza6/fix/ultimo-cierre-fecha"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Recover(3d): restaurar archivos nuevos de la sesión 3D/UX (salón Three.js, kds, bodegas, informes) extraídos de sourcemaps de .next"
+          "date": "2026-10-23",
+          "summary": "Sync con backend production (78f94785)"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Recover(wip): restaurar sesión del 24-sep (experiencia visual 3D + overhaul UX) recuperada de stash eliminado"
+          "date": "2026-10-23",
+          "summary": "'Último cierre' mostraba un día menos por zona horaria"
         },
         {
-          "date": "2026-09-24",
-          "summary": "Merge branch 'feat/contract-sync' into dev"
+          "date": "2026-10-23",
+          "summary": "Merge pull request #50 from felipebarraza6/dev"
         },
         {
-          "date": "2026-09-24",
-          "summary": "Actualizar SHA del schema OpenAPI (post-regeneración backend)"
+          "date": "2026-10-23",
+          "summary": "Merge pull request #49 from felipebarraza6/fix/auditoria-1022"
         },
         {
-          "date": "2026-09-24",
-          "summary": "Blindaje de contrato API backend↔frontend"
+          "date": "2026-10-23",
+          "summary": "Estado del correo de acceso una sola vez en la fila (vista escritorio)"
         },
         {
-          "date": "2026-09-22",
-          "summary": "Align de with master (CI triggers fix)"
+          "date": "2026-10-22",
+          "summary": "Página de pago de cuotas, aviso de cuentas abiertas antiguas en POS, rewrite kds/station"
         },
         {
-          "date": "2026-09-22",
-          "summary": "Merge master into production (CI triggers fix)"
+          "date": "2026-10-22",
+          "summary": "Merge pull request #48 from felipebarraza6/dev"
         },
         {
-          "date": "2026-09-22",
-          "summary": "Update CI workflow to include production branch"
+          "date": "2026-10-22",
+          "summary": "Merge pull request #47 from felipebarraza6/fix/mani-1022"
         },
         {
-          "date": "2026-09-22",
-          "summary": "Fix CI workflow branch ignore configuration"
+          "date": "2026-10-22",
+          "summary": "Tipos de producto según backend, resumen por caja, 'Abierta el' con fecha, Consumidor final + Agregar pago, estado/reenvío de acceso"
         },
         {
-          "date": "2026-09-22",
-          "summary": "Align de with master (deploy gate)"
+          "date": "2026-10-22",
+          "summary": "Merge pull request #46 from felipebarraza6/dev"
         },
         {
-          "date": "2026-09-22",
-          "summary": "Merge master into production (deploy gate → production)"
+          "date": "2026-10-22",
+          "summary": "Merge pull request #45 from felipebarraza6/fix/cajas-stale"
         },
         {
-          "date": "2026-09-22",
-          "summary": "Deploy FTP desde production"
+          "date": "2026-10-22",
+          "summary": "Listar y cerrar cajas OPEN de días anteriores"
         },
         {
-          "date": "2026-09-21",
-          "summary": "Align master with de"
+          "date": "2026-10-22",
+          "summary": "Merge pull request #44 from felipebarraza6/dev"
         },
         {
-          "date": "2026-09-21",
-          "summary": "Align de with master"
+          "date": "2026-10-22",
+          "summary": "Merge pull request #43 from felipebarraza6/fix/survey-rewrite"
         },
         {
-          "date": "2026-09-21",
-          "summary": "Align master with de"
+          "date": "2026-10-22",
+          "summary": "Sync con backend en producción (c4f39e7d)"
         },
         {
-          "date": "2026-09-21",
-          "summary": "Merge master into de (align after sync)"
+          "date": "2026-10-22",
+          "summary": "Reescribir /survey/<slug> a /survey/__.html"
         },
         {
-          "date": "2026-09-21",
-          "summary": "Merge de into master (sync + CI fixes)"
+          "date": "2026-10-21",
+          "summary": "Merge pull request #42 from felipebarraza6/dev"
         },
         {
-          "date": "2026-09-21",
-          "summary": "Merge master into de (sync cosmic-layer fix)"
+          "date": "2026-10-21",
+          "summary": "Merge pull request #41 from felipebarraza6/feat/repartidores"
         },
         {
-          "date": "2026-09-21",
-          "summary": "Merge pull request #1 from felipebarraza6/fix/sync-package-lock-next-16.3.5"
+          "date": "2026-10-21",
+          "summary": "Merge pull request #40 from felipebarraza6/dev"
         },
         {
-          "date": "2026-09-21",
-          "summary": "Avoid setState in effects for discounts and order pay"
+          "date": "2026-10-21",
+          "summary": "Rol Repartidor y selector de asignación"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Dejar el gate de lint en verde para el código 3D/KDS recuperado"
+          "date": "2026-10-21",
+          "summary": "Merge pull request #39 from felipebarraza6/fix/zona-reactivar"
         },
         {
-          "date": "2026-09-25",
-          "summary": "Dejar el gate de lint en verde para el código 3D/KDS recuperado"
+          "date": "2026-10-21",
+          "summary": "Mostrar el mensaje real del API al guardar zona"
         }
       ]
     },
@@ -488,9 +488,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-10-23T11:32:54Z",
-      "pushedAt": "2026-10-23T11:32:50Z",
+      "updatedAt": "2026-10-24T10:53:00Z",
+      "pushedAt": "2026-10-24T10:52:56Z",
       "commits": [
+        {
+          "date": "2026-10-24",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-10-23",
           "summary": "Data: sync actividad pública del inventario Yggdra"
