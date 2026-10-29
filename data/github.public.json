@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-28T12:45:35Z",
+  "updatedAt": "2026-10-29T12:55:07Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -10,9 +10,13 @@
       "description": "FRIG - Punto de venta gastronómico multi-tenant white-label",
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
-      "updatedAt": "2026-10-24T22:58:58Z",
-      "pushedAt": "2026-10-25T02:32:31Z",
+      "updatedAt": "2026-10-29T04:56:30Z",
+      "pushedAt": "2026-10-29T04:59:28Z",
       "commits": [
+        {
+          "date": "2026-10-29",
+          "summary": "Extras visibles en cocina y cobro correcto con extras"
+        },
         {
           "date": "2026-10-24",
           "summary": "Merge dev: menos carga a Yggdra, cache por sucursal, filtros de producto"
@@ -128,10 +132,6 @@
         {
           "date": "2026-10-21",
           "summary": "Merge pull request #39 from felipebarraza6/fix/zona-reactivar"
-        },
-        {
-          "date": "2026-10-21",
-          "summary": "Mostrar el mensaje real del API al guardar zona"
         }
       ]
     },
@@ -488,9 +488,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-10-27T12:05:08Z",
-      "pushedAt": "2026-10-27T12:05:05Z",
+      "updatedAt": "2026-10-28T12:45:40Z",
+      "pushedAt": "2026-10-28T12:45:36Z",
       "commits": [
+        {
+          "date": "2026-10-28",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-10-27",
           "summary": "Data: sync actividad pública del inventario Yggdra"
