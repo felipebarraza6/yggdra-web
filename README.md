@@ -1,4 +1,36 @@
-# Yggdra Platform (web pública)
+# yggdra-web
+
+## Descripción
+Sitio web Yggdra.
+
+## Arquitectura
+Carpetas principales: `data/`, `docs/`, `public/`, `scripts/`, `src/`.
+
+
+## Setup local
+1. Clonar el repo y copiar `.env.example` a `.env` (no versionar `.env`).
+2. Completar las variables con valores de desarrollo (pedirlos a Felipe; nunca por chat ni en commits).
+3. Instalar dependencias (`npm ci`) y levantar el servicio.
+
+## Variables de entorno
+Solo nombres; valores en el servidor o en GitHub Secrets:
+- `GH_TOKEN`
+- `GITHUB_TOKEN`
+
+## Deploy
+- Deploy **manual**; nada va a `production` sin aprobación de Felipe.
+- No usar `down`, `--volumes` ni `prune` en servidores de producción.
+
+## Runbook
+- Revisar logs del contenedor/servicio antes de reiniciar; avisar antes de reiniciar servicios productivos.
+- Ante un secreto filtrado: rotar, actualizar el servidor y ver `SECURITY.md`.
+- Ante errores de CI: un solo re-run por PR.
+
+---
+
+## Documentación previa
+
+### Yggdra Platform (web pública)
 
 Sitio explicativo de **Yggdra Platform**: portafolio técnico de la arquitectura
 multi-tenant y de las aplicaciones que la consumen.
@@ -45,7 +77,7 @@ Todo se genera desde `data/*.json` en build. Formato documentado en
 
 ```bash
 pip install -r requirements-data.txt
-# colocar YAML privado en _private/CONSUMERS.yaml (gitignorado)
+### colocar YAML privado en _private/CONSUMERS.yaml (gitignorado)
 python3 scripts/build_public_data.py
 python3 scripts/check_privacy.py
 ```
