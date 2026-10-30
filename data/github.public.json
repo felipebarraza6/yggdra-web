@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-29T12:55:07Z",
+  "updatedAt": "2026-10-30T12:47:45Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -10,9 +10,41 @@
       "description": "FRIG - Punto de venta gastronómico multi-tenant white-label",
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
-      "updatedAt": "2026-10-29T04:56:30Z",
-      "pushedAt": "2026-10-29T04:59:28Z",
+      "updatedAt": "2026-10-30T04:01:04Z",
+      "pushedAt": "2026-10-30T04:01:02Z",
       "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "El preview de staging usa la API de staging"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Tipa el root layout sin LayoutProps"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #70 from felipebarraza6/docs/estandar"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #69 from felipebarraza6/contract-check"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Chequeo de contrato OpenAPI"
+        },
         {
           "date": "2026-10-29",
           "summary": "Extras visibles en cocina y cobro correcto con extras"
@@ -100,38 +132,399 @@
         {
           "date": "2026-10-22",
           "summary": "Merge pull request #44 from felipebarraza6/dev"
+        }
+      ]
+    },
+    {
+      "name": "nxrd_apr",
+      "fullName": "felipebarraza6/nxrd_apr",
+      "description": "Cliente web de Cauce. Registro del ciclo de agua potable rural: socio, medidor, lectura, tarifa vigente y cobro del período.",
+      "language": "TypeScript",
+      "createdAt": "2026-09-30T14:12:42Z",
+      "updatedAt": "2026-10-30T04:01:09Z",
+      "pushedAt": "2026-10-30T04:01:07Z",
+      "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "El preview de staging usa la API de staging"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Merge pull request #34 from felipebarraza6/fix/login-water-14-dev"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El tema por host de la org Cauce/Smart APR ya no tapa el agua"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Pages de staging en dev"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #32 from felipebarraza6/docs/estandar"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #31 from felipebarraza6/contract-check"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Filtrar undefined al aplanar submodulos"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Chequeo de contrato OpenAPI y tipos al dia con el freeze"
         },
         {
           "date": "2026-10-22",
-          "summary": "Merge pull request #43 from felipebarraza6/fix/survey-rewrite"
+          "summary": "Lecturas atrasadas y buscador de medidores"
         },
         {
-          "date": "2026-10-22",
-          "summary": "Sync con backend en producción (c4f39e7d)"
+          "date": "2026-10-09",
+          "summary": "Presentar el repositorio como el cliente de agua"
         },
         {
-          "date": "2026-10-22",
-          "summary": "Reescribir /survey/<slug> a /survey/__.html"
+          "date": "2026-10-09",
+          "summary": "Identidad hidráulica y caudal portable"
         },
         {
-          "date": "2026-10-21",
-          "summary": "Merge pull request #42 from felipebarraza6/dev"
+          "date": "2026-10-09",
+          "summary": "Auditoría pre-producción y validación e2e de octubre 2026"
         },
         {
-          "date": "2026-10-21",
-          "summary": "Merge pull request #41 from felipebarraza6/feat/repartidores"
+          "date": "2026-10-09",
+          "summary": "Cerrar cobro, padrón y lecturas antes de la pasada UI"
         },
         {
-          "date": "2026-10-21",
-          "summary": "Merge pull request #40 from felipebarraza6/dev"
+          "date": "2026-10-02",
+          "summary": "Document Cloud Agent install and dev commands"
         },
         {
-          "date": "2026-10-21",
-          "summary": "Rol Repartidor y selector de asignación"
+          "date": "2026-10-02",
+          "summary": "Cuentas abiertas desde receivables y paginar pendientes"
         },
         {
-          "date": "2026-10-21",
-          "summary": "Merge pull request #39 from felipebarraza6/fix/zona-reactivar"
+          "date": "2026-10-02",
+          "summary": "Copy genérico en showcase demo (sin APR seed)"
+        },
+        {
+          "date": "2026-10-02",
+          "summary": "Español chileno con tuteo y socios en contextos APR"
+        },
+        {
+          "date": "2026-10-02",
+          "summary": "Merge pull request #8 from felipebarraza6/cursor/demo-roles-front"
+        },
+        {
+          "date": "2026-10-02",
+          "summary": "Medidor (METER) usa su allowlist, Pagos tolera OC sin permiso y m³ del POS formateado"
+        },
+        {
+          "date": "2026-10-02",
+          "summary": "Merge pull request #7 from felipebarraza6/cursor/hydration-pos-sidebar"
+        },
+        {
+          "date": "2026-10-02",
+          "summary": "Hidratación sin #418, POS móvil abre arriba y sin sidebar con barra final"
+        },
+        {
+          "date": "2026-10-02",
+          "summary": "Merge pull request #6 from felipebarraza6/cursor/cauce-demo-pos-fixes"
+        },
+        {
+          "date": "2026-10-02",
+          "summary": "Búsqueda muestra medidores ya leídos, lupa alineada, medidores activos y tarjeta POS con datos reales"
+        },
+        {
+          "date": "2026-10-02",
+          "summary": "Merge pull request #5 from felipebarraza6/cursor/cauce-demo-aeb9"
+        },
+        {
+          "date": "2026-10-01",
+          "summary": "Cumplir lint set-state-in-effect en banner y landing"
+        },
+        {
+          "date": "2026-10-01",
+          "summary": "Limpiar demo_expires_at al cerrar sesión"
+        },
+        {
+          "date": "2026-10-01",
+          "summary": "Probar demo en landing, banner de sesión y showcase KPIs"
+        }
+      ]
+    },
+    {
+      "name": "forja",
+      "fullName": "felipebarraza6/forja",
+      "description": "Forja: plataforma para personal trainers (venta de servicios y gestión de alumnos), sobre la API Yggdra",
+      "language": "TypeScript",
+      "createdAt": "2026-10-15T03:27:43Z",
+      "updatedAt": "2026-10-30T04:01:21Z",
+      "pushedAt": "2026-10-30T04:01:18Z",
+      "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "El preview de staging usa la API de staging"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Chequeo de contrato OpenAPI y tipos generados"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Pages por Actions en dev y production"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #11 from felipebarraza6/docs/estandar"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Informe de validación con resultados API real (5/6)"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Publish staging [skip ci]"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Merge pull request #9 from felipebarraza6/cursor/fix-student-status-d66f"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Enums Forja en inglés (API) + labels ES en UI"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Status de alumno — quitar invitado (API 400)"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Publish staging [skip ci]"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Merge pull request #5 from felipebarraza6/cursor/forja-e2e-integration-d66f"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Merge: integrar main (#4+#6) en E2E y regenerar informe"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Publish staging [skip ci]"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Merge pull request #6 from felipebarraza6/cursor/forja-ui-nordic-e150"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Merge: integrar main (#4) en UI nórdica"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Publish staging [skip ci]"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Merge pull request #4 from felipebarraza6/cursor/forja-contract-audit-5ea1"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Restaurar index.html de producción con tipografías nuevas"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Identidad nórdica, logo rúnico y pulido UX"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Pruebas E2E/integración, informe PDF y suite API real opcional"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Alinear cliente al contrato Yggdra y auditar Forja"
+        },
+        {
+          "date": "2026-10-16",
+          "summary": "Conectar Forja a API Yggdra real (branch 91) + gaps de contrato"
+        },
+        {
+          "date": "2026-10-15",
+          "summary": "Publicar SPA de producción en main para GitHub Pages"
+        },
+        {
+          "date": "2026-10-15",
+          "summary": "Publicar build en main para Pages (source legacy main/)"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Pages por Actions en dev y production"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #11 from felipebarraza6/docs/estandar"
+        }
+      ]
+    },
+    {
+      "name": "proyecto-90",
+      "fullName": "felipebarraza6/proyecto-90",
+      "description": "Proyecto 90: landing, inscripción y panel del desafío de 90 días.",
+      "language": "TypeScript",
+      "createdAt": "2026-10-30T03:10:38Z",
+      "updatedAt": "2026-10-30T04:01:36Z",
+      "pushedAt": "2026-10-30T04:01:34Z",
+      "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "El preview de staging usa la API de staging"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El FTPS de producción sale de main"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #31 from felipebarraza6/docs/estandar"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #30 from felipebarraza6/contract-check"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Chequeo de contrato OpenAPI y tipos generados"
+        },
+        {
+          "date": "2026-10-27",
+          "summary": "Pago de cuota + biblioteca por categorías"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Respetar can_delete/author_id del backend"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Alinear delete/SSE al contrato yggdra_infra #148"
+        },
+        {
+          "date": "2026-10-20",
+          "summary": "Nutri/admin pueden eliminar mensajes y avisos generales"
+        },
+        {
+          "date": "2026-10-18",
+          "summary": "Merge pull request #26 from felipebarraza6/cursor/fix-macro-targets-save-on-approve-74f9"
+        },
+        {
+          "date": "2026-10-18",
+          "summary": "POST meta de macros solo al aprobar el plan"
+        },
+        {
+          "date": "2026-10-18",
+          "summary": "Macros del nutricionista se guardan y se ven al recargar"
+        },
+        {
+          "date": "2026-10-15",
+          "summary": "Aclarar conteo de entrenamientos en la ficha"
+        },
+        {
+          "date": "2026-10-15",
+          "summary": "% semanal en la ficha y semana actual aparte en Progreso (tolerante)"
+        },
+        {
+          "date": "2026-10-14",
+          "summary": "Estilo del cuadro de respuesta y texto de ayuda en celular"
+        },
+        {
+          "date": "2026-10-14",
+          "summary": "'Descanso' cabe completo en el desplegable de hábitos a 390px"
+        },
+        {
+          "date": "2026-10-14",
+          "summary": "Bandeja del equipo con etiquetas y filtro 90 días (tolerante a backend sin endpoint)"
+        },
+        {
+          "date": "2026-10-14",
+          "summary": "En celular, registro diario con lista desplegable (Sí/No/Descanso)"
+        },
+        {
+          "date": "2026-10-14",
+          "summary": "Preferir effective_macro_targets en vista alumno"
+        },
+        {
+          "date": "2026-10-13",
+          "summary": "Evitar scroll horizontal y etiquetar Estado en español"
+        },
+        {
+          "date": "2026-10-13",
+          "summary": "SSE al instante, sin doble broadcast, hilo en Ficha admin"
+        },
+        {
+          "date": "2026-10-13",
+          "summary": "SSE de mensajes, Mensajes sin onboarding y hilo en Ficha"
+        },
+        {
+          "date": "2026-10-13",
+          "summary": "Pesos de macros, metas por tramo y mensajería"
+        },
+        {
+          "date": "2026-10-12",
+          "summary": "Participantes usa semana del panel; quita probe PATCH de Reglas"
+        },
+        {
+          "date": "2026-10-12",
+          "summary": "Cierra gaps de auditoría del panel y legado"
+        },
+        {
+          "date": "2026-10-10",
+          "summary": "Español claro en Reglas/admin y plan de entreno cumplido"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
         }
       ]
     },
@@ -141,9 +534,41 @@
       "description": "Muninn - Agentes IA Especializados",
       "language": "TypeScript",
       "createdAt": "2026-07-09T13:21:01Z",
-      "updatedAt": "2026-10-22T23:53:09Z",
-      "pushedAt": "2026-10-22T23:53:04Z",
+      "updatedAt": "2026-10-30T04:01:42Z",
+      "pushedAt": "2026-10-30T04:01:40Z",
       "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "El preview de staging usa la API de staging"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Pages de staging pasa a dev, y el lock de npm queda alineado"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #29 from felipebarraza6/docs/estandar"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #28 from felipebarraza6/contract-check"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Chequeo de contrato OpenAPI y tipos generados"
+        },
         {
           "date": "2026-10-22",
           "summary": "Merge pull request #27 from felipebarraza6/feat/agent-store"
@@ -225,44 +650,12 @@
           "summary": "Bug fixes de auditoría + split agent-chat-core + tab Reglas"
         },
         {
-          "date": "2026-08-03",
-          "summary": "Style: format business-home.tsx"
+          "date": "2026-10-30",
+          "summary": "Pages de staging pasa a dev, y el lock de npm queda alineado"
         },
         {
-          "date": "2026-08-03",
-          "summary": "Dashboard dinámico con widgets configurables y mejoras de permisos"
-        },
-        {
-          "date": "2026-07-31",
-          "summary": "Intervalos de polling conservadores (10s live / 30s idle) para no saturar el rate-limit del API"
-        },
-        {
-          "date": "2026-07-31",
-          "summary": "Polling adaptativo de mensajes y no reintentar 429 (rate-limit)"
-        },
-        {
-          "date": "2026-07-31",
-          "summary": "Forzar overflow nativo en viewport de ScrollArea con !important (Radix sobrescribe inline style)"
-        },
-        {
-          "date": "2026-07-31",
-          "summary": "Viewport de ScrollArea siempre scrolleable nativamente (overflow auto) + flex column para altura limitada"
-        },
-        {
-          "date": "2026-07-31",
-          "summary": "Limitar altura de ChatThread para evitar auto-scroll infinito"
-        },
-        {
-          "date": "2026-07-31",
-          "summary": "Auto-scroll en bandeja de conversaciones"
-        },
-        {
-          "date": "2026-10-22",
-          "summary": "Merge pull request #26 from felipebarraza6/fix/session-persistence"
-        },
-        {
-          "date": "2026-10-22",
-          "summary": "Resumen superadmin usa /ai-agents/summary/ con filtro Todas"
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
         }
       ]
     },
@@ -272,9 +665,41 @@
       "description": "Gungir — comercio general sobre Yggdra (landing + cotizador, Public/Local/Admin)",
       "language": "TypeScript",
       "createdAt": "2026-09-19T03:56:35Z",
-      "updatedAt": "2026-09-19T04:41:53Z",
-      "pushedAt": "2026-09-19T04:41:49Z",
+      "updatedAt": "2026-10-30T04:01:25Z",
+      "pushedAt": "2026-10-30T04:01:24Z",
       "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "El preview de staging usa la API de staging"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Pages de staging y producción"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #2 from felipebarraza6/docs/estandar"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #1 from felipebarraza6/contract-check"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Chequeo de contrato OpenAPI y tipos generados"
+        },
         {
           "date": "2026-09-19",
           "summary": "Premium Frig-level UX — mark, live preview, demos, plans, contact"
@@ -311,9 +736,13 @@
       "description": "Landing cotizador oro (prototipo cliente) — consume Yggdra /api/public/*",
       "language": "TypeScript",
       "createdAt": "2026-09-19T04:31:14Z",
-      "updatedAt": "2026-09-19T04:33:15Z",
-      "pushedAt": "2026-09-19T04:33:11Z",
+      "updatedAt": "2026-10-30T02:06:53Z",
+      "pushedAt": "2026-10-30T02:06:54Z",
       "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "Pages sale de staging y production"
+        },
         {
           "date": "2026-09-19",
           "summary": "Client-facing copy shows Gungir only, no Yggdra"
@@ -330,9 +759,49 @@
       "description": "HEIR - plataforma de agenda, pagos y agente conversacional para profesionales de la salud",
       "language": "TypeScript",
       "createdAt": "2026-08-12T04:32:26Z",
-      "updatedAt": "2026-09-04T23:58:27Z",
-      "pushedAt": "2026-09-04T23:58:23Z",
+      "updatedAt": "2026-10-30T04:01:31Z",
+      "pushedAt": "2026-10-30T04:01:29Z",
       "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "El preview de staging usa la API de staging"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El lock de npm apunta a registry.npmjs.org"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Reintentar npm ci en Pages"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Pages de staging y producción"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #2 from felipebarraza6/docs/estandar"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #1 from felipebarraza6/contract-check"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Chequeo de contrato OpenAPI y tipos generados"
+        },
         {
           "date": "2026-09-04",
           "summary": "README con contrato Yggdra, roles y configuración pre-producción"
@@ -357,9 +826,41 @@
       "description": null,
       "language": "TypeScript",
       "createdAt": "2026-09-04T23:18:46Z",
-      "updatedAt": "2026-09-05T00:10:02Z",
-      "pushedAt": "2026-09-05T00:09:58Z",
+      "updatedAt": "2026-10-30T04:01:15Z",
+      "pushedAt": "2026-10-30T04:01:13Z",
       "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "El preview de staging usa la API de staging"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "La rama staging publica el preview"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "Pages de staging y producción, y lock de npm alineado"
+        },
+        {
+          "date": "2026-10-30",
+          "summary": "El contrato compara el sha en GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #2 from felipebarraza6/docs/estandar"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Merge pull request #1 from felipebarraza6/contract-check"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+        },
+        {
+          "date": "2026-10-29",
+          "summary": "Chequeo de contrato OpenAPI y tipos generados"
+        },
         {
           "date": "2026-09-05",
           "summary": "Remove binary probe"
@@ -447,38 +948,6 @@
         {
           "date": "2026-09-04",
           "summary": "Add ui field and input-group"
-        },
-        {
-          "date": "2026-09-04",
-          "summary": "Add ui form, hover-card, input, kbd, label"
-        },
-        {
-          "date": "2026-09-04",
-          "summary": "Add ui dropdown-menu"
-        },
-        {
-          "date": "2026-09-04",
-          "summary": "Add ui drawer and empty"
-        },
-        {
-          "date": "2026-09-04",
-          "summary": "Add ui command and dialog"
-        },
-        {
-          "date": "2026-09-04",
-          "summary": "Add ui components batch 3 (card, checkbox, collapsible)"
-        },
-        {
-          "date": "2026-09-04",
-          "summary": "Add ui components batch 2 (badge, breadcrumb, button-group, button)"
-        },
-        {
-          "date": "2026-09-04",
-          "summary": "Add ui components batch 1 (accordion, alert-dialog, alert, aspect-ratio, avatar)"
-        },
-        {
-          "date": "2026-09-04",
-          "summary": "Add tarificacion Documentos"
         }
       ]
     },
@@ -488,9 +957,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-10-28T12:45:40Z",
-      "pushedAt": "2026-10-28T12:45:36Z",
+      "updatedAt": "2026-10-29T12:55:12Z",
+      "pushedAt": "2026-10-29T14:13:56Z",
       "commits": [
+        {
+          "date": "2026-10-29",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-10-28",
           "summary": "Data: sync actividad pública del inventario Yggdra"
