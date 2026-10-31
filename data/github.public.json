@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-30T12:47:45Z",
+  "updatedAt": "2026-10-31T12:18:41Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -731,29 +731,6 @@
       ]
     },
     {
-      "name": "cotizador-oro",
-      "fullName": "felipebarraza6/cotizador-oro",
-      "description": "Landing cotizador oro (prototipo cliente) — consume Yggdra /api/public/*",
-      "language": "TypeScript",
-      "createdAt": "2026-09-19T04:31:14Z",
-      "updatedAt": "2026-10-30T02:06:53Z",
-      "pushedAt": "2026-10-30T02:06:54Z",
-      "commits": [
-        {
-          "date": "2026-10-30",
-          "summary": "Pages sale de staging y production"
-        },
-        {
-          "date": "2026-09-19",
-          "summary": "Client-facing copy shows Gungir only, no Yggdra"
-        },
-        {
-          "date": "2026-09-19",
-          "summary": "Initial commit: landing cotizador oro for GitHub Pages"
-        }
-      ]
-    },
-    {
       "name": "heir",
       "fullName": "felipebarraza6/heir",
       "description": "HEIR - plataforma de agenda, pagos y agente conversacional para profesionales de la salud",
@@ -957,9 +934,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-10-29T12:55:12Z",
-      "pushedAt": "2026-10-29T14:13:56Z",
+      "updatedAt": "2026-10-30T12:47:50Z",
+      "pushedAt": "2026-10-30T12:47:46Z",
       "commits": [
+        {
+          "date": "2026-10-30",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-10-29",
           "summary": "Data: sync actividad pública del inventario Yggdra"
