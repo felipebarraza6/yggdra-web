@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-02T15:41:16Z",
+  "updatedAt": "2026-11-03T14:04:57Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -403,9 +403,69 @@
       "description": "Proyecto 90: landing, inscripción y panel del desafío de 90 días.",
       "language": "TypeScript",
       "createdAt": "2026-10-30T03:10:38Z",
-      "updatedAt": "2026-11-01T00:13:52Z",
-      "pushedAt": "2026-11-02T01:34:43Z",
+      "updatedAt": "2026-11-03T11:05:21Z",
+      "pushedAt": "2026-11-03T11:06:09Z",
       "commits": [
+        {
+          "date": "2026-11-03",
+          "summary": "Merge pull request #21 from felipebarraza6/fix/3-kg-format"
+        },
+        {
+          "date": "2026-11-03",
+          "summary": "Redondeo de variación de peso y etiqueta en curso (refs #3)"
+        },
+        {
+          "date": "2026-11-03",
+          "summary": "Merge pull request #19 from felipebarraza6/fix/2-etapa-en-curso"
+        },
+        {
+          "date": "2026-11-03",
+          "summary": "Etapa en curso con adherencia parcial (closes #2)"
+        },
+        {
+          "date": "2026-11-03",
+          "summary": "Cierre del día en la API"
+        },
+        {
+          "date": "2026-11-03",
+          "summary": "Registrar cierre del día en la API"
+        },
+        {
+          "date": "2026-11-03",
+          "summary": "Solo lectura explícita para revisor"
+        },
+        {
+          "date": "2026-11-03",
+          "summary": "Solo lectura explícita para revisor"
+        },
+        {
+          "date": "2026-11-02",
+          "summary": "Merge pull request #13 from felipebarraza6/fix/p90-resto-auditoria"
+        },
+        {
+          "date": "2026-11-02",
+          "summary": "El sitio público lo publica production, igual que el workflow"
+        },
+        {
+          "date": "2026-11-02",
+          "summary": "Pesos y adherencia por tramo en Participantes y CSV"
+        },
+        {
+          "date": "2026-11-02",
+          "summary": "Reintento si falla la config del panel y solo lectura del revisor"
+        },
+        {
+          "date": "2026-11-02",
+          "summary": "Merge pull request #12 from felipebarraza6/fix-p90-issues-9748922738431183649"
+        },
+        {
+          "date": "2026-11-02",
+          "summary": "Aviso de peso del hito vigente y tramos sin falso 0%"
+        },
+        {
+          "date": "2026-11-02",
+          "summary": "Fix layout issues in ProgressMilestones and Add Stage Adherence"
+        },
         {
           "date": "2026-11-01",
           "summary": "Sync con Project Yggdra · Operación + check Closes #N"
@@ -465,66 +525,6 @@
         {
           "date": "2026-10-20",
           "summary": "Respetar can_delete/author_id del backend"
-        },
-        {
-          "date": "2026-10-20",
-          "summary": "Alinear delete/SSE al contrato yggdra_infra #148"
-        },
-        {
-          "date": "2026-10-20",
-          "summary": "Nutri/admin pueden eliminar mensajes y avisos generales"
-        },
-        {
-          "date": "2026-10-18",
-          "summary": "Merge pull request #26 from felipebarraza6/cursor/fix-macro-targets-save-on-approve-74f9"
-        },
-        {
-          "date": "2026-10-18",
-          "summary": "POST meta de macros solo al aprobar el plan"
-        },
-        {
-          "date": "2026-10-18",
-          "summary": "Macros del nutricionista se guardan y se ven al recargar"
-        },
-        {
-          "date": "2026-10-15",
-          "summary": "Aclarar conteo de entrenamientos en la ficha"
-        },
-        {
-          "date": "2026-10-15",
-          "summary": "% semanal en la ficha y semana actual aparte en Progreso (tolerante)"
-        },
-        {
-          "date": "2026-10-14",
-          "summary": "Estilo del cuadro de respuesta y texto de ayuda en celular"
-        },
-        {
-          "date": "2026-10-14",
-          "summary": "'Descanso' cabe completo en el desplegable de hábitos a 390px"
-        },
-        {
-          "date": "2026-10-14",
-          "summary": "Bandeja del equipo con etiquetas y filtro 90 días (tolerante a backend sin endpoint)"
-        },
-        {
-          "date": "2026-10-14",
-          "summary": "En celular, registro diario con lista desplegable (Sí/No/Descanso)"
-        },
-        {
-          "date": "2026-10-14",
-          "summary": "Preferir effective_macro_targets en vista alumno"
-        },
-        {
-          "date": "2026-10-13",
-          "summary": "Evitar scroll horizontal y etiquetar Estado en español"
-        },
-        {
-          "date": "2026-10-13",
-          "summary": "SSE al instante, sin doble broadcast, hilo en Ficha admin"
-        },
-        {
-          "date": "2026-10-31",
-          "summary": "Merge pull request #10 from felipebarraza6/main"
         }
       ]
     },
@@ -974,9 +974,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-11-01T13:15:04Z",
-      "pushedAt": "2026-11-01T13:15:01Z",
+      "updatedAt": "2026-11-02T15:41:21Z",
+      "pushedAt": "2026-11-02T15:41:17Z",
       "commits": [
+        {
+          "date": "2026-11-02",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-01",
           "summary": "Data: sync actividad pública del inventario Yggdra"
