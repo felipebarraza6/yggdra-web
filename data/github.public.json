@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-06T14:11:38Z",
+  "updatedAt": "2026-11-07T12:54:01Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -403,9 +403,53 @@
       "description": "Proyecto 90: landing, inscripción y panel del desafío de 90 días.",
       "language": "TypeScript",
       "createdAt": "2026-10-30T03:10:38Z",
-      "updatedAt": "2026-11-03T11:05:21Z",
-      "pushedAt": "2026-11-03T11:06:09Z",
+      "updatedAt": "2026-11-07T05:59:48Z",
+      "pushedAt": "2026-11-07T06:04:35Z",
       "commits": [
+        {
+          "date": "2026-11-07",
+          "summary": "Merge pull request #35 from felipebarraza6/fix/p90-shell-cache"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "El shell no se cachea y el deploy compara el hash"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "Merge pull request #31 from felipebarraza6/fix/ux-cierre-marce"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "Semana móvil, calendario de adherencia y promedios vigentes"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "Merge pull request #26 from felipebarraza6/feat/24-insights-alumno"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "Merge main: peso inicial y sha del contrato"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "Merge pull request #25 from felipebarraza6/fix/23-peso-participantes"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "Alinea el sha del contrato con el freeze de la API"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "Calendario de adherencia y racha con la serie diaria"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "La ficha usa el peso de Participantes en Inicial y hitos"
+        },
+        {
+          "date": "2026-11-07",
+          "summary": "Peso compacto, semana visible, promedio e insights de lectura"
+        },
         {
           "date": "2026-11-03",
           "summary": "Merge pull request #21 from felipebarraza6/fix/3-kg-format"
@@ -481,50 +525,6 @@
         {
           "date": "2026-10-31",
           "summary": "Sincroniza el contrato OpenAPI con prod"
-        },
-        {
-          "date": "2026-10-31",
-          "summary": "Merge pull request #8 from felipebarraza6/main"
-        },
-        {
-          "date": "2026-10-30",
-          "summary": "El preview de staging usa la API de staging"
-        },
-        {
-          "date": "2026-10-30",
-          "summary": "La rama staging publica el preview"
-        },
-        {
-          "date": "2026-10-30",
-          "summary": "El FTPS de producción sale de main"
-        },
-        {
-          "date": "2026-10-30",
-          "summary": "El contrato compara el sha en GitHub"
-        },
-        {
-          "date": "2026-10-29",
-          "summary": "Merge pull request #31 from felipebarraza6/docs/estandar"
-        },
-        {
-          "date": "2026-10-29",
-          "summary": "Merge pull request #30 from felipebarraza6/contract-check"
-        },
-        {
-          "date": "2026-10-29",
-          "summary": "Ordena README, arquitectura y plantillas de GitHub"
-        },
-        {
-          "date": "2026-10-29",
-          "summary": "Chequeo de contrato OpenAPI y tipos generados"
-        },
-        {
-          "date": "2026-10-27",
-          "summary": "Pago de cuota + biblioteca por categorías"
-        },
-        {
-          "date": "2026-10-20",
-          "summary": "Respetar can_delete/author_id del backend"
         }
       ]
     },
@@ -974,9 +974,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-11-05T14:34:08Z",
-      "pushedAt": "2026-11-05T14:34:05Z",
+      "updatedAt": "2026-11-06T14:11:43Z",
+      "pushedAt": "2026-11-06T14:11:39Z",
       "commits": [
+        {
+          "date": "2026-11-06",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-05",
           "summary": "Data: sync actividad pública del inventario Yggdra"
