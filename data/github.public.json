@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T14:47:42Z",
+  "updatedAt": "2026-11-11T14:12:03Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -10,128 +10,128 @@
       "description": "FRIG - Punto de venta gastronómico multi-tenant white-label",
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
-      "updatedAt": "2026-11-01T00:13:36Z",
-      "pushedAt": "2026-11-10T14:43:42Z",
+      "updatedAt": "2026-11-11T13:19:31Z",
+      "pushedAt": "2026-11-11T12:19:25Z",
       "commits": [
         {
-          "date": "2026-11-01",
-          "summary": "Sync con Project Yggdra · Operación + check Closes #N"
+          "date": "2026-11-11",
+          "summary": "Merge pull request #144 from felipebarraza6/dev"
         },
         {
-          "date": "2026-10-31",
-          "summary": "Merge pull request #78 from felipebarraza6/main"
+          "date": "2026-11-11",
+          "summary": "Sello Sercotec en todas las sucursales de Michillan"
         },
         {
-          "date": "2026-10-31",
-          "summary": "Merge pull request #79 from felipebarraza6/chore/sync-contract"
+          "date": "2026-11-11",
+          "summary": "Boletas en formato térmico 58mm"
         },
         {
-          "date": "2026-10-31",
-          "summary": "Sincroniza el contrato OpenAPI con prod"
+          "date": "2026-11-10",
+          "summary": "No enviar cookies de la API en dominios custom"
         },
         {
-          "date": "2026-10-31",
-          "summary": "Merge pull request #76 from felipebarraza6/production"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #134 from felipebarraza6/dev"
         },
         {
-          "date": "2026-10-30",
-          "summary": "El preview de staging usa la API de staging"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #132 from felipebarraza6/wip/pos-mesas-en-tiles"
         },
         {
-          "date": "2026-10-30",
-          "summary": "La rama staging publica el preview"
+          "date": "2026-11-10",
+          "summary": "Elegir mesa con tiles y filtrar mesas por estado"
         },
         {
-          "date": "2026-10-30",
-          "summary": "Tipa el root layout sin LayoutProps"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #131 from felipebarraza6/dev"
         },
         {
-          "date": "2026-10-30",
-          "summary": "El contrato compara el sha en GitHub"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #129 from felipebarraza6/test/67-componentes-y-smoke"
         },
         {
-          "date": "2026-10-29",
-          "summary": "Merge pull request #70 from felipebarraza6/docs/estandar"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #128 from felipebarraza6/feat/73-iot-alertas-graficos"
         },
         {
-          "date": "2026-10-29",
-          "summary": "Merge pull request #69 from felipebarraza6/contract-check"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #127 from felipebarraza6/fix/62-sesion-cookie"
         },
         {
-          "date": "2026-10-29",
-          "summary": "Ordena README, arquitectura y plantillas de GitHub"
+          "date": "2026-11-10",
+          "summary": "El KDS y despacho no dependen de otros módulos"
         },
         {
-          "date": "2026-10-29",
-          "summary": "Chequeo de contrato OpenAPI"
+          "date": "2026-11-10",
+          "summary": "Componentes de POS y KDS, y smoke E2E nocturno"
         },
         {
-          "date": "2026-10-29",
-          "summary": "Merge pull request #57 from felipebarraza6/dev"
+          "date": "2026-11-10",
+          "summary": "Alertas por umbral y gráficos de lecturas"
         },
         {
-          "date": "2026-10-29",
-          "summary": "Extras visibles en cocina y cobro correcto con extras"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #126 from felipebarraza6/feat/82-anticipo-orden"
         },
         {
-          "date": "2026-10-24",
-          "summary": "Merge dev: menos carga a Yggdra, cache por sucursal, filtros de producto"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #125 from felipebarraza6/fix/81-ventas-fuera-de-rango"
         },
         {
-          "date": "2026-10-24",
-          "summary": "Menos carga a Yggdra y cache aislada por sucursal"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #124 from felipebarraza6/fix/fase1-seguridad"
         },
         {
-          "date": "2026-10-24",
-          "summary": "Merge pull request #53 from felipebarraza6/ci/failure-issues"
+          "date": "2026-11-10",
+          "summary": "Anticipo al crear una orden"
         },
         {
-          "date": "2026-10-24",
-          "summary": "Prefijar logos con el basePath de Pages"
+          "date": "2026-11-10",
+          "summary": "Avisa de órdenes abiertas fuera del rango de fechas"
         },
         {
-          "date": "2026-10-24",
-          "summary": "Publicar dev en GitHub Pages"
+          "date": "2026-11-10",
+          "summary": "CSP y HSTS en el .htaccess del export"
         },
         {
-          "date": "2026-10-24",
-          "summary": "Abrir/cerrar issues automáticamente cuando falla CI"
+          "date": "2026-11-10",
+          "summary": "Next 16.4.6, vitest 5 y sin xlsx ni playwright-core"
         },
         {
-          "date": "2026-10-23",
-          "summary": "Merge pull request #52 from felipebarraza6/dev"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #123 from felipebarraza6/dev"
         },
         {
-          "date": "2026-10-23",
-          "summary": "Merge pull request #51 from felipebarraza6/fix/ultimo-cierre-fecha"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #122 from felipebarraza6/chore/fase0-limpieza"
         },
         {
-          "date": "2026-10-23",
-          "summary": "Sync con backend production (78f94785)"
+          "date": "2026-11-10",
+          "summary": "Deja .qwen y .zcode fuera del repo"
         },
         {
-          "date": "2026-10-23",
-          "summary": "'Último cierre' mostraba un día menos por zona horaria"
+          "date": "2026-11-10",
+          "summary": "Quita los workflows que llaman a yggdra_infra"
         },
         {
-          "date": "2026-10-23",
-          "summary": "Merge pull request #50 from felipebarraza6/dev"
+          "date": "2026-11-10",
+          "summary": "Merge: trae main a dev para dejar de divergir"
         },
         {
-          "date": "2026-10-23",
-          "summary": "Merge pull request #49 from felipebarraza6/fix/auditoria-1022"
+          "date": "2026-11-10",
+          "summary": "Merge pull request #109 from felipebarraza6/fix/68-nits"
         },
         {
-          "date": "2026-10-23",
-          "summary": "Estado del correo de acceso una sola vez en la fila (vista escritorio)"
+          "date": "2026-11-10",
+          "summary": "Sello Apoyado por Sercotec en Arena Negra y Buchupureo"
         },
         {
-          "date": "2026-10-22",
-          "summary": "Página de pago de cuotas, aviso de cuentas abiertas antiguas en POS, rewrite kds/station"
+          "date": "2026-11-10",
+          "summary": "La imagen del alta se sube al crear"
         },
         {
-          "date": "2026-10-22",
-          "summary": "Merge pull request #48 from felipebarraza6/dev"
+          "date": "2026-11-11",
+          "summary": "Sello Sercotec en todas las sucursales de Michillan"
         }
       ]
     },
@@ -974,9 +974,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-11-09T16:08:41Z",
-      "pushedAt": "2026-11-09T16:08:36Z",
+      "updatedAt": "2026-11-10T14:47:48Z",
+      "pushedAt": "2026-11-10T14:47:43Z",
       "commits": [
+        {
+          "date": "2026-11-10",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-09",
           "summary": "Data: sync actividad pública del inventario Yggdra"
