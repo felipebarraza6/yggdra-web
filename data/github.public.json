@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T14:12:03Z",
+  "updatedAt": "2026-11-12T15:05:49Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -403,9 +403,49 @@
       "description": "Proyecto 90: landing, inscripción y panel del desafío de 90 días.",
       "language": "TypeScript",
       "createdAt": "2026-10-30T03:10:38Z",
-      "updatedAt": "2026-11-07T05:59:48Z",
-      "pushedAt": "2026-11-07T06:04:35Z",
+      "updatedAt": "2026-11-11T23:35:49Z",
+      "pushedAt": "2026-11-12T15:02:19Z",
       "commits": [
+        {
+          "date": "2026-11-11",
+          "summary": "Merge pull request #44 from felipebarraza6/feat/p90-38-42-alumno"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "Merge pull request #43 from felipebarraza6/feat/p90-39-40-41-marce"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "El rótulo del calendario de macros no cruza el 80 % al redondear (refs #38)"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "Ficha semanal en el perfil del alumno (refs #42)"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "Calendario de cumplimiento macros con % diario (refs #38)"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "Sincronizar contrato con yggdra_infra #393"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "Sincronizar sha con prod (e4a5b499)"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "Dos avisos en inicio y Mostrar todos (refs #41)"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "Tres cuadros de adherencia y racha ≥80 % (refs #40)"
+        },
+        {
+          "date": "2026-11-11",
+          "summary": "Ejes y escalas fijas en gráficos semanales (refs #39)"
+        },
         {
           "date": "2026-11-07",
           "summary": "Merge pull request #35 from felipebarraza6/fix/p90-shell-cache"
@@ -485,46 +525,6 @@
         {
           "date": "2026-11-02",
           "summary": "Merge pull request #13 from felipebarraza6/fix/p90-resto-auditoria"
-        },
-        {
-          "date": "2026-11-02",
-          "summary": "El sitio público lo publica production, igual que el workflow"
-        },
-        {
-          "date": "2026-11-02",
-          "summary": "Pesos y adherencia por tramo en Participantes y CSV"
-        },
-        {
-          "date": "2026-11-02",
-          "summary": "Reintento si falla la config del panel y solo lectura del revisor"
-        },
-        {
-          "date": "2026-11-02",
-          "summary": "Merge pull request #12 from felipebarraza6/fix-p90-issues-9748922738431183649"
-        },
-        {
-          "date": "2026-11-02",
-          "summary": "Aviso de peso del hito vigente y tramos sin falso 0%"
-        },
-        {
-          "date": "2026-11-02",
-          "summary": "Fix layout issues in ProgressMilestones and Add Stage Adherence"
-        },
-        {
-          "date": "2026-11-01",
-          "summary": "Sync con Project Yggdra · Operación + check Closes #N"
-        },
-        {
-          "date": "2026-10-31",
-          "summary": "Merge pull request #10 from felipebarraza6/main"
-        },
-        {
-          "date": "2026-10-31",
-          "summary": "Merge pull request #9 from felipebarraza6/chore/sync-contract"
-        },
-        {
-          "date": "2026-10-31",
-          "summary": "Sincroniza el contrato OpenAPI con prod"
         }
       ]
     },
@@ -974,9 +974,13 @@
       "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-11-10T14:47:48Z",
-      "pushedAt": "2026-11-10T14:47:43Z",
+      "updatedAt": "2026-11-11T15:12:07Z",
+      "pushedAt": "2026-11-11T14:12:04Z",
       "commits": [
+        {
+          "date": "2026-11-11",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-10",
           "summary": "Data: sync actividad pública del inventario Yggdra"
