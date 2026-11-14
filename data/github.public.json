@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-13T14:29:45Z",
+  "updatedAt": "2026-11-14T13:26:25Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -404,8 +404,28 @@
       "language": "TypeScript",
       "createdAt": "2026-10-30T03:10:38Z",
       "updatedAt": "2026-11-11T23:35:49Z",
-      "pushedAt": "2026-11-12T22:35:23Z",
+      "pushedAt": "2026-11-14T12:14:00Z",
       "commits": [
+        {
+          "date": "2026-11-14",
+          "summary": "Asignar rutina desde la Ficha y copy de Inicio"
+        },
+        {
+          "date": "2026-11-14",
+          "summary": "Merge pull request #53 from felipebarraza6/chore/sync-contract-406"
+        },
+        {
+          "date": "2026-11-14",
+          "summary": "Sincronizar contrato con prod"
+        },
+        {
+          "date": "2026-11-14",
+          "summary": "Merge pull request #51 from felipebarraza6/feat/50-creador-rutinas"
+        },
+        {
+          "date": "2026-11-13",
+          "summary": "Creador de rutinas con guía, bloques y borrado"
+        },
         {
           "date": "2026-11-12",
           "summary": "Merge pull request #49 from felipebarraza6/fix/47-primary-program-wins"
@@ -505,26 +525,6 @@
         {
           "date": "2026-11-07",
           "summary": "Peso compacto, semana visible, promedio e insights de lectura"
-        },
-        {
-          "date": "2026-11-03",
-          "summary": "Merge pull request #21 from felipebarraza6/fix/3-kg-format"
-        },
-        {
-          "date": "2026-11-03",
-          "summary": "Redondeo de variación de peso y etiqueta en curso (refs #3)"
-        },
-        {
-          "date": "2026-11-03",
-          "summary": "Merge pull request #19 from felipebarraza6/fix/2-etapa-en-curso"
-        },
-        {
-          "date": "2026-11-03",
-          "summary": "Etapa en curso con adherencia parcial (closes #2)"
-        },
-        {
-          "date": "2026-11-03",
-          "summary": "Cierre del día en la API"
         }
       ]
     },
@@ -975,8 +975,12 @@
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
       "updatedAt": "2026-11-12T16:05:55Z",
-      "pushedAt": "2026-11-12T15:05:50Z",
+      "pushedAt": "2026-11-13T14:29:46Z",
       "commits": [
+        {
+          "date": "2026-11-13",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-12",
           "summary": "Data: sync actividad pública del inventario Yggdra"
@@ -1092,10 +1096,6 @@
         {
           "date": "2026-10-17",
           "summary": "Copy: presentar Yggdra como plataforma corporativa"
-        },
-        {
-          "date": "2026-10-17",
-          "summary": "Sitio público Yggdra (GitHub Pages)"
         }
       ]
     }
