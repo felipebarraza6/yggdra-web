@@ -1,0 +1,41 @@
+---
+const nodes = [
+  {
+    tag: "1",
+    title: "Llega el pedido",
+    body: "Alguien de tu operación pide ayuda: un ticket, un formulario, un evento del día.",
+  },
+  {
+    tag: "2 · Muninn",
+    title: "Entiende con contexto",
+    body: "Lee quién eres, qué reglas tienes y qué se puede hacer — con respeto.",
+  },
+  {
+    tag: "3 · Equipo",
+    title: "Actúa donde corresponde",
+    body: "Ejecuta en ventas, agenda, cobros o lo que hayas habilitado.",
+  },
+  {
+    tag: "4 · Fly",
+    title: "Coordina el camino",
+    body: "Ordena pasos y handoffs para que el hilo no se rompa.",
+  },
+  {
+    tag: "5",
+    title: "Cierra con cuidado",
+    body: "El resultado queda solo en tu perímetro. Nosotros seguimos cerca.",
+  },
+];
+---
+
+<div class="agent-flow reveal">
+  {
+    nodes.map((n, i) => (
+      <article class={`agent-node reveal reveal-delay-${(i % 3) + 1}`}>
+        <div class="tag">{n.tag}</div>
+        <h3>{n.title}</h3>
+        <p>{n.body}</p>
+      </article>
+    ))
+  }
+</div>

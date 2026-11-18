@@ -1,218 +1,269 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Logo from "../components/Logo.astro";
-import Rune from "../components/Rune.astro";
-import ArchitectureDiagram from "../components/ArchitectureDiagram.astro";
-import ChangeFlowDiagram from "../components/ChangeFlowDiagram.astro";
-import TenantDiagram from "../components/TenantDiagram.astro";
-import ActivityCharts from "../components/ActivityCharts.astro";
-import HistoryView from "../components/HistoryView.astro";
-import ModuleMap from "../components/ModuleMap.astro";
-import { projects, modules, activity, counts, githubRepos } from "../lib/data";
+import HeroMark from "../components/HeroMark.astro";
+import IsoArchitecture from "../components/IsoArchitecture.astro";
+import AgentFlow from "../components/AgentFlow.astro";
+import { projects, counts } from "../lib/data";
 
 const base = import.meta.env.BASE_URL;
+
+/** Orgs en producción: company no vacío + al menos una app active */
+const orgMap = new Map<
+  string,
+  { company: string; apps: typeof projects; count: number }
+>();
+for (const p of projects) {
+  const company = (p.company || "").trim();
+  if (!company || p.status !== "active") continue;
+  const cur = orgMap.get(company) || { company, apps: [], count: 0 };
+  cur.apps.push(p);
+  cur.count += 1;
+  orgMap.set(company, cur);
+}
+const orgs = [...orgMap.values()].sort((a, b) => b.count - a.count);
+
+const offerings = [
+  {
+    tag: "Gastronomía",
+    title: "Locales y sucursales",
+    body: "Acompañamos caja, cartas, inventarios y cobros para que varias sucursales respiren al mismo ritmo.",
+    tone: "a",
+  },
+  {
+    tag: "Territorio",
+    title: "Agua y servicios",
+    body: "Apoyamos cobros, vecinos y telemetría en agua potable rural y operación hídrica.",
+    tone: "b",
+  },
+  {
+    tag: "Cuidado",
+    title: "Salud y agenda",
+    body: "Cuidamos reservas, pagos y seguimiento para que la atención fluya con calma.",
+    tone: "c",
+  },
+  {
+    tag: "Hábitos",
+    title: "Entrenamiento",
+    body: "Sostenemos programas, coaches y progreso — para quienes viven de acompañar personas.",
+    tone: "d",
+  },
+  {
+    tag: "Comercio",
+    title: "Cotizaciones y ventas",
+    body: "Ordenamos cotizar, vender y dar seguimiento, en sintonía con el resto de tu operación.",
+    tone: "e",
+  },
+  {
+    tag: "Agentes",
+    title: "Equipo a tu lado",
+    body: "Muninn, Fly y el equipo YARQ atienden y coordinan pedidos reales, siempre dentro de tus límites.",
+    tone: "f",
+  },
+];
 ---
 
 <BaseLayout>
   <section class="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <p class="section-kicker"><Rune name="algiz" /> Yggdra Platform</p>
-        <h1>El árbol que sostiene muchas aplicaciones</h1>
+    <div class="hero-atmosphere" aria-hidden="true">
+      <span class="hero-mist hero-mist--a"></span>
+      <span class="hero-mist hero-mist--b"></span>
+      <span class="hero-mist hero-mist--c"></span>
+      <span class="hero-void-wash"></span>
+      <span class="hero-horizon"></span>
+      <span class="hero-grid"></span>
+    </div>
+    <div class="wrap hero-compose">
+      <div class="hero-mark-stage">
+        <HeroMark />
+      </div>
+      <div class="hero-copy hero-copy--center">
+        <p class="hero-brand">YARQ</p>
+        <h1>Un equipo de agentes que ordena tu operación</h1>
         <p class="lede">
-          Página explicativa de la plataforma y del oficio detrás: arquitectura
-          multi-tenant, contratos OpenAPI, orquestación de cambios, CI/CD y el
-          inventario vivo de las aplicaciones que la consumen o migran hacia ella.
+          Somos un equipo de agentes especializados, orquestados para entender
+          tu día a día, coordinar lo que hace falta y acompañarte mientras la
+          operación se ordena.
         </p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href={`${base}#tronco`}>Ver el tronco</a>
-          <a class="btn btn-ghost" href={`${base}apps/`}>Explorar ramas</a>
-        </div>
-      </div>
-      <div class="glass panel" style="padding:1.25rem;display:flex;justify-content:center;">
-        <Logo size={260} />
-      </div>
-    </div>
-  </section>
-
-  <section id="raices">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="section-kicker"><Rune name="eihwaz" /> Raíces</p>
-        <h2>Infraestructura y aislamiento</h2>
-        <p>
-          Las raíces sostienen el núcleo: identidad, datos y límites de tenant.
-          Cada organización opera con sucursales aisladas sobre el mismo contrato.
-        </p>
-      </div>
-      <TenantDiagram />
-      <div class="glass panel stats-panel" style="margin-top:1rem;">
-        <div>
-          <div class="num">{counts.total}</div>
-          <div class="lbl">apps consumidoras</div>
-        </div>
-        <div>
-          <div class="num">{counts.active}</div>
-          <div class="lbl">activas</div>
-        </div>
-        <div>
-          <div class="num" style="color:var(--warn);">{counts.migrating}</div>
-          <div class="lbl">en migración</div>
-        </div>
-        <div>
-          <div class="num">{counts.modules}</div>
-          <div class="lbl">módulos</div>
+        <div class="cta-row cta-row--center">
+          <a class="btn btn-primary" href={`${base}#equipo`}>Conocer al equipo</a>
+          <a class="btn btn-ghost" href={`${base}#casos`}>Ver organizaciones</a>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="tronco">
+  <section id="equipo">
     <div class="wrap">
-      <div class="section-head">
-        <p class="section-kicker"><Rune name="ansuz" /> Tronco</p>
-        <h2>API, módulos y contrato</h2>
+      <div class="section-head section-head--wide reveal">
+        <p class="section-kicker">Qué es YARQ</p>
+        <h2>Agentes con oficio, orquestados con cuidado</h2>
         <p>
-          El tronco es la capa compartida: módulos reutilizables expuestos por
-          un contrato OpenAPI. Las aplicaciones no reinventan el dominio; lo
-          consumen con tipado, proxy o integración planificada.
+          Cada agente tiene un rol claro. Juntos leen pedidos, coordinan pasos y
+          ejecutan solo donde tú autorizas. El desarrollo sigue vivo; el
+          servicio es acompañarte en la operación.
         </p>
       </div>
-      <ArchitectureDiagram />
-      <div class="model-points" style="margin-top:1rem;">
-        <article class="glass panel">
-          <h3>Multi-tenant</h3>
-          <p>Organización y sucursal como unidades de aislamiento.</p>
+      <div class="discipline-grid">
+        <article class="discipline-item reveal">
+          <span class="idx">Desarrollo</span>
+          <h3>El equipo crece contigo</h3>
+          <p>
+            Mejoramos agentes y flujos a medida que tu operación enseña qué
+            necesita. Es un trabajo continuo, abierto a aprender.
+          </p>
         </article>
-        <article class="glass panel">
-          <h3>Módulos</h3>
-          <p>Cuentas, ventas, finanzas, telemetría y más, según cada rama.</p>
+        <article class="discipline-item reveal reveal-delay-1">
+          <span class="idx">Servicio</span>
+          <h3>Acompañamos el día a día</h3>
+          <p>
+            Seguimos la operación: entender excepciones, ordenar handoffs y
+            cuidar que nada se pierda entre un pedido y el resultado.
+          </p>
         </article>
-        <article class="glass panel">
-          <h3>OpenAPI</h3>
-          <p>Contrato estable entre plataforma y aplicaciones.</p>
-        </article>
-        <article class="glass panel">
-          <h3>Observabilidad</h3>
-          <p>Impacto de cada cambio medido contra el mapa de consumidores.</p>
+        <article class="discipline-item reveal reveal-delay-2">
+          <span class="idx">Orquestación</span>
+          <h3>Nadie actúa solo</h3>
+          <p>
+            Muninn entiende, Fly coordina, el resto del equipo ejecuta en
+            sintonía. La fuerza está en el conjunto.
+          </p>
         </article>
       </div>
     </div>
   </section>
 
-  <section id="ramas">
+  <section id="acompanamos">
     <div class="wrap">
-      <div class="section-head">
-        <p class="section-kicker"><Rune name="raidho" /> Ramas</p>
-        <h2>Mapa app ↔ módulos</h2>
+      <div class="section-head section-head--wide reveal">
+        <p class="section-kicker">Dónde aportamos</p>
+        <h2>Oficios reales en los que ya caminamos</h2>
         <p>
-          Cada rama es una aplicación que se apoya en parte del tronco.
-          La matriz y el grafo muestran esa relación; cada ficha enlaza a su página.
+          Aprendimos acompañando gastronomía, agua, salud, entrenamiento y
+          comercio. Si tu mundo se parece a alguno, podemos empezar ahí — con
+          respeto por lo que ya construiste.
         </p>
       </div>
-      <ModuleMap consumers={projects} modules={modules} base={base} />
-      <p style="margin-top:1rem;">
-        <a class="btn btn-ghost" href={`${base}apps/`}>Ver todas las aplicaciones</a>
-        <a class="btn btn-ghost" href={`${base}modulos/`} style="margin-left:0.5rem;">Ver módulos</a>
+      <div class="offer-grid">
+        {
+          offerings.map((o, i) => (
+            <article class={`offer-card offer-card--${o.tone} reveal reveal-delay-${(i % 3) + 1}`}>
+              <header class="offer-card__head">
+                <span class="offer-card__tag">{o.tag}</span>
+                <span class={`offer-card__glyph offer-card__glyph--${o.tone}`} aria-hidden="true" />
+              </header>
+              <h3>{o.title}</h3>
+              <p>{o.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="flujo" class="section-visual">
+    <div class="wrap">
+      <div class="section-head section-head--wide reveal">
+        <p class="section-kicker">Cómo actúa el equipo</p>
+        <h2>Del pedido al resultado, con cuidado</h2>
+        <p>
+          Un pedido llega. Muninn lo entiende. Fly ordena los pasos. El equipo
+          ejecuta solo donde tú diste permiso.
+        </p>
+      </div>
+      <AgentFlow />
+    </div>
+  </section>
+
+  <section id="estructura" class="section-visual">
+    <div class="wrap">
+      <div class="section-head section-head--wide reveal">
+        <p class="section-kicker">Lo que sostiene al equipo</p>
+        <h2>Estructura espacial que se arma al bajar</h2>
+        <p>
+          Cimientos, núcleo, puente de cambios y productos. No es el centro del
+          relato: es lo que permite que los agentes te cuiden bien.
+        </p>
+      </div>
+      <div class="iso-hero reveal">
+        <IsoArchitecture />
+      </div>
+    </div>
+  </section>
+
+  <section id="casos">
+    <div class="wrap">
+      <div class="section-head section-head--wide reveal">
+        <p class="section-kicker">Casos</p>
+        <h2>Organizaciones que ya caminan con YARQ</h2>
+        <p>
+          Cada tarjeta es una organización en producción — no el catálogo de
+          productos. En Store encuentras cada app del ecosistema.
+        </p>
+      </div>
+      <div class="org-grid">
+        {
+          orgs.map((o, i) => {
+            const first = o.apps[0];
+            return (
+              <a
+                class={`org-card reveal reveal-delay-${(i % 3) + 1}`}
+                href={`${base}apps/${first.id}/`}
+              >
+                <header class="org-card__head">
+                  <span class="org-card__label">En producción</span>
+                  <span class="badge" data-status="activa">activa</span>
+                </header>
+                <h3>{o.company}</h3>
+                <p class="meta">
+                  {o.count} {o.count === 1 ? "producto" : "productos"} con el equipo
+                </p>
+                <div class="org-card__apps">
+                  {o.apps.slice(0, 4).map((a) => (
+                    <span class="mod-chip">{a.product || a.name}</span>
+                  ))}
+                </div>
+              </a>
+            );
+          })
+        }
+      </div>
+      <p class="section-actions">
+        <a class="btn btn-ghost" href={`${base}apps/`}>Abrir el Store</a>
       </p>
     </div>
   </section>
 
-  <section id="nornas">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="section-kicker"><Rune name="sowilo" /> Nornas</p>
-        <h2>Orquestación e impacto</h2>
-        <p>
-          Antes de llegar a producción, cada cambio se lee contra el destino
-          de las ramas: qué módulos toca y qué aplicaciones deben ajustarse.
-        </p>
-      </div>
-      <ChangeFlowDiagram />
-      <div class="steps" style="margin-top:1rem;">
-        <article class="step glass panel">
-          <h3>Reporte automático</h3>
-          <p>El pull request genera impacto sobre las apps consumidoras de los módulos afectados.</p>
-        </article>
-        <article class="step glass panel">
-          <h3>Ajustes por rama</h3>
-          <p>Se coordinan contrato, tipado o interfaz según la severidad del reporte.</p>
-        </article>
-        <article class="step glass panel">
-          <h3>Promoción conjunta</h3>
-          <p>Plataforma y aplicaciones avanzan juntas cuando el impacto está cubierto.</p>
-        </article>
-      </div>
+  <div class="impact-strip wrap reveal" style="margin-bottom:3rem;">
+    <div>
+      <div class="num">{counts.active}</div>
+      <div class="lbl">operaciones activas</div>
     </div>
-  </section>
-
-  <section id="historia">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="section-kicker"><Rune name="eihwaz" /> Historia</p>
-        <h2>Cuánto tiempo lleva este oficio</h2>
-        <p>
-          Trayectoria pública del ecosistema: cuándo nació cada rama visible,
-          cuántos días abarca el trabajo documentado y dónde se concentró la
-          intensidad. Sin arrogancia: solo el rastro medible.
-        </p>
-      </div>
-      <HistoryView projects={projects} repos={githubRepos} activity={activity} base={base} />
+    <div>
+      <div class="num">{orgs.length}</div>
+      <div class="lbl">organizaciones</div>
     </div>
-  </section>
-
-  <section id="bifrost">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="section-kicker"><Rune name="algiz" /> Bifröst</p>
-        <h2>Integraciones, despliegue y actividad reciente</h2>
-        <p>
-          El puente entre cambio y producción: CI/CD continuo y el registro
-          reciente de avances de la plataforma, por módulo y por semana.
-        </p>
-      </div>
-      <ActivityCharts items={activity} />
-      <div class="glass panel" style="margin-top:1rem;">
-        <h3 style="margin:0 0 1rem;font-family:var(--font-display);font-size:1.1rem;">Avances recientes del tronco</h3>
-        <ol class="timeline">
-          {
-            activity.slice(0, 12).map((item) => (
-              <li>
-                <time datetime={item.date}>{item.date}</time>
-                <p class="summary">{item.summary}</p>
-                <a class="mod-chip" href={`${base}modulos/${encodeURIComponent(item.module)}/`}>{item.module}</a>
-              </li>
-            ))
-          }
-        </ol>
-      </div>
+    <div>
+      <div class="num">{counts.modules}</div>
+      <div class="lbl">oficios cubiertos</div>
     </div>
-  </section>
+    <div>
+      <div class="num">{counts.migrating}</div>
+      <div class="lbl">en acompañamiento</div>
+    </div>
+  </div>
 
   <section>
     <div class="wrap">
-      <div class="section-head">
-        <h2>Aplicaciones destacadas</h2>
-        <p>Selección del inventario público. Cada ficha abre el detalle de módulos y contrato.</p>
-      </div>
-      <div class="grid-cards">
-        {
-          projects.filter((c) => c.status === "active").slice(0, 6).map((c) => (
-            <a class="product-card glass" href={`${base}apps/${c.id}/`}>
-              <div style="display:flex;justify-content:space-between;gap:0.5rem;align-items:flex-start;">
-                <h3>{c.product || c.name}</h3>
-                <span class="badge" data-status={c.statusLabel}>{c.statusLabel}</span>
-              </div>
-              <p class="meta">
-                {c.company ? <>Cliente: <strong style="color:var(--text);">{c.company}</strong></> : <span>Cliente por confirmar</span>}
-              </p>
-              {c.description && <p class="meta" style="margin:0;">{c.description}</p>}
-              <div class="modules">
-                {c.modules.slice(0, 6).map((m) => <span class="mod-chip">{m}</span>)}
-              </div>
-            </a>
-          ))
-        }
+      <div class="cta-band reveal">
+        <h2>Si quieres ordenar tu operación con un equipo a tu lado</h2>
+        <p>
+          Estamos para escuchar cómo trabajas hoy y ver juntos cómo los agentes
+          pueden acompañarte — con desarrollo continuo y servicio cercano.
+        </p>
+        <div class="cta-row cta-row--center">
+          <a class="btn btn-primary" href={`${base}#acompanamos`}>Ver dónde aportamos</a>
+          <a class="btn btn-ghost" href={`${base}apps/`}>Explorar el Store</a>
+        </div>
       </div>
     </div>
   </section>

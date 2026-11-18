@@ -1,6 +1,6 @@
 ---
 /**
- * Vista histórica del esfuerzo: cuánto tiempo lleva el ecosistema Yggdra
+ * Vista histórica del esfuerzo: cuánto tiempo lleva el ecosistema YARQ
  * (creación de ramas públicas + actividad de plataforma).
  */
 interface ActivityItem {
@@ -149,7 +149,7 @@ const web = repoByName.get("yggdra-web");
 if (web?.createdAt) {
   milestones.push({
     date: day(web.createdAt)!,
-    label: "Publicación del portafolio Yggdra Platform",
+    label: "Publicación del portafolio YARQ",
   });
 }
 if (maxDate) {
@@ -183,7 +183,7 @@ milestones.sort((a, b) => a.date.localeCompare(b.date));
       minDate && maxDate ? (
         <>
           Desde el <strong>{fmt(minDate)}</strong> hasta el <strong>{fmt(maxDate)}</strong>
-          ({spanWeeks} semanas) se observa el trabajo público del ecosistema Yggdra:
+          ({spanWeeks} semanas) se observa el trabajo público del ecosistema YARQ:
           creación de aplicaciones, iteraciones y cambios de plataforma.
           {privateCount > 0 && (
             <>
@@ -324,7 +324,7 @@ milestones.sort((a, b) => a.date.localeCompare(b.date));
     top: 0;
     bottom: 0;
     border-radius: inherit;
-    background: linear-gradient(90deg, #4a9a8e, var(--accent-strong));
+    background: linear-gradient(90deg, var(--accent), var(--accent-strong));
     min-width: 0.5rem;
   }
   @media (max-width: 640px) {

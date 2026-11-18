@@ -13,11 +13,16 @@
     "check": "python3 scripts/check_privacy.py && astro check"
   },
   "dependencies": {
-    "@fontsource/inter": "^5.3.0",
-    "@fontsource/literata": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "@fontsource/syne": "^5.3.0",
     "astro": "^4.16.18"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^5.9.3"
   }
 }

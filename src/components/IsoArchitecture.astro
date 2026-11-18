@@ -1,0 +1,88 @@
+---
+/**
+ * Isometría YARQ: capas que se arman/desarman con scroll (data-iso-*).
+ */
+---
+
+<div class="iso-stage" data-iso-stage>
+  <div class="iso-canvas" role="img" aria-label="Estructura que sostiene al equipo YARQ: cimientos, núcleo, cambios y productos">
+    <svg viewBox="0 0 840 480" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="isoFloor" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#152028" stop-opacity="0.95"></stop>
+          <stop offset="100%" stop-color="#0b1216" stop-opacity="1"></stop>
+        </linearGradient>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity="0.45"></feDropShadow>
+        </filter>
+      </defs>
+
+      <!-- Floor grid -->
+      <g opacity="0.55" stroke="#2a4a52" stroke-width="1">
+        <path d="M80 360 L420 200 L760 360 L420 460 Z" fill="url(#isoFloor)" stroke="#3d6a74"></path>
+        <path d="M180 390 L420 280 L660 390" fill="none"></path>
+        <path d="M260 415 L420 340 L580 415" fill="none"></path>
+        <path d="M250 320 L420 240 L590 320" fill="none"></path>
+      </g>
+
+      <!-- Roots layer -->
+      <g data-iso-layer style="--dx: 0px; --dy: 56px;" filter="url(#soft)">
+        <path d="M300 390 L420 335 L540 390 L420 430 Z" fill="#5a8a94" opacity="0.9"></path>
+        <path d="M300 390 L300 372 L420 320 L420 335 Z" fill="#7aa3ab"></path>
+        <path d="M540 390 L540 372 L420 320 L420 335 Z" fill="#4a7580"></path>
+        <text x="420" y="385" text-anchor="middle" fill="#fff" font-size="13" font-family="Manrope, sans-serif" font-weight="600">Cimientos</text>
+      </g>
+
+      <!-- CI rail -->
+      <g data-iso-layer style="--dx: -28px; --dy: 40px;" filter="url(#soft)">
+        <path d="M250 330 L390 265 L430 285 L290 350 Z" fill="#3d8f9a"></path>
+        <path d="M390 265 L430 285 L430 300 L390 280 Z" fill="#2f747d"></path>
+        <path d="M250 330 L290 350 L290 365 L250 345 Z" fill="#5aa5ae"></path>
+        <text x="340" y="320" fill="#fff" font-size="11" font-family="JetBrains Mono, monospace">Cambios</text>
+      </g>
+
+      <!-- Trunk / API -->
+      <g data-iso-layer style="--dx: 0px; --dy: 28px;" filter="url(#soft)">
+        <path d="M340 300 L420 260 L500 300 L420 340 Z" fill="#1a3f4a"></path>
+        <path d="M340 300 L340 250 L420 210 L420 260 Z" fill="#2a5560"></path>
+        <path d="M500 300 L500 250 L420 210 L420 260 Z" fill="#0f2c33"></path>
+        <path d="M340 250 L420 210 L500 250 L420 290 Z" fill="#0d6e7a"></path>
+        <text x="420" y="255" text-anchor="middle" fill="#fff" font-size="14" font-family="Syne, sans-serif" font-weight="700">YARQ</text>
+        <text x="420" y="274" text-anchor="middle" fill="#cfe5e8" font-size="11" font-family="Manrope, sans-serif">Núcleo del equipo</text>
+      </g>
+
+      <!-- App branches -->
+      <g data-iso-layer style="--dx: 36px; --dy: -24px;" filter="url(#soft)">
+        <path d="M470 210 L560 165 L600 185 L510 230 Z" fill="#0d6e7a"></path>
+        <path d="M560 165 L600 185 L600 198 L560 178 Z" fill="#0a5560"></path>
+        <text x="545" y="195" fill="#fff" font-size="11" font-family="Manrope, sans-serif">Ramas</text>
+      </g>
+      <g data-iso-layer style="--dx: -36px; --dy: -28px;" filter="url(#soft)">
+        <path d="M240 210 L330 165 L370 185 L280 230 Z" fill="#0d6e7a" opacity="0.92"></path>
+        <path d="M330 165 L370 185 L370 198 L330 178 Z" fill="#0a5560"></path>
+        <text x="310" y="195" fill="#fff" font-size="11" font-family="Manrope, sans-serif">Apps</text>
+      </g>
+      <g data-iso-layer style="--dx: 0px; --dy: -48px;" filter="url(#soft)">
+        <path d="M360 150 L420 120 L480 150 L420 180 Z" fill="#148a98"></path>
+        <path d="M360 150 L360 138 L420 108 L420 120 Z" fill="#3d8f9a"></path>
+        <path d="M480 150 L480 138 L420 108 L420 120 Z" fill="#0a5560"></path>
+        <text x="420" y="148" text-anchor="middle" fill="#fff" font-size="11" font-family="Manrope, sans-serif">Agentes</text>
+      </g>
+
+      <!-- Energy links -->
+      <g data-iso-layer style="--dx: 0px; --dy: -10px;" stroke="#0d6e7a" stroke-width="1.5" fill="none" opacity="0.55">
+        <path d="M420 210 L420 150" stroke-dasharray="4 4"></path>
+        <path d="M400 230 L310 195" stroke-dasharray="4 4"></path>
+        <path d="M440 230 L530 195" stroke-dasharray="4 4"></path>
+        <path d="M300 360 L340 300" stroke-dasharray="3 5"></path>
+        <path d="M540 360 L500 300" stroke-dasharray="3 5"></path>
+      </g>
+    </svg>
+  </div>
+  <div class="iso-legend" aria-hidden="true">
+    <span><i class="roots"></i> Cimientos</span>
+    <span><i class="ci"></i> Cambios</span>
+    <span><i class="trunk"></i> Núcleo YARQ</span>
+    <span><i class="apps"></i> Productos / agentes</span>
+  </div>
+</div>

@@ -1,8 +1,8 @@
-# Formato de datos públicos (Yggdra Platform)
+# Formato de datos públicos (YARQ)
 
 Todo el contenido del sitio se genera en **build** desde `data/*.json`.
 
-**Alcance:** solo Yggdra Platform y las aplicaciones del inventario que la
+**Alcance:** solo YARQ y las aplicaciones del inventario que la
 consumen o migran hacia ella. No se publican repos ajenos al ecosistema.
 
 Un workflow del **repo privado** del backend puede empujar JSON actualizados y
@@ -20,7 +20,7 @@ Accept: application/vnd.github+json
 
 ## `data/projects.json`
 
-Inventario público de aplicaciones sobre Yggdra.
+Inventario público de aplicaciones sobre YARQ.
 
 ```json
 {

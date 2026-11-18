@@ -1,21 +1,28 @@
-# Yggdra Platform (web pública)
+# yggdra-web (landing YARQ)
 
-Sitio explicativo de **Yggdra Platform**: portafolio técnico de la arquitectura
-multi-tenant y de las aplicaciones que la consumen.
+Landing y portafolio técnico de **YARQ** (Y ARQ): backend multi-tenant,
+API compartida, CI con impacto, productos, agentes y puerta API → sectores.
 
 - URL: https://felipebarraza6.github.io/yggdra-web/
-- Marca: **Yggdra Platform**
+- Marca: **YARQ** / **Y ARQ**
 - Backend: **privado** — este repo no publica código, rutas internas ni secretos
-- **Alcance:** solo Yggdra y las apps del inventario (consumidoras o en migración).
+- **Alcance:** solo YARQ y las apps del inventario (consumidoras o en migración).
   Nada de repos ajenos al ecosistema.
 
-Texto en **español de Chile** (registro neutro). No es una página de venta:
-explica el oficio (arquitectura, contratos, orquestación, CI/CD, telemetría).
+Texto en **español de Chile** (registro comercial-técnico). La home explica
+adopción de clientes; las secciones profundizan contratos, orquestación,
+CI/CD y telemetría.
 
-## Conceptos (nórdicos, sutiles)
+## Conceptos
 
 | Concepto | Significado en el sitio |
 |----------|-------------------------|
+| Y / ARQ | Marca display (YARQ en prosa) |
+| Adopción | Cómo entran clientes al tronco |
+| YARQ | API multi-tenant: raíces, tronco, CI, ramas |
+| Productos | Apps del inventario que demuestran el tronco |
+| Agentes | Muninn (+ Fly) orquestados sobre la operación |
+| Puerta API | Qué puedes entrar y a qué sectores llegar |
 | Raíces | Infraestructura y aislamiento |
 | Tronco | API, módulos, OpenAPI |
 | Ramas | Aplicaciones consumidoras |
@@ -24,9 +31,9 @@ explica el oficio (arquitectura, contratos, orquestación, CI/CD, telemetría).
 
 ## Rutas
 
-- `/` — portada con diagramas y gráficos
+- `/` — landing de impacto + profundidad técnica
 - `/apps/` y `/apps/<id>/` — inventario y ficha por aplicación
-- `/modulos/` y `/modulos/<id>/` — módulos y quién los usa
+- `/modulos/` y `/modulos/<id>/` — módulos/sectores y quién los usa
 
 ## Datos (contenido que muta solo)
 
@@ -78,9 +85,12 @@ python3 scripts/check_privacy.py
 npm install
 npm run dev
 npm run build
+npm run check
 ```
+
+Local típico: `http://127.0.0.1:4323/yggdra-web/` (el puerto puede variar).
 
 ## TODO — clientes por confirmar
 
-Forja, Muninn, Ikolu Void, Gungir, Cotizador de oro, HEIR, Yggdra Agents,
+Forja, Muninn, Ikolu Void, Gungir, Cotizador de oro, HEIR, Agents,
 App Smoking APR. Andean Labs pendiente de inventario.

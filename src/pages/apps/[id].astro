@@ -1,6 +1,5 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Rune from "../../components/Rune.astro";
 import {
   projects,
   getProject,
@@ -21,42 +20,59 @@ if (!project) {
 const base = import.meta.env.BASE_URL;
 const related = activityForModules(project.modules, 10);
 const gh = githubForProject(project);
-const title = `${project.product || project.name} | Yggdra Platform`;
+const label = project.product || project.name;
+const title = `${label} | YARQ Store`;
 const description =
-  project.description ||
-  `Aplicación ${project.product || project.name} sobre Yggdra Platform.`;
+  project.description?.replace(/Yggdra/gi, "YARQ") ||
+  `${label} camina con el equipo YARQ.`;
 
-// Diagrama simple app → módulos
 const mods = project.modules;
-const svgH = Math.max(220, 48 + mods.length * 36);
+const svgH = Math.max(240, 56 + mods.length * 40);
 ---
 
 <BaseLayout title={title} description={description}>
-  <section class="page-hero">
+  <section class="page-hero product-identity">
     <div class="wrap">
       <ul class="breadcrumbs">
         <li><a href={base}>Inicio</a> /</li>
-        <li><a href={`${base}apps/`}>Ramas</a> /</li>
-        <li>{project.product || project.name}</li>
+        <li><a href={`${base}apps/`}>Store</a> /</li>
+        <li>{label}</li>
       </ul>
-      <p class="section-kicker"><Rune name="raidho" /> Rama</p>
-      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;">
-        <h1 style="margin:0;">{project.product || project.name}</h1>
-        <span class="badge" data-status={project.statusLabel}>{project.statusLabel}</span>
+      <div class="product-identity__banner glass">
+        <div class="product-identity__mark" aria-hidden="true">
+          <span>{label.slice(0, 1)}</span>
+        </div>
+        <div>
+          <p class="section-kicker">Producto en el Store</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;">
+            <h1 style="margin:0;">{label}</h1>
+            <span class="badge" data-status={project.statusLabel}>{project.statusLabel}</span>
+          </div>
+          <p style="color:var(--text-muted);max-width:40rem;margin:0.75rem 0 0;">
+            {description}
+          </p>
+          {
+            project.company && (
+              <p class="product-identity__org">
+                Organización: <strong>{project.company}</strong>
+              </p>
+            )
+          }
+        </div>
       </div>
-      <p style="color:var(--text-muted);max-width:40rem;margin:0.75rem 0 0;">
-        {project.description || "Aplicación consumidora de Yggdra Platform."}
-      </p>
     </div>
   </section>
 
   <section style="padding-top:0;">
     <div class="wrap two-col">
-      <div class="glass panel">
-        <h2 style="margin:0 0 0.75rem;font-family:var(--font-display);font-size:1.25rem;">Qué es</h2>
-        <dl style="margin:0;display:grid;gap:0.65rem;">
+      <article class="glass panel panel--headed">
+        <header class="panel-head">
+          <span class="panel-head__tag">Identidad</span>
+          <h2>Quién es</h2>
+        </header>
+        <dl style="margin:0;display:grid;gap:0.75rem;">
           <div>
-            <dt style="color:var(--text-muted);font-size:0.85rem;">Cliente</dt>
+            <dt style="color:var(--text-muted);font-size:0.85rem;">Organización</dt>
             <dd style="margin:0;font-weight:600;">{project.company || "Por confirmar"}</dd>
           </div>
           <div>
@@ -64,7 +80,7 @@ const svgH = Math.max(220, 48 + mods.length * 36);
             <dd style="margin:0;">{project.statusLabel}</dd>
           </div>
           <div>
-            <dt style="color:var(--text-muted);font-size:0.85rem;">Contrato</dt>
+            <dt style="color:var(--text-muted);font-size:0.85rem;">Cómo se integra</dt>
             <dd style="margin:0;">{project.contract?.label || "Consumo del contrato público"}</dd>
           </div>
           {
@@ -84,25 +100,34 @@ const svgH = Math.max(220, 48 + mods.length * 36);
             )
           }
         </dl>
-      </div>
+      </article>
 
-      <div class="glass panel">
-        <h2 style="margin:0 0 0.75rem;font-family:var(--font-display);font-size:1.25rem;">Módulos del tronco</h2>
-        <div class="diagram-wrap">
-          <svg class="diagram" viewBox={`0 0 360 ${svgH}`} role="img" aria-label="Módulos usados por la aplicación">
-            <rect class="node-strong" x="20" y={svgH / 2 - 24} width="120" height="48" rx="12"></rect>
-            <text x="80" y={svgH / 2 + 5} text-anchor="middle" font-size="12" font-weight="600">
-              {(project.product || project.name).slice(0, 14)}
+      <article class="glass panel panel--headed">
+        <header class="panel-head">
+          <span class="panel-head__tag">Mapa</span>
+          <h2>Oficios que usa</h2>
+        </header>
+        <div class="diagram-wrap space-diagram">
+          <svg class="diagram" viewBox={`0 0 400 ${svgH}`} role="img" aria-label={`Oficios usados por ${label}`}>
+            <defs>
+              <linearGradient id="nodeGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#2ec4d4" stop-opacity="0.35"></stop>
+                <stop offset="100%" stop-color="#1a3f4a" stop-opacity="0.9"></stop>
+              </linearGradient>
+            </defs>
+            <rect class="node-strong" x="16" y={svgH / 2 - 28} width="130" height="56" rx="14" fill="url(#nodeGrad)"></rect>
+            <text x="81" y={svgH / 2 + 5} text-anchor="middle" font-size="12" font-weight="700" fill="#e8f2f4">
+              {label.slice(0, 16)}
             </text>
             {
               mods.map((m, i) => {
-                const y = 28 + i * 36;
+                const y = 32 + i * 40;
                 return (
                   <g>
-                    <path class="edge" d={`M140 ${svgH / 2} L200 ${y + 12}`}></path>
+                    <path class="edge" d={`M146 ${svgH / 2} L210 ${y + 14}`} stroke="#2ec4d4" stroke-opacity="0.45"></path>
                     <a href={`${base}modulos/${encodeURIComponent(m)}/`}>
-                      <rect class="node" x="200" y={y} width="140" height="28" rx="8"></rect>
-                      <text x="270" y={y + 18} text-anchor="middle" font-size="11">{m}</text>
+                      <rect class="node" x="210" y={y} width="160" height="32" rx="10"></rect>
+                      <text x="290" y={y + 20} text-anchor="middle" font-size="11">{m}</text>
                     </a>
                   </g>
                 );
@@ -112,21 +137,18 @@ const svgH = Math.max(220, 48 + mods.length * 36);
         </div>
         {
           mods.length === 0 && (
-            <p style="color:var(--text-muted);margin:0;">Módulos en definición (migración).</p>
+            <p style="color:var(--text-muted);margin:0;">Oficios en definición (acompañamiento).</p>
           )
         }
-      </div>
+      </article>
     </div>
   </section>
 
   <section>
     <div class="wrap">
       <div class="section-head">
-        <h2>Cómo consume el contrato</h2>
-        <p>
-          Estilo de integración declarado en el inventario público.
-          Sin rutas internas ni detalle de implementación.
-        </p>
+        <h2>Cómo se conecta</h2>
+        <p>Estilo declarado en el Store público — sin rutas internas.</p>
       </div>
       <div class="glass panel">
         <p style="margin:0;">
@@ -142,8 +164,8 @@ const svgH = Math.max(220, 48 + mods.length * 36);
       <section>
         <div class="wrap">
           <div class="section-head">
-            <h2>Cambios recientes que la afectan</h2>
-            <p>Entradas de actividad cuyos módulos intersectan con esta aplicación.</p>
+            <h2>Avances que la tocan</h2>
+            <p>Actividad reciente cuyos oficios intersectan con este producto.</p>
           </div>
           <ol class="timeline">
             {related.map((item) => (
@@ -167,7 +189,7 @@ const svgH = Math.max(220, 48 + mods.length * 36);
         <div class="wrap">
           <div class="section-head">
             <h2>Señal pública del repositorio</h2>
-            <p>Metadatos del repo público asociado, cuando existe.</p>
+            <p>Cuando el repo es público, mostramos lo visible.</p>
           </div>
           <div class="glass panel">
             <p style="margin:0 0 0.5rem;">
@@ -181,16 +203,6 @@ const svgH = Math.max(220, 48 + mods.length * 36);
               <p style="margin:0;font-size:0.9rem;color:var(--text-muted);">
                 Última actualización pública: {String(gh.updatedAt).slice(0, 10)}
               </p>
-            )}
-            {gh.commits?.length > 0 && (
-              <ol class="timeline" style="margin-top:1rem;">
-                {gh.commits.slice(0, 5).map((c) => (
-                  <li>
-                    <time datetime={c.date}>{c.date}</time>
-                    <p class="summary">{c.summary}</p>
-                  </li>
-                ))}
-              </ol>
             )}
           </div>
         </div>

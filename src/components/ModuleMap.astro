@@ -54,7 +54,7 @@ const payload = JSON.stringify({ consumers, modules, base });
 
   <div class="graph-wrap glass hidden" data-panel="graph" role="region" aria-label="Grafo apps y módulos">
     <svg data-graph viewBox="0 0 920 480" role="img" aria-labelledby="graph-title">
-      <title id="graph-title">Relación entre apps y módulos de Yggdra</title>
+      <title id="graph-title">Relación entre apps y módulos de YARQ</title>
     </svg>
   </div>
   <p class="visually-hidden" id="map-live" aria-live="polite"></p>
@@ -162,7 +162,7 @@ const payload = JSON.stringify({ consumers, modules, base });
         })
         .join("");
 
-      graphSvg.innerHTML = `<title id="graph-title">Relación entre apps y módulos de Yggdra</title>${edges}${appNodes}${modNodes}`;
+      graphSvg.innerHTML = `<title id="graph-title">Relación entre apps y módulos de YARQ</title>${edges}${appNodes}${modNodes}`;
       live.textContent = `Grafo con ${rows.length} apps y ${mods.length} módulos.`;
     }
 

@@ -1,9 +1,13 @@
 ---
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/500.css";
-import "@fontsource/inter/600.css";
-import "@fontsource/literata/600.css";
-import "@fontsource/literata/700.css";
+import "@fontsource/syne/600.css";
+import "@fontsource/syne/700.css";
+import "@fontsource/syne/800.css";
+import "@fontsource/manrope/400.css";
+import "@fontsource/manrope/500.css";
+import "@fontsource/manrope/600.css";
+import "@fontsource/manrope/700.css";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
 import "../styles/global.css";
 import Logo from "../components/Logo.astro";
 
@@ -13,8 +17,8 @@ interface Props {
 }
 
 const {
-  title = "Yggdra Platform — portafolio técnico",
-  description = "Página explicativa de Yggdra Platform: arquitectura multi-tenant, módulos, orquestación de cambios y las aplicaciones que la consumen.",
+  title = "YARQ — equipo de agentes que ordenan tu operación",
+  description = "YARQ es un equipo de agentes especializados, orquestados para ordenar tu operación. Desarrollo continuo y acompañamiento cercano.",
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
@@ -26,6 +30,14 @@ function isCurrent(href: string) {
   if (href === base || href === `${base}`) return path === base || path === `${base}` || path === "/";
   return path.startsWith(href);
 }
+
+const nav = [
+  { href: `${base}#equipo`, label: "Equipo", icon: "team" },
+  { href: `${base}#acompanamos`, label: "Oficios", icon: "craft" },
+  { href: `${base}#flujo`, label: "Flujo", icon: "flow" },
+  { href: `${base}#casos`, label: "Casos", icon: "cases" },
+  { href: `${base}apps/`, label: "Store", icon: "store", page: true },
+];
 ---
 
 <!doctype html>
@@ -34,12 +46,12 @@ function isCurrent(href: string) {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#eef3f1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0b1216" />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CL" />
-    <meta property="og:site_name" content="Yggdra Platform" />
+    <meta property="og:site_name" content="YARQ" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -52,24 +64,29 @@ function isCurrent(href: string) {
   </head>
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <div class="void-field" aria-hidden="true"></div>
     <header class="site-header">
       <div class="wrap nav">
         <a class="brand" href={base}>
-          <Logo size={32} />
-          <span class="brand-text">
-            <strong>Yggdra Platform</strong>
-            <span>portafolio técnico</span>
-          </span>
+          <Logo size={36} animated />
+          <span class="brand-text">ARQ</span>
         </a>
         <nav aria-label="Principal">
           <ul class="nav-links">
-            <li><a href={`${base}#raices`} aria-current={isCurrent(`${base}#raices`) ? "page" : undefined}>Raíces</a></li>
-            <li><a href={`${base}#tronco`}>Tronco</a></li>
-            <li><a href={`${base}apps/`}>Ramas</a></li>
-            <li><a href={`${base}#nornas`}>Nornas</a></li>
-            <li><a href={`${base}#historia`}>Historia</a></li>
-            <li><a href={`${base}#bifrost`}>Bifröst</a></li>
-            <li><a href={`${base}modulos/`}>Módulos</a></li>
+            {
+              nav.map((item) => (
+                <li>
+                  <a
+                    class="nav-link"
+                    href={item.href}
+                    aria-current={item.page && isCurrent(`${base}apps/`) ? "page" : undefined}
+                  >
+                    <span class={`nav-ico nav-ico--${item.icon}`} aria-hidden="true" />
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
           </ul>
         </nav>
       </div>
@@ -78,19 +95,62 @@ function isCurrent(href: string) {
       <slot />
     </main>
     <footer class="site-footer">
-      <div class="wrap">
-        <p>
-          <strong>Yggdra Platform</strong> es una plataforma backend privada
-          multi-tenant. Este sitio explica su arquitectura y el inventario
-          público de aplicaciones que la consumen, sin exponer código ni
-          infraestructura interna.
-        </p>
-        <p>
-          Código de esta web:
-          <a href="https://github.com/felipebarraza6/yggdra-web">yggdra-web</a>.
-        </p>
+      <div class="wrap footer-grid">
+        <div>
+          <p>
+            <strong>YARQ</strong> es un equipo de agentes especializados,
+            orquestados para ordenar operaciones: desarrollo continuo y
+            acompañamiento cercano. Esta web lo cuenta sin revelar lo interno.
+          </p>
+          <p>
+            Código abierto de esta web:
+            <a href="https://github.com/felipebarraza6/yggdra-web">yggdra-web</a>.
+          </p>
+        </div>
         <p class="credit-foot">creado por Felipe Barraza</p>
       </div>
     </footer>
+    <script>
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!reduce) {
+        const els = document.querySelectorAll(".reveal");
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-in");
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
+        );
+        els.forEach((el) => io.observe(el));
+
+        const iso = document.querySelector("[data-iso-stage]");
+        if (iso) {
+          const layers = iso.querySelectorAll("[data-iso-layer]");
+          const onScroll = () => {
+            const rect = iso.getBoundingClientRect();
+            const vh = window.innerHeight || 1;
+            const progress = Math.min(1, Math.max(0, 1 - rect.top / (vh * 0.85)));
+            layers.forEach((layer, i) => {
+              const el = layer as HTMLElement;
+              const start = i * 0.12;
+              const local = Math.min(1, Math.max(0, (progress - start) / 0.35));
+              el.style.setProperty("--assemble", String(local));
+            });
+            iso.classList.toggle("is-assembled", progress > 0.72);
+          };
+          onScroll();
+          window.addEventListener("scroll", onScroll, { passive: true });
+        }
+      } else {
+        document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-in"));
+        document.querySelectorAll("[data-iso-layer]").forEach((el) => {
+          (el as HTMLElement).style.setProperty("--assemble", "1");
+        });
+      }
+    </script>
   </body>
 </html>
