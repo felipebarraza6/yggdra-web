@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-17T15:55:13Z",
+  "updatedAt": "2026-11-18T15:33:59Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -11,8 +11,24 @@
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
       "updatedAt": "2026-11-11T13:19:31Z",
-      "pushedAt": "2026-11-11T12:19:25Z",
+      "pushedAt": "2026-11-18T04:04:49Z",
       "commits": [
+        {
+          "date": "2026-11-18",
+          "summary": "Merge pull request #146 from felipebarraza6/fix/forgot-password-always-works"
+        },
+        {
+          "date": "2026-11-18",
+          "summary": "Sincroniza tipos y SHA con el schema de producción"
+        },
+        {
+          "date": "2026-11-18",
+          "summary": "El olvido de clave envía branch_id cuando el portal lo conoce"
+        },
+        {
+          "date": "2026-11-18",
+          "summary": "El olvido de clave envía el slug de sucursal saneado"
+        },
         {
           "date": "2026-11-11",
           "summary": "Merge pull request #144 from felipebarraza6/dev"
@@ -114,24 +130,8 @@
           "summary": "Quita los workflows que llaman a yggdra_infra"
         },
         {
-          "date": "2026-11-10",
-          "summary": "Merge: trae main a dev para dejar de divergir"
-        },
-        {
-          "date": "2026-11-10",
-          "summary": "Merge pull request #109 from felipebarraza6/fix/68-nits"
-        },
-        {
-          "date": "2026-11-10",
-          "summary": "Sello Apoyado por Sercotec en Arena Negra y Buchupureo"
-        },
-        {
-          "date": "2026-11-10",
-          "summary": "La imagen del alta se sube al crear"
-        },
-        {
-          "date": "2026-11-11",
-          "summary": "Sello Sercotec en todas las sucursales de Michillan"
+          "date": "2026-11-18",
+          "summary": "Sincroniza tipos y SHA con el schema de producción"
         }
       ]
     },
@@ -975,8 +975,20 @@
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
       "updatedAt": "2026-11-12T16:05:55Z",
-      "pushedAt": "2026-11-16T15:37:06Z",
+      "pushedAt": "2026-11-18T04:37:23Z",
       "commits": [
+        {
+          "date": "2026-11-18",
+          "summary": "Hero compacto en fold, nav móvil e iconos SVG"
+        },
+        {
+          "date": "2026-11-18",
+          "summary": "Branding YARQ space dark — equipo de agentes, Store y Casos"
+        },
+        {
+          "date": "2026-11-17",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-16",
           "summary": "Data: sync actividad pública del inventario Yggdra"
@@ -1083,18 +1095,6 @@
         },
         {
           "date": "2026-10-21",
-          "summary": "Data: sync actividad pública del inventario Yggdra"
-        },
-        {
-          "date": "2026-10-20",
-          "summary": "Data: sync actividad pública del inventario Yggdra"
-        },
-        {
-          "date": "2026-10-19",
-          "summary": "Data: sync actividad pública del inventario Yggdra"
-        },
-        {
-          "date": "2026-10-18",
           "summary": "Data: sync actividad pública del inventario Yggdra"
         }
       ]
