@@ -210,7 +210,7 @@ summary:focus-visible,
 }
 
 .nav-links a {
-  color: var(--text-muted);
+  color: color-mix(in srgb, var(--text) 78%, var(--text-muted));
   text-decoration: none;
   font-size: 0.88rem;
   font-weight: 600;
@@ -219,18 +219,19 @@ summary:focus-visible,
 
 .nav-links a:hover,
 .nav-links a[aria-current="page"] {
-  color: var(--text);
+  color: var(--accent-strong);
 }
 
-/* Hero — void con energía */
+/* Hero — void con energía; contenido completo en el fold */
 .hero {
-  padding: clamp(2.25rem, 5.5vw, 4rem) 0 clamp(2.75rem, 5.5vw, 4.25rem);
+  padding: clamp(1.5rem, 4vw, 2.75rem) 0 clamp(2rem, 5vw, 3.25rem);
   position: relative;
   isolation: isolate;
-  min-height: min(82vh, 780px);
+  min-height: auto;
   display: flex;
   align-items: center;
-  overflow: clip;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .hero-atmosphere {
@@ -320,7 +321,7 @@ summary:focus-visible,
   mask-image: radial-gradient(ellipse 72% 62% at 72% 38%, #000 8%, transparent 74%);
 }
 
-/* Hero centrado: Y animada arriba, copy corto abajo — nada pegado a la izquierda */
+/* Hero centrado compacto: mark + marca + copy + CTAs en un fold */
 .hero-compose {
   position: relative;
   z-index: 1;
@@ -328,12 +329,12 @@ summary:focus-visible,
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: clamp(1.25rem, 3.5vw, 2.25rem);
+  gap: clamp(0.65rem, 2vw, 1.1rem);
   width: 100%;
 }
 
 .hero-mark-stage {
-  width: min(100%, 460px);
+  width: min(100%, 280px);
   animation: hero-rise 1s var(--ease-out) both;
 }
 
@@ -341,7 +342,7 @@ summary:focus-visible,
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 40rem;
+  max-width: 38rem;
   margin-inline: auto;
   animation: hero-rise 0.9s var(--ease-out) 0.12s both;
 }
@@ -349,34 +350,34 @@ summary:focus-visible,
 .hero-brand {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
   line-height: 0.95;
-  letter-spacing: 0.1em;
-  margin: 0 0 1rem;
-  background: linear-gradient(120deg, #0d6e7a 0%, #148a98 40%, #0a5560 100%);
+  letter-spacing: 0.12em;
+  margin: 0 0 0.55rem;
+  background: linear-gradient(120deg, #5ad4e0 0%, #2ec4d4 45%, #148a98 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .hero h1 {
-  margin: 0 0 1rem;
+  margin: 0 0 0.65rem;
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.8vw, 1.95rem);
-  line-height: 1.28;
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  line-height: 1.25;
   letter-spacing: -0.03em;
   font-weight: 650;
-  max-width: 20ch;
+  max-width: 22ch;
   color: var(--text);
   text-wrap: balance;
 }
 
 .hero .lede {
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.15rem;
   color: var(--text-muted);
-  font-size: 1.08rem;
-  max-width: 36rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  max-width: 34rem;
+  line-height: 1.55;
 }
 
 .cta-row--center {
@@ -467,39 +468,6 @@ summary:focus-visible,
   text-align: center;
 }
 
-.offer-grid {
-  display: grid;
-  gap: 1.1rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-}
-
-.offer-card {
-  padding: 1.4rem 1.3rem;
-  background: rgba(16, 28, 34, 0.78);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  border-left: 3px solid var(--accent);
-  transition: transform 0.25s var(--ease-out), box-shadow 0.25s ease;
-}
-
-.offer-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow);
-}
-
-.offer-card h3 {
-  margin: 0 0 0.5rem;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  letter-spacing: -0.02em;
-}
-
-.offer-card p {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.55;
-}
 
 @keyframes hero-rise {
   from {
@@ -547,13 +515,13 @@ summary:focus-visible,
 }
 
 .btn-primary {
-  background: var(--ink);
-  color: #fff;
+  background: var(--accent);
+  color: #041014;
 }
 
 .btn-primary:hover {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-strong);
+  color: #041014;
   transform: translateY(-1px);
 }
 
@@ -1440,36 +1408,11 @@ a.mod-chip:hover {
 }
 
 .nav-ico {
-  width: 0.85rem;
-  height: 0.85rem;
-  border: 1.5px solid currentColor;
-  opacity: 0.75;
+  width: 0.95rem;
+  height: 0.95rem;
   flex-shrink: 0;
-}
-
-.nav-ico--team {
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 2px transparent, 3px -3px 0 -1px currentColor;
-}
-.nav-ico--craft {
-  border-radius: 2px;
-  transform: rotate(45deg) scale(0.85);
-}
-.nav-ico--flow {
-  border-radius: 0;
-  border-top: 0;
-  border-left: 0;
-  width: 0.55rem;
-  height: 0.55rem;
-  transform: rotate(-45deg);
-}
-.nav-ico--cases {
-  border-radius: 3px 3px 1px 1px;
-  position: relative;
-}
-.nav-ico--store {
-  border-radius: 2px 2px 0 0;
-  border-bottom-width: 3px;
+  opacity: 0.9;
+  display: block;
 }
 
 /* Offer cards con header */
@@ -1725,24 +1668,27 @@ a.mod-chip:hover {
   padding: 0.5rem;
 }
 
-.btn-primary {
-  background: var(--accent);
-  color: #041014;
-}
-
-.btn-primary:hover {
-  background: var(--accent-strong);
-  color: #041014;
-}
-
-.site-header {
-  background: rgba(6, 10, 12, 0.85);
-  border-bottom-color: var(--line);
-}
-
 @media (max-width: 720px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    padding-block: 0.35rem;
+  }
+
   .nav-links {
-    display: none;
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    gap: 0.65rem;
+    padding-bottom: 0.15rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .nav-links a {
+    white-space: nowrap;
+    font-size: 0.82rem;
   }
 
   .matrix thead th {
