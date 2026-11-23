@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-22T14:29:12Z",
+  "updatedAt": "2026-11-23T17:58:16Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
     {
       "name": "frig",
       "fullName": "felipebarraza6/frig",
-      "description": "FRIG - Punto de venta gastronómico multi-tenant white-label",
+      "description": "Solución de gestión gastronómica integral: punto de venta, mesas, comandas de cocina, caja, inventario, recetas, finanzas y reportes. Multi-sucursal y white-label.",
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
-      "updatedAt": "2026-11-11T13:19:31Z",
-      "pushedAt": "2026-11-18T04:04:49Z",
+      "updatedAt": "2026-11-23T17:17:30Z",
+      "pushedAt": "2026-11-22T17:43:09Z",
       "commits": [
         {
           "date": "2026-11-18",
@@ -269,10 +269,10 @@
     {
       "name": "forja",
       "fullName": "felipebarraza6/forja",
-      "description": "Forja: plataforma para personal trainers (venta de servicios y gestión de alumnos), sobre la API Yggdra",
+      "description": "Plataforma para personal trainers: venta de servicios y gestión de alumnos, sobre la API Yggdra.",
       "language": "TypeScript",
       "createdAt": "2026-10-15T03:27:43Z",
-      "updatedAt": "2026-11-01T00:14:00Z",
+      "updatedAt": "2026-11-23T16:29:22Z",
       "pushedAt": "2026-11-01T00:13:57Z",
       "commits": [
         {
@@ -531,10 +531,10 @@
     {
       "name": "muninn",
       "fullName": "felipebarraza6/muninn",
-      "description": "Muninn - Agentes IA Especializados",
+      "description": "Cliente para diseñar y operar agentes de IA: catálogo, estudio, chat, canales y flujos.",
       "language": "TypeScript",
       "createdAt": "2026-07-09T13:21:01Z",
-      "updatedAt": "2026-11-01T00:14:08Z",
+      "updatedAt": "2026-11-23T16:29:06Z",
       "pushedAt": "2026-11-16T16:50:05Z",
       "commits": [
         {
@@ -753,10 +753,10 @@
     {
       "name": "heir",
       "fullName": "felipebarraza6/heir",
-      "description": "HEIR - plataforma de agenda, pagos y agente conversacional para profesionales de la salud",
+      "description": "Agenda, pagos y agente conversacional para profesionales de la salud.",
       "language": "TypeScript",
       "createdAt": "2026-08-12T04:32:26Z",
-      "updatedAt": "2026-11-01T00:13:29Z",
+      "updatedAt": "2026-11-23T16:29:19Z",
       "pushedAt": "2026-11-01T00:13:26Z",
       "commits": [
         {
@@ -840,10 +840,10 @@
     {
       "name": "nxord",
       "fullName": "felipebarraza6/nxord",
-      "description": null,
+      "description": "Plataforma de gestión hídrica y telemetría en tiempo real, con módulo opcional de APR.",
       "language": "TypeScript",
       "createdAt": "2026-09-04T23:18:46Z",
-      "updatedAt": "2026-11-01T00:13:44Z",
+      "updatedAt": "2026-11-23T16:29:16Z",
       "pushedAt": "2026-11-01T00:13:42Z",
       "commits": [
         {
@@ -971,12 +971,16 @@
     {
       "name": "yggdra-web",
       "fullName": "felipebarraza6/yggdra-web",
-      "description": "Yggdra: portafolio vivo del backend transversal y las apps que lo usan",
+      "description": "Portafolio vivo de Yggdra: el backend transversal y las apps que lo usan.",
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
-      "updatedAt": "2026-11-12T16:05:55Z",
-      "pushedAt": "2026-11-21T14:35:13Z",
+      "updatedAt": "2026-11-23T16:29:09Z",
+      "pushedAt": "2026-11-22T14:29:13Z",
       "commits": [
+        {
+          "date": "2026-11-22",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-21",
           "summary": "Data: sync actividad pública del inventario Yggdra"
@@ -1091,10 +1095,6 @@
         },
         {
           "date": "2026-10-26",
-          "summary": "Data: sync actividad pública del inventario Yggdra"
-        },
-        {
-          "date": "2026-10-25",
           "summary": "Data: sync actividad pública del inventario Yggdra"
         }
       ]
