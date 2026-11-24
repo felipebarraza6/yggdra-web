@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-23T17:58:16Z",
+  "updatedAt": "2026-11-24T17:36:21Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -10,9 +10,21 @@
       "description": "Solución de gestión gastronómica integral: punto de venta, mesas, comandas de cocina, caja, inventario, recetas, finanzas y reportes. Multi-sucursal y white-label.",
       "language": "TypeScript",
       "createdAt": "2026-08-11T05:55:15Z",
-      "updatedAt": "2026-11-23T17:17:30Z",
-      "pushedAt": "2026-11-22T17:43:09Z",
+      "updatedAt": "2026-11-23T20:12:01Z",
+      "pushedAt": "2026-11-23T20:26:31Z",
       "commits": [
+        {
+          "date": "2026-11-23",
+          "summary": "Merge pull request #154 from felipebarraza6/feat/sercotec-uchanas"
+        },
+        {
+          "date": "2026-11-23",
+          "summary": "Sincroniza el SHA con el contrato de producción"
+        },
+        {
+          "date": "2026-11-23",
+          "summary": "Sello Sercotec en la sucursal Uchanas"
+        },
         {
           "date": "2026-11-18",
           "summary": "Merge pull request #146 from felipebarraza6/fix/forgot-password-always-works"
@@ -118,20 +130,8 @@
           "summary": "Merge pull request #123 from felipebarraza6/dev"
         },
         {
-          "date": "2026-11-10",
-          "summary": "Merge pull request #122 from felipebarraza6/chore/fase0-limpieza"
-        },
-        {
-          "date": "2026-11-10",
-          "summary": "Deja .qwen y .zcode fuera del repo"
-        },
-        {
-          "date": "2026-11-10",
-          "summary": "Quita los workflows que llaman a yggdra_infra"
-        },
-        {
-          "date": "2026-11-18",
-          "summary": "Sincroniza tipos y SHA con el schema de producción"
+          "date": "2026-11-23",
+          "summary": "Sincroniza el SHA con el contrato de producción"
         }
       ]
     },
@@ -975,8 +975,12 @@
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
       "updatedAt": "2026-11-23T16:29:09Z",
-      "pushedAt": "2026-11-22T14:29:13Z",
+      "pushedAt": "2026-11-23T17:58:17Z",
       "commits": [
+        {
+          "date": "2026-11-23",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-22",
           "summary": "Data: sync actividad pública del inventario Yggdra"
@@ -1091,10 +1095,6 @@
         },
         {
           "date": "2026-10-27",
-          "summary": "Data: sync actividad pública del inventario Yggdra"
-        },
-        {
-          "date": "2026-10-26",
           "summary": "Data: sync actividad pública del inventario Yggdra"
         }
       ]
