@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:36:21Z",
+  "updatedAt": "2026-11-25T17:07:27Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -404,8 +404,48 @@
       "language": "TypeScript",
       "createdAt": "2026-10-30T03:10:38Z",
       "updatedAt": "2026-11-11T23:35:49Z",
-      "pushedAt": "2026-11-14T12:14:00Z",
+      "pushedAt": "2026-11-25T17:05:43Z",
       "commits": [
+        {
+          "date": "2026-11-25",
+          "summary": "Merge pull request #80 from felipebarraza6/fix/62-confirmar-eliminar"
+        },
+        {
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into fix/62-confirmar-eliminar"
+        },
+        {
+          "date": "2026-11-25",
+          "summary": "Merge pull request #79 from felipebarraza6/fix/58-59-centro-control"
+        },
+        {
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into fix/62-confirmar-eliminar"
+        },
+        {
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into fix/58-59-centro-control"
+        },
+        {
+          "date": "2026-11-25",
+          "summary": "Merge pull request #98 from felipebarraza6/chore/sync-contract-prod"
+        },
+        {
+          "date": "2026-11-25",
+          "summary": "Sincronizar tipos y sha con producción"
+        },
+        {
+          "date": "2026-11-24",
+          "summary": "Diálogo de confirmación al eliminar alumno"
+        },
+        {
+          "date": "2026-11-24",
+          "summary": "Abrir Nutrición filtrada a pendientes (#58, #59)"
+        },
+        {
+          "date": "2026-11-24",
+          "summary": "Unificar riesgo con el panel y respetar filtro (#58, #59)"
+        },
         {
           "date": "2026-11-14",
           "summary": "Asignar rutina desde la Ficha y copy de Inicio"
@@ -485,46 +525,6 @@
         {
           "date": "2026-11-07",
           "summary": "Merge pull request #35 from felipebarraza6/fix/p90-shell-cache"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "El shell no se cachea y el deploy compara el hash"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Merge pull request #31 from felipebarraza6/fix/ux-cierre-marce"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Semana móvil, calendario de adherencia y promedios vigentes"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Merge pull request #26 from felipebarraza6/feat/24-insights-alumno"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Merge main: peso inicial y sha del contrato"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Merge pull request #25 from felipebarraza6/fix/23-peso-participantes"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Alinea el sha del contrato con el freeze de la API"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Calendario de adherencia y racha con la serie diaria"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "La ficha usa el peso de Participantes en Inicial y hitos"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Peso compacto, semana visible, promedio e insights de lectura"
         }
       ]
     },
@@ -975,8 +975,12 @@
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
       "updatedAt": "2026-11-23T16:29:09Z",
-      "pushedAt": "2026-11-23T17:58:17Z",
+      "pushedAt": "2026-11-24T17:36:22Z",
       "commits": [
+        {
+          "date": "2026-11-24",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-23",
           "summary": "Data: sync actividad pública del inventario Yggdra"
@@ -1091,10 +1095,6 @@
         },
         {
           "date": "2026-10-28",
-          "summary": "Data: sync actividad pública del inventario Yggdra"
-        },
-        {
-          "date": "2026-10-27",
           "summary": "Data: sync actividad pública del inventario Yggdra"
         }
       ]
