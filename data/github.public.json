@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-25T17:07:27Z",
+  "updatedAt": "2026-11-26T16:47:56Z",
   "generatedNote": "Actividad pública solo de repos del inventario Yggdra. Repos privados no se listan aquí.",
   "scope": "inventory-only",
   "repos": [
@@ -404,127 +404,127 @@
       "language": "TypeScript",
       "createdAt": "2026-10-30T03:10:38Z",
       "updatedAt": "2026-11-11T23:35:49Z",
-      "pushedAt": "2026-11-25T17:05:43Z",
+      "pushedAt": "2026-11-26T04:24:28Z",
       "commits": [
         {
-          "date": "2026-11-25",
-          "summary": "Merge pull request #80 from felipebarraza6/fix/62-confirmar-eliminar"
+          "date": "2026-11-26",
+          "summary": "Merge pull request #102 from felipebarraza6/chore/docs-cloudflare-consistency"
+        },
+        {
+          "date": "2026-11-26",
+          "summary": "Quitar .htaccess residual de la era FTPS"
+        },
+        {
+          "date": "2026-11-26",
+          "summary": "Alinear documentación con Cloudflare Pages"
         },
         {
           "date": "2026-11-25",
-          "summary": "Merge remote-tracking branch 'origin/main' into fix/62-confirmar-eliminar"
+          "summary": "Merge pull request #100 from felipebarraza6/chore/deploy-cloudflare-pages"
         },
         {
           "date": "2026-11-25",
-          "summary": "Merge pull request #79 from felipebarraza6/fix/58-59-centro-control"
+          "summary": "Publicar en Cloudflare Pages en vez de FTPS"
         },
         {
           "date": "2026-11-25",
-          "summary": "Merge remote-tracking branch 'origin/main' into fix/62-confirmar-eliminar"
+          "summary": "Merge pull request #95 from felipebarraza6/feat/69-rutina-en-blanco"
         },
         {
           "date": "2026-11-25",
-          "summary": "Merge remote-tracking branch 'origin/main' into fix/58-59-centro-control"
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/69-rutina-en-blanco"
         },
         {
           "date": "2026-11-25",
-          "summary": "Merge pull request #98 from felipebarraza6/chore/sync-contract-prod"
+          "summary": "Merge pull request #94 from felipebarraza6/feat/68-copiar-rutina"
         },
         {
           "date": "2026-11-25",
-          "summary": "Sincronizar tipos y sha con producción"
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/68-copiar-rutina"
         },
         {
-          "date": "2026-11-24",
-          "summary": "Diálogo de confirmación al eliminar alumno"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #93 from felipebarraza6/feat/77-alerta-seguimiento"
         },
         {
-          "date": "2026-11-24",
-          "summary": "Abrir Nutrición filtrada a pendientes (#58, #59)"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/77-alerta-seguimiento"
         },
         {
-          "date": "2026-11-24",
-          "summary": "Unificar riesgo con el panel y respetar filtro (#58, #59)"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #92 from felipebarraza6/feat/70-metas-por-fecha"
         },
         {
-          "date": "2026-11-14",
-          "summary": "Asignar rutina desde la Ficha y copy de Inicio"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/70-metas-por-fecha"
         },
         {
-          "date": "2026-11-14",
-          "summary": "Merge pull request #53 from felipebarraza6/chore/sync-contract-406"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #90 from felipebarraza6/feat/72-sesiones-orden"
         },
         {
-          "date": "2026-11-14",
-          "summary": "Sincronizar contrato con prod"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/72-sesiones-orden"
         },
         {
-          "date": "2026-11-14",
-          "summary": "Merge pull request #51 from felipebarraza6/feat/50-creador-rutinas"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #89 from felipebarraza6/feat/64-tramos-participantes"
         },
         {
-          "date": "2026-11-13",
-          "summary": "Creador de rutinas con guía, bloques y borrado"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/64-tramos-participantes"
         },
         {
-          "date": "2026-11-12",
-          "summary": "Merge pull request #49 from felipebarraza6/fix/47-primary-program-wins"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #88 from felipebarraza6/feat/71-contenido-iconos-fecha"
         },
         {
-          "date": "2026-11-12",
-          "summary": "El programa principal gana a la guía de emergencia"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/71-contenido-iconos-fecha"
         },
         {
-          "date": "2026-11-12",
-          "summary": "Merge pull request #48 from felipebarraza6/fix/47-entrenamiento-fallback-workouts"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #87 from felipebarraza6/feat/60-resumen-estadisticas"
         },
         {
-          "date": "2026-11-12",
-          "summary": "Entrenamiento no queda vacío en rutinas creadas desde el coach"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/60-resumen-estadisticas"
         },
         {
-          "date": "2026-11-11",
-          "summary": "Merge pull request #44 from felipebarraza6/feat/p90-38-42-alumno"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #86 from felipebarraza6/feat/66-grafico-macros-periodo"
         },
         {
-          "date": "2026-11-11",
-          "summary": "Merge pull request #43 from felipebarraza6/feat/p90-39-40-41-marce"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/66-grafico-macros-periodo"
         },
         {
-          "date": "2026-11-11",
-          "summary": "El rótulo del calendario de macros no cruza el 80 % al redondear (refs #38)"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #85 from felipebarraza6/feat/67-grilla-rutinas"
         },
         {
-          "date": "2026-11-11",
-          "summary": "Ficha semanal en el perfil del alumno (refs #42)"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/67-grilla-rutinas"
         },
         {
-          "date": "2026-11-11",
-          "summary": "Calendario de cumplimiento macros con % diario (refs #38)"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #84 from felipebarraza6/feat/65-78-calendario-macros"
         },
         {
-          "date": "2026-11-11",
-          "summary": "Sincronizar contrato con yggdra_infra #393"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into feat/65-78-calendario-macros"
         },
         {
-          "date": "2026-11-11",
-          "summary": "Sincronizar sha con prod (e4a5b499)"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #83 from felipebarraza6/fix/74-selector-rutinas-web"
         },
         {
-          "date": "2026-11-11",
-          "summary": "Dos avisos en inicio y Mostrar todos (refs #41)"
+          "date": "2026-11-25",
+          "summary": "Merge remote-tracking branch 'origin/main' into fix/74-selector-rutinas-web"
         },
         {
-          "date": "2026-11-11",
-          "summary": "Tres cuadros de adherencia y racha ≥80 % (refs #40)"
-        },
-        {
-          "date": "2026-11-11",
-          "summary": "Ejes y escalas fijas en gráficos semanales (refs #39)"
-        },
-        {
-          "date": "2026-11-07",
-          "summary": "Merge pull request #35 from felipebarraza6/fix/p90-shell-cache"
+          "date": "2026-11-25",
+          "summary": "Merge pull request #97 from felipebarraza6/feat/75-tipos-programa"
         }
       ]
     },
@@ -975,8 +975,12 @@
       "language": "Astro",
       "createdAt": "2026-10-17T21:44:38Z",
       "updatedAt": "2026-11-23T16:29:09Z",
-      "pushedAt": "2026-11-24T17:36:22Z",
+      "pushedAt": "2026-11-25T17:07:28Z",
       "commits": [
+        {
+          "date": "2026-11-25",
+          "summary": "Data: sync actividad pública del inventario Yggdra"
+        },
         {
           "date": "2026-11-24",
           "summary": "Data: sync actividad pública del inventario Yggdra"
@@ -1091,10 +1095,6 @@
         },
         {
           "date": "2026-10-29",
-          "summary": "Data: sync actividad pública del inventario Yggdra"
-        },
-        {
-          "date": "2026-10-28",
           "summary": "Data: sync actividad pública del inventario Yggdra"
         }
       ]
