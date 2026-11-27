@@ -1,7 +1,7 @@
 ---
-import "@fontsource/syne/600.css";
-import "@fontsource/syne/700.css";
-import "@fontsource/syne/800.css";
+import "@fontsource/space-grotesk/500.css";
+import "@fontsource/space-grotesk/600.css";
+import "@fontsource/space-grotesk/700.css";
 import "@fontsource/manrope/400.css";
 import "@fontsource/manrope/500.css";
 import "@fontsource/manrope/600.css";
@@ -9,7 +9,8 @@ import "@fontsource/manrope/700.css";
 import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
 import "../styles/global.css";
-import Logo from "../components/Logo.astro";
+import ParticleYMark from "../components/ParticleYMark.astro";
+import AntigravityField from "../components/AntigravityField.astro";
 
 interface Props {
   title?: string;
@@ -17,8 +18,8 @@ interface Props {
 }
 
 const {
-  title = "YARQ — equipo de agentes que ordenan tu operación",
-  description = "YARQ es un equipo de agentes especializados, orquestados para ordenar tu operación. Desarrollo continuo y acompañamiento cercano.",
+  title = "YARQ — Infraestructura digital para construir el futuro",
+  description = "Digitalizamos lo esencial para construir un futuro mejor: plataformas, automatización e inteligencia artificial sobre una arquitectura compartida.",
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
@@ -31,12 +32,13 @@ function isCurrent(href: string) {
   return path.startsWith(href);
 }
 
+const isHome = path === base || path === `${base}` || path === "/" || path === `${base}index.html`;
+
 const nav = [
-  { href: `${base}#equipo`, label: "Equipo", icon: "team" },
-  { href: `${base}#acompanamos`, label: "Oficios", icon: "craft" },
-  { href: `${base}#flujo`, label: "Flujo", icon: "flow" },
-  { href: `${base}#casos`, label: "Casos", icon: "cases" },
-  { href: `${base}apps/`, label: "Store", icon: "store", page: true },
+  { href: `${base}#yarq`, label: "Nosotros", icon: "sigil" },
+  { href: `${base}#capacidades`, label: "Servicios", icon: "iso" },
+  { href: `${base}#productos`, label: "Productos", icon: "matrix" },
+  { href: `${base}apps/`, label: "Catálogo", icon: "index", page: true },
 ];
 ---
 
@@ -46,8 +48,8 @@ const nav = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0b1216" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#edf2f7" />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CL" />
@@ -64,52 +66,78 @@ const nav = [
   </head>
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
-    <div class="void-field" aria-hidden="true"></div>
+    <div class="lab-field" aria-hidden="true">
+      <span class="lab-aurora lab-aurora--a"></span>
+      <span class="lab-aurora lab-aurora--b"></span>
+      <span class="lab-aurora lab-aurora--c"></span>
+      <span class="lab-aurora lab-aurora--d"></span>
+      <span class="lab-stars"></span>
+      <span class="lab-orbit"></span>
+      <span class="lab-mesh"></span>
+    </div>
+    <AntigravityField />
+    {!isHome && (
     <header class="site-header">
-      <div class="wrap nav">
-        <a class="brand" href={base}>
-          <Logo size={36} animated />
-          <span class="brand-text">ARQ</span>
-        </a>
-        <nav aria-label="Principal">
-          <ul class="nav-links">
-            {
-              nav.map((item) => (
-                <li>
-                  <a
-                    class="nav-link"
-                    href={item.href}
-                    aria-current={item.page && isCurrent(`${base}apps/`) ? "page" : undefined}
-                  >
-                    <svg class={`nav-ico nav-ico--${item.icon}`} viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                      {item.icon === "team" && (
-                        <>
-                          <circle cx="8" cy="5.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4" />
-                          <path d="M3.2 13c.6-2.2 2.2-3.4 4.8-3.4s4.2 1.2 4.8 3.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-                        </>
-                      )}
-                      {item.icon === "craft" && (
-                        <path d="M3 11.5 8 3.5l5 8H3Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
-                      )}
-                      {item.icon === "flow" && (
-                        <path d="M2.5 8h7.2M7.2 4.8 10.8 8 7.2 11.2M12.2 5.2v5.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                      )}
-                      {item.icon === "cases" && (
-                        <path d="M3 5.5h10v7H3v-7Zm2.2-2h5.6v2H5.2v-2Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
-                      )}
-                      {item.icon === "store" && (
-                        <path d="M3 6.2 4.2 3.5h7.6L13 6.2v6.3H3V6.2Zm0 0h10M6.2 9.2h3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                      )}
-                    </svg>
-                    {item.label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
+      <div class="wrap nav-wrap">
+        <div class="nav nav--pill">
+          <a class="brand brand--icon-only" href={base} aria-label="YARQ — Inicio">
+            <ParticleYMark isHome={isHome} />
+          </a>
+          <nav aria-label="Principal">
+            <ul class="nav-links">
+              {
+                nav.map((item) => (
+                  <li>
+                    <a
+                      class="nav-link"
+                      href={item.href}
+                      aria-current={item.page && isCurrent(`${base}apps/`) ? "page" : undefined}
+                    >
+                      <svg class="nav-ico" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        {item.icon === "sigil" && (
+                          <>
+                            <circle cx="10" cy="10" r="7.2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 2.2" />
+                            <polygon points="10,4.5 14.8,13 5.2,13" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round" />
+                            <circle cx="10" cy="10.2" r="1.4" fill="var(--nav-accent, #7c3aed)" />
+                          </>
+                        )}
+                        {item.icon === "iso" && (
+                          <>
+                            <polygon points="10,2.4 16.8,6.2 10,10 3.2,6.2" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round" />
+                            <path d="M3.2 6.2v6.6L10 16.6l6.8-3.8V6.2M10 10v6.6" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round" />
+                            <circle cx="10" cy="6.2" r="1.1" fill="var(--nav-accent, #06b6d4)" />
+                          </>
+                        )}
+                        {item.icon === "matrix" && (
+                          <>
+                            <rect x="3.2" y="3.2" width="5.4" height="5.4" rx="1.4" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.3" />
+                            <rect x="11.4" y="3.2" width="5.4" height="5.4" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.3" />
+                            <rect x="3.2" y="11.4" width="5.4" height="5.4" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.3" />
+                            <rect x="11.4" y="11.4" width="5.4" height="5.4" rx="1.4" fill="var(--nav-accent, #7c3aed)" fill-opacity="0.28" stroke="var(--nav-accent, #7c3aed)" stroke-width="1.3" />
+                          </>
+                        )}
+                        {item.icon === "index" && (
+                          <>
+                            <circle cx="4.8" cy="5.5" r="1.4" fill="var(--nav-accent, #06b6d4)" />
+                            <path d="M8.5 5.5h8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                            <circle cx="4.8" cy="10" r="1.4" fill="currentColor" />
+                            <path d="M8.5 10h6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                            <circle cx="4.8" cy="14.5" r="1.4" fill="var(--nav-accent, #7c3aed)" />
+                            <path d="M8.5 14.5h8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                          </>
+                        )}
+                      </svg>
+                      {item.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+        </div>
       </div>
     </header>
+    )}
     <main id="contenido">
       <slot />
     </main>
@@ -117,16 +145,20 @@ const nav = [
       <div class="wrap footer-grid">
         <div>
           <p>
-            <strong>YARQ</strong> es un equipo de agentes especializados,
-            orquestados para ordenar operaciones: desarrollo continuo y
-            acompañamiento cercano. Esta web lo cuenta sin revelar lo interno.
+            <strong>YARQ</strong> — estudio de productos digitales, sistemas y
+            automatización en producción. Documentación pública sin exponer
+            rutas internas ni secretos.
           </p>
-          <p>
-            Código abierto de esta web:
-            <a href="https://github.com/felipebarraza6/yggdra-web">yggdra-web</a>.
+          <p class="footer-meta">
+            Repositorio público:
+            <a href="https://github.com/felipebarraza6/yggdra-web" target="_blank" rel="noreferrer">yggdra-web</a>
+            {" · "}
+            <a href={`${base}apps/`}>Catálogo completo</a>
+            {" · "}
+            <a href={`${base}modulos/`}>Módulos API</a>
           </p>
         </div>
-        <p class="credit-foot">creado por Felipe Barraza</p>
+        <p class="credit-foot">YARQ</p>
       </div>
     </footer>
     <script>
@@ -142,33 +174,24 @@ const nav = [
               }
             }
           },
-          { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
+          { rootMargin: "0px 0px -6% 0px", threshold: 0.1 }
         );
         els.forEach((el) => io.observe(el));
 
-        const iso = document.querySelector("[data-iso-stage]");
-        if (iso) {
-          const layers = iso.querySelectorAll("[data-iso-layer]");
-          const onScroll = () => {
-            const rect = iso.getBoundingClientRect();
-            const vh = window.innerHeight || 1;
-            const progress = Math.min(1, Math.max(0, 1 - rect.top / (vh * 0.85)));
-            layers.forEach((layer, i) => {
-              const el = layer as HTMLElement;
-              const start = i * 0.12;
-              const local = Math.min(1, Math.max(0, (progress - start) / 0.35));
-              el.style.setProperty("--assemble", String(local));
-            });
-            iso.classList.toggle("is-assembled", progress > 0.72);
-          };
-          onScroll();
-          window.addEventListener("scroll", onScroll, { passive: true });
-        }
+        // Rastreo de puntero para revelación de energía negativa en paneles interactivos
+        document.querySelectorAll<HTMLElement>(".glass--interactive, .cta-band--space").forEach((el) => {
+          el.addEventListener(
+            "pointermove",
+            (ev) => {
+              const r = el.getBoundingClientRect();
+              el.style.setProperty("--mx", `${ev.clientX - r.left}px`);
+              el.style.setProperty("--my", `${ev.clientY - r.top}px`);
+            },
+            { passive: true }
+          );
+        });
       } else {
         document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-in"));
-        document.querySelectorAll("[data-iso-layer]").forEach((el) => {
-          (el as HTMLElement).style.setProperty("--assemble", "1");
-        });
       }
     </script>
   </body>

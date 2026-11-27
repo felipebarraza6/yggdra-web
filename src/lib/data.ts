@@ -34,6 +34,33 @@ export function githubForProject(project: Project) {
   return githubRepos.find((r) => r.name === name || r.fullName === project.repo);
 }
 
+/**
+ * Envuelve referencias internas de la vertical hídrica bajo el ecosistema Nereus API
+ * y normaliza la marca pública a Y ARQ.
+ */
+export function publicOrg(company?: string): string {
+  const raw = (company || "").trim();
+  if (!raw) return "Ecosistema YARQ";
+  if (/smarthydro/i.test(raw)) return "Nereus API";
+  return raw;
+}
+
+export function publicLabel(project: Project): string {
+  const raw = project.product || project.name;
+  if (project.id === "nereus_smarthydro") return "nereus_app";
+  return raw
+    .replace(/SmartHydro/gi, "Nereus")
+    .replace(/Yggdra/gi, "YARQ");
+}
+
+export function publicCopy(text?: string): string {
+  if (!text) return "";
+  return text
+    .replace(/Panel operativo SmartHydro sobre Yggdra\.?/gi, "Suite operativa core sobre Nereus API (fork de YARQ).")
+    .replace(/SmartHydro/gi, "Nereus API")
+    .replace(/Yggdra/gi, "YARQ");
+}
+
 export const counts = {
   total: projects.length,
   active: projects.filter((c) => c.status === "active").length,

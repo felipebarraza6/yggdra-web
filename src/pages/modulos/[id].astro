@@ -1,10 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Rune from "../../components/Rune.astro";
 import {
   allModuleIds,
   projectsForModule,
   activityForModules,
+  publicOrg,
+  publicLabel,
+  publicCopy,
 } from "../../lib/data";
 
 export function getStaticPaths() {
@@ -21,7 +23,7 @@ const svgH = Math.max(200, 48 + apps.length * 40);
 
 <BaseLayout
   title={`Módulo ${moduleId} | YARQ`}
-  description={`Aplicaciones que consumen el módulo ${moduleId} de YARQ.`}
+  description={`Aplicaciones que consumen el módulo ${moduleId} en la plataforma YARQ.`}
 >
   <section class="page-hero">
     <div class="wrap">
@@ -30,10 +32,10 @@ const svgH = Math.max(200, 48 + apps.length * 40);
         <li><a href={`${base}modulos/`}>Módulos</a> /</li>
         <li>{moduleId}</li>
       </ul>
-      <p class="section-kicker"><Rune name="ansuz" /> Módulo</p>
+      <p class="section-kicker">Módulo de dominio</p>
       <h1 style="font-family:var(--font-mono);">{moduleId}</h1>
       <p style="color:var(--text-muted);max-width:40rem;margin:0.5rem 0 0;">
-        Parte del tronco de YARQ. {apps.length}{" "}
+        Capacidad del contrato API compartido. {apps.length}{" "}
         {apps.length === 1 ? "aplicación lo consume" : "aplicaciones lo consumen"}.
       </p>
     </div>
@@ -42,8 +44,8 @@ const svgH = Math.max(200, 48 + apps.length * 40);
   <section style="padding-top:0;">
     <div class="wrap">
       <div class="glass panel">
-        <h2 style="margin:0 0 0.75rem;font-family:var(--font-display);font-size:1.25rem;">
-          Ramas conectadas
+        <h2 style="margin:0 0 0.75rem;font-family:var(--font-display);font-size:1.2rem;">
+          Aplicaciones conectadas
         </h2>
         <div class="diagram-wrap">
           <svg class="diagram" viewBox={`0 0 420 ${svgH}`} role="img" aria-label={`Apps que usan ${moduleId}`}>
@@ -52,7 +54,7 @@ const svgH = Math.max(200, 48 + apps.length * 40);
             {
               apps.map((app, i) => {
                 const y = 24 + i * 40;
-                const label = (app.product || app.name).slice(0, 18);
+                const label = publicLabel(app).slice(0, 18);
                 return (
                   <g>
                     <path class="edge" d={`M150 ${svgH / 2} L210 ${y + 14}`}></path>
@@ -76,13 +78,13 @@ const svgH = Math.max(200, 48 + apps.length * 40);
       <div class="grid-cards" style="margin-top:1rem;">
         {
           apps.map((c) => (
-            <a class="product-card glass" href={`${base}apps/${c.id}/`}>
+            <a class="product-card glass glass--interactive" href={`${base}apps/${c.id}/`}>
               <div style="display:flex;justify-content:space-between;gap:0.5rem;">
-                <h3>{c.product || c.name}</h3>
+                <h3>{publicLabel(c)}</h3>
                 <span class="badge" data-status={c.statusLabel}>{c.statusLabel}</span>
               </div>
               <p class="meta" style="margin:0;">
-                {c.company || "Cliente por confirmar"}
+                {publicOrg(c.company)}
               </p>
             </a>
           ))
@@ -103,7 +105,7 @@ const svgH = Math.max(200, 48 + apps.length * 40);
             {related.map((item) => (
               <li>
                 <time datetime={item.date}>{item.date}</time>
-                <p class="summary">{item.summary}</p>
+                <p class="summary">{publicCopy(item.summary)}</p>
               </li>
             ))}
           </ol>

@@ -4,104 +4,85 @@ interface Props {
   class?: string;
   animated?: boolean;
 }
-const { size = 36, class: className = "", animated = true } = Astro.props;
-const uid = "logo-y-mark";
+const { size = 36, class: className = "", animated = false } = Astro.props;
+const uid = `ym-${Math.random().toString(36).slice(2, 7)}`;
 ---
 
 <svg
-  class={`logo-y ${animated ? "logo-y--animated" : ""} ${className}`.trim()}
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 96 96"
+  class={`yarq-mark ${animated ? "yarq-mark--anim" : ""} ${className}`.trim()}
   width={size}
   height={size}
-  role="img"
-  aria-label="YARQ"
+  viewBox="0 0 48 48"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
 >
   <defs>
-    <linearGradient id={`${uid}-stroke`} x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#148a98"></stop>
-      <stop offset="55%" stop-color="#0d6e7a"></stop>
-      <stop offset="100%" stop-color="#0f1c22"></stop>
+    <linearGradient id={`${uid}-bg`} x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#070c18"></stop>
+      <stop offset="100%" stop-color="#131c36"></stop>
+    </linearGradient>
+    <linearGradient id={`${uid}-stroke`} x1="12" y1="11" x2="36" y2="37" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f8fafc"></stop>
+      <stop offset="52%" stop-color="#38bdf8"></stop>
+      <stop offset="100%" stop-color="#8b5cf6"></stop>
+    </linearGradient>
+    <linearGradient id={`${uid}-rim`} x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.65"></stop>
+      <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.35"></stop>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.18"></stop>
     </linearGradient>
   </defs>
-  <g class="logo-guides" stroke="#7aa3ab" stroke-width="0.7" opacity="0.45">
-    <line x1="8" y1="88" x2="48" y2="12"></line>
-    <line x1="88" y1="88" x2="48" y2="12"></line>
-    <line x1="18" y1="88" x2="48" y2="28"></line>
-    <line x1="78" y1="88" x2="48" y2="28"></line>
-  </g>
+
+  <!-- Cápsula minimal obsidiana -->
+  <rect x="2" y="2" width="44" height="44" rx="13" fill={`url(#${uid}-bg)`} stroke={`url(#${uid}-rim)`} stroke-width="1.2"></rect>
+
+  <!-- Faceta Y minimalista y geométrica -->
   <path
-    class="logo-mark"
-    d="M22 18 L48 52 L74 18 M48 52 V82"
-    fill="none"
+    class="yarq-mark__arm"
+    d="M14.5 14L24 24.5L33.5 14"
     stroke={`url(#${uid}-stroke)`}
-    stroke-width="5.5"
+    stroke-width="3.2"
     stroke-linecap="round"
     stroke-linejoin="round"
   ></path>
-  <circle class="logo-node" cx="22" cy="18" r="3.2" fill="#148a98"></circle>
-  <circle class="logo-node" cx="74" cy="18" r="3.2" fill="#148a98"></circle>
-  <circle class="logo-node logo-node--core" cx="48" cy="52" r="4" fill="#0f1c22"></circle>
-  <circle class="logo-node" cx="48" cy="82" r="3" fill="#5a8a94"></circle>
+  <path
+    class="yarq-mark__stem"
+    d="M24 24.5V35"
+    stroke="#f8fafc"
+    stroke-width="3.2"
+    stroke-linecap="round"
+  ></path>
+
+  <!-- Singularidad flotante superior -->
+  <circle class="yarq-mark__dot" cx="24" cy="13.5" r="2.2" fill="#38bdf8"></circle>
 </svg>
 
 <style>
-  .logo-y {
+  .yarq-mark {
     display: block;
     flex-shrink: 0;
   }
 
-  .logo-y--animated .logo-mark {
-    stroke-dasharray: 220;
-    stroke-dashoffset: 220;
-    animation: logo-y-draw 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+  .yarq-mark--anim .yarq-mark__dot {
+    animation: ym-pulse 3.2s ease-in-out infinite;
+    transform-origin: 24px 13.5px;
   }
 
-  .logo-y--animated .logo-node {
-    opacity: 0;
-    transform-origin: center;
-    animation: logo-y-node 0.5s ease 1.15s forwards;
-  }
-
-  .logo-y--animated .logo-guides {
-    opacity: 0;
-    animation: logo-y-guides 0.8s ease 0.05s forwards;
-  }
-
-  @keyframes logo-y-draw {
-    to {
-      stroke-dashoffset: 0;
+  @keyframes ym-pulse {
+    0%, 100% {
+      opacity: 0.72;
+      transform: scale(0.92);
     }
-  }
-
-  @keyframes logo-y-node {
-    from {
-      opacity: 0;
-      transform: scale(0.45);
-    }
-    to {
+    50% {
       opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes logo-y-guides {
-    to {
-      opacity: 0.45;
+      transform: scale(1.18);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .logo-y--animated .logo-mark,
-    .logo-y--animated .logo-node,
-    .logo-y--animated .logo-guides {
+    .yarq-mark--anim .yarq-mark__dot {
       animation: none;
-      stroke-dashoffset: 0;
-      opacity: 1;
-      transform: none;
-    }
-    .logo-y--animated .logo-guides {
-      opacity: 0.45;
     }
   }
 </style>

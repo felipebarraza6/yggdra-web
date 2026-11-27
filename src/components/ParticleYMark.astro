@@ -1,0 +1,191 @@
+---
+/**
+ * Marca "Y" del header compuesta por partículas (mismo ADN visual que YARQ en el hero):
+ * En la home permanece oculta en el hero y se ensambla desde partículas al hacer scroll.
+ */
+interface Props {
+  isHome?: boolean;
+}
+const { isHome = false } = Astro.props;
+---
+
+<span class={`py-mark ${isHome ? "py-mark--home" : "py-mark--visible"}`} data-particle-y data-is-home={isHome ? "1" : "0"}>
+  <canvas class="py-mark__canvas" width="40" height="40" aria-hidden="true"></canvas>
+</span>
+
+<script>
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hosts = document.querySelectorAll<HTMLElement>("[data-particle-y]");
+
+  hosts.forEach((host) => {
+    const canvas = host.querySelector<HTMLCanvasElement>(".py-mark__canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const isHome = host.dataset.isHome === "1";
+    const size = 40;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    type Dot = {
+      tx: number;
+      ty: number;
+      sx: number;
+      sy: number;
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      r: number;
+      tone: number;
+      phase: number;
+    };
+
+    const dots: Dot[] = [];
+
+    function sampleY() {
+      const off = document.createElement("canvas");
+      off.width = size;
+      off.height = size;
+      const octx = off.getContext("2d");
+      if (!octx) return;
+
+      octx.strokeStyle = "#000";
+      octx.lineWidth = 4.6;
+      octx.lineCap = "round";
+      octx.lineJoin = "round";
+      octx.beginPath();
+      octx.moveTo(10, 9);
+      octx.lineTo(20, 21);
+      octx.lineTo(30, 9);
+      octx.moveTo(20, 21);
+      octx.lineTo(20, 32);
+      octx.stroke();
+
+      const data = octx.getImageData(0, 0, size, size).data;
+      dots.length = 0;
+
+      for (let y = 2; y < size - 2; y += 2) {
+        for (let x = 2; x < size - 2; x += 2) {
+          if (data[(y * size + x) * 4 + 3] > 90) {
+            const ang = Math.random() * Math.PI * 2;
+            const dist = 16 + Math.random() * 22;
+            const sx = x + Math.cos(ang) * dist;
+            const sy = y + Math.sin(ang) * dist;
+            const roll = Math.random();
+            const tone = roll < 0.48 ? 0 : roll < 0.78 ? 1 : 2;
+            dots.push({
+              tx: x,
+              ty: y,
+              sx,
+              sy,
+              x: isHome && !reduce ? sx : x,
+              y: isHome && !reduce ? sy : y,
+              vx: 0,
+              vy: 0,
+              r: 0.75 + Math.random() * 0.65,
+              tone,
+              phase: Math.random() * Math.PI * 2,
+            });
+          }
+        }
+      }
+    }
+
+    sampleY();
+
+    let active = !isHome;
+    let t = 0;
+    let raf = 0;
+
+    function updateVisibility() {
+      if (!isHome) {
+        active = true;
+        host.classList.add("py-mark--visible");
+        return;
+      }
+      const next = window.scrollY > 170;
+      if (next !== active) {
+        active = next;
+        host.classList.toggle("py-mark--visible", active);
+      }
+    }
+
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    updateVisibility();
+
+    function tick() {
+      t += 0.03;
+      ctx.clearRect(0, 0, size, size);
+
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i];
+        const gx = active ? d.tx + Math.sin(t + d.phase) * 0.35 : d.sx;
+        const gy = active ? d.ty + Math.cos(t * 0.9 + d.phase) * 0.35 : d.sy;
+
+        if (reduce) {
+          d.x = d.tx;
+          d.y = d.ty;
+        } else {
+          d.vx += (gx - d.x) * (active ? 0.09 : 0.06);
+          d.vy += (gy - d.y) * (active ? 0.09 : 0.06);
+          d.vx *= 0.78;
+          d.vy *= 0.78;
+          d.x += d.vx;
+          d.y += d.vy;
+        }
+
+        const alpha = active ? 0.92 : 0.0;
+        if (alpha <= 0.01 && Math.hypot(d.x - d.sx, d.y - d.sy) < 1) continue;
+
+        if (d.tone === 0) ctx.fillStyle = "rgba(9, 16, 28, 0.92)";
+        else if (d.tone === 1) ctx.fillStyle = "rgba(2, 132, 199, 0.9)";
+        else ctx.fillStyle = "rgba(124, 58, 237, 0.88)";
+
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (!reduce) {
+        raf = requestAnimationFrame(tick);
+      }
+    }
+
+    tick();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) cancelAnimationFrame(raf);
+      else if (!reduce) raf = requestAnimationFrame(tick);
+    });
+  });
+</script>
+
+<style>
+  .py-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    opacity: 0;
+    transform: scale(0.86);
+    pointer-events: none;
+    transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .py-mark--visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  .py-mark__canvas {
+    display: block;
+  }
+</style>

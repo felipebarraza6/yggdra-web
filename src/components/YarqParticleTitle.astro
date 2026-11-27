@@ -1,0 +1,460 @@
+---
+/**
+ * Wordmark "YARQ" compuesto por miles de partículas de datos en 3D:
+ * Se ensambla desde el espacio, respira con oleaje tridimensional y reacciona al cursor.
+ */
+---
+
+<div
+  class="yarq-3d"
+  data-yarq-trigger
+  role="button"
+  tabindex="0"
+  aria-pressed="false"
+  aria-label="YARQ — Haz clic para revelar el futuro completo a color"
+  title="Haz clic en YARQ para revelar el mundo futuro"
+>
+  <canvas class="yarq-3d__canvas" data-yarq-particles aria-hidden="true"></canvas>
+  <span class="yarq-3d__fallback" aria-hidden="true">YARQ</span>
+  <span class="visually-hidden">YARQ</span>
+</div>
+
+<script>
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canvases = document.querySelectorAll<HTMLCanvasElement>("[data-yarq-particles]");
+
+  if (!reduce && canvases.length > 0) {
+    const startAll = () => {
+      canvases.forEach((canvas) => {
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        let w = 0;
+        let h = 0;
+        let dpr = Math.min(window.devicePixelRatio || 1, 2);
+        let raf = 0;
+        let t = 0;
+
+        const pointer = { x: -9999, y: -9999, active: false };
+
+        type Dot = {
+          tx: number;
+          ty: number;
+          tz: number;
+          x: number;
+          y: number;
+          z: number;
+          vx: number;
+          vy: number;
+          vz: number;
+          size: number;
+          phase: number;
+          tone: number; // 0 obsidian, 1 cyan, 2 violet, 3 cobalt
+          alpha: number;
+        };
+
+        let dots: Dot[] = [];
+        let intro = 0;
+        let isSolid = false;
+        let solidMix = 0;
+        // Cuando el revelador blanco cubre el logo, el casco cambia a tinta oscura para no desaparecer sobre el blanco
+        let lensMix = 0;
+        let lensTarget = 0;
+        window.addEventListener("yarq:lens", (e: Event) => {
+          const ce = e as CustomEvent<{ mix?: number }>;
+          lensTarget = Math.max(0, Math.min(1, Number(ce.detail?.mix) || 0));
+        });
+        // Interpola de `from` (k=0, color claro) a `to` (k=1, tinta oscura)
+        const mixRGB = (from: number[], to: number[], k: number) =>
+          `rgba(${Math.round(from[0] + (to[0] - from[0]) * k)}, ${Math.round(
+            from[1] + (to[1] - from[1]) * k
+          )}, ${Math.round(from[2] + (to[2] - from[2]) * k)}, ${(from[3] + (to[3] - from[3]) * k).toFixed(3)})`;
+        const HULL_LIGHT: [number, number, number, number][] = [
+          [255, 255, 255, 1],
+          [241, 245, 249, 1],
+          [203, 213, 225, 1],
+          [148, 163, 184, 1],
+          [224, 242, 254, 1],
+        ];
+        const HULL_INK: [number, number, number, number][] = [
+          [11, 18, 32, 1],
+          [30, 41, 59, 1],
+          [51, 65, 85, 1],
+          [3, 105, 161, 1],
+          [2, 132, 199, 1],
+        ];
+        const RIM_LIGHT: number[][] = [
+          [255, 255, 255, 0.92],
+          [186, 230, 253, 0.65],
+          [56, 189, 248, 0.82],
+        ];
+        const RIM_INK: number[][] = [
+          [2, 6, 23, 0.92],
+          [15, 23, 42, 0.7],
+          [2, 132, 199, 0.92],
+        ];
+        let cachedFontSize = 96;
+        let cachedSpacing = 90;
+        let cachedStartX = 0;
+        const hullCanvas = document.createElement("canvas");
+        const hctx = hullCanvas.getContext("2d");
+
+        const triggerEl = canvas.closest<HTMLElement>("[data-yarq-trigger]");
+        const heroEl = canvas.closest<HTMLElement>(".hero--sea");
+
+        const setRealityMode = (next: boolean) => {
+          if (isSolid === next) return;
+          isSolid = next;
+          triggerEl?.setAttribute("aria-pressed", next ? "true" : "false");
+          heroEl?.classList.toggle("is-full-reality", next);
+          window.dispatchEvent(new CustomEvent("yarq:reality", { detail: { full: next } }));
+        };
+
+        triggerEl?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          setRealityMode(!isSolid);
+        });
+
+        triggerEl?.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setRealityMode(!isSolid);
+          }
+        });
+
+        // Clic afuera de YARQ (o Escape) vuelve suavemente todo al modo White y desintegra YARQ en partículas
+        document.addEventListener("click", (e) => {
+          if (!isSolid) return;
+          const target = e.target as HTMLElement | null;
+          if (target && (triggerEl?.contains(target) || target.closest("[data-dive-drone]"))) return;
+          setRealityMode(false);
+        });
+
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && isSolid) setRealityMode(false);
+        });
+
+        function buildParticles() {
+          const rect = canvas.parentElement?.getBoundingClientRect();
+          w = Math.max(300, Math.min(760, Math.floor(rect?.width || 640)));
+          h = Math.max(118, Math.floor(w * 0.25));
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = Math.floor(w * dpr);
+          canvas.height = Math.floor(h * dpr);
+          canvas.style.width = `${w}px`;
+          canvas.style.height = `${h}px`;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+          // Render offscreen para muestrear las letras YARQ en partículas
+          const off = document.createElement("canvas");
+          off.width = w;
+          off.height = h;
+          const octx = off.getContext("2d");
+          if (!octx) return;
+
+          const fontSize = Math.floor(Math.min(h * 0.82, w * 0.215));
+          const letters = ["Y", "A", "R", "Q"];
+          const spacing = fontSize * 0.94;
+          const startX = w / 2 - ((letters.length - 1) * spacing) / 2;
+          cachedFontSize = fontSize;
+          cachedSpacing = spacing;
+          cachedStartX = startX;
+
+          octx.clearRect(0, 0, w, h);
+          octx.fillStyle = "#000";
+          octx.textAlign = "center";
+          octx.textBaseline = "middle";
+          octx.font = `700 ${fontSize}px "Space Grotesk", "Manrope", sans-serif`;
+
+          letters.forEach((ch, idx) => {
+            octx.fillText(ch, startX + idx * spacing, h * 0.54);
+          });
+
+          const img = octx.getImageData(0, 0, w, h).data;
+          const step = w < 460 ? 3 : 4;
+          const nextDots: Dot[] = [];
+
+          for (let y = 0; y < h; y += step) {
+            for (let x = 0; x < w; x += step) {
+              const a = img[(y * w + x) * 4 + 3];
+              if (a > 90) {
+                const normX = x / w;
+                const toneRoll = Math.random();
+                let tone = 0;
+                if (toneRoll < 0.42) tone = 0; // obsidiana dominante
+                else if (toneRoll < 0.72) tone = normX < 0.55 ? 1 : 2; // cian / violeta
+                else tone = 3; // azul cobalto
+
+                const tz = (Math.random() - 0.5) * 42;
+                // Posición inicial dispersa para ensamblaje pausado desde el espacio
+                const angle = Math.random() * Math.PI * 2;
+                const spread = 95 + Math.random() * 190;
+                nextDots.push({
+                  tx: x,
+                  ty: y,
+                  tz,
+                  x: x + Math.cos(angle) * spread,
+                  y: y + Math.sin(angle) * spread * 0.55,
+                  z: tz + (Math.random() - 0.5) * 240,
+                  vx: 0,
+                  vy: 0,
+                  vz: 0,
+                  size: 1.1 + Math.random() * 1.15,
+                  phase: Math.random() * Math.PI * 2,
+                  tone,
+                  alpha: 0.65 + Math.random() * 0.35,
+                });
+              }
+            }
+          }
+
+          dots = nextDots;
+        }
+
+        const onMove = (e: MouseEvent) => {
+          const rect = canvas.getBoundingClientRect();
+          const lx = e.clientX - rect.left;
+          const ly = e.clientY - rect.top;
+          pointer.x = lx;
+          pointer.y = ly;
+          pointer.active = lx >= -40 && lx <= w + 40 && ly >= -40 && ly <= h + 40;
+        };
+        const onLeave = () => {
+          pointer.active = false;
+        };
+
+        window.addEventListener("mousemove", onMove, { passive: true });
+        canvas.parentElement?.addEventListener("mouseleave", onLeave, { passive: true });
+        window.addEventListener("resize", buildParticles, { passive: true });
+        buildParticles();
+
+        function tick() {
+          t += 0.018;
+          intro = Math.min(1, intro + 0.016);
+          solidMix += ((isSolid ? 1 : 0) - solidMix) * 0.085;
+          lensMix += (lensTarget - lensMix) * 0.12;
+          ctx.clearRect(0, 0, w, h);
+
+          const fov = 420;
+          const cx = w * 0.5;
+          const cy = h * 0.5;
+          const spring = 0.022 + intro * 0.028 + solidMix * 0.14;
+          const particleVis = Math.max(0, 1 - solidMix * 0.92);
+
+          if (particleVis > 0.02) {
+            for (let i = 0; i < dots.length; i++) {
+              const d = dots[i];
+
+              // En modo sólido las partículas convergen firmes hacia las letras exactas
+              const waveAmp = 1 - solidMix;
+              const waveX = Math.sin(t + d.tx * 0.018 + d.phase) * 1.25 * waveAmp;
+              const waveY = Math.cos(t * 0.9 + d.tx * 0.015 + d.phase) * 1.35 * waveAmp;
+              const waveZ = Math.sin(t * 1.05 + d.tx * 0.02) * 16 * waveAmp;
+
+              const goalX = d.tx + waveX;
+              const goalY = d.ty + waveY;
+              const goalZ = d.tz * waveAmp + waveZ;
+
+              d.vx += (goalX - d.x) * spring;
+              d.vy += (goalY - d.y) * spring;
+              d.vz += (goalZ - d.z) * (spring * 0.85);
+
+              let energized = 0;
+              if (pointer.active && !isSolid) {
+                const dx = d.x - pointer.x;
+                const dy = d.y - pointer.y;
+                const distSq = dx * dx + dy * dy;
+                const rad = 84;
+                if (distSq > 0.5 && distSq < rad * rad) {
+                  const dist = Math.sqrt(distSq);
+                  const push = 1 - dist / rad;
+                  energized = push;
+                  d.vx += (dx / dist) * push * 3.6;
+                  d.vy += (dy / dist) * push * 3.6;
+                  d.vz += push * 16;
+                }
+              }
+
+              d.vx *= 0.84;
+              d.vy *= 0.84;
+              d.vz *= 0.84;
+
+              d.x += d.vx;
+              d.y += d.vy;
+              d.z += d.vz;
+
+              const scale = fov / (fov + d.z);
+              const sx = cx + (d.x - cx) * scale;
+              const sy = cy + (d.y - cy) * scale;
+              const r = Math.max(0.8, d.size * scale + energized * 0.9);
+              const alpha =
+                Math.min(0.98, d.alpha * intro * (0.74 + scale * 0.26) + energized * 0.28) *
+                particleVis;
+
+              if (energized > 0.24) {
+                ctx.fillStyle = `rgba(125, 211, 252, ${alpha.toFixed(3)})`;
+              } else if (d.tone === 0) {
+                ctx.fillStyle = `rgba(9, 16, 28, ${alpha.toFixed(3)})`;
+              } else if (d.tone === 1) {
+                ctx.fillStyle = `rgba(2, 132, 199, ${alpha.toFixed(3)})`;
+              } else if (d.tone === 2) {
+                ctx.fillStyle = `rgba(124, 58, 237, ${(alpha * 0.92).toFixed(3)})`;
+              } else {
+                ctx.fillStyle = `rgba(15, 23, 42, ${(alpha * 0.82).toFixed(3)})`;
+              }
+
+              ctx.beginPath();
+              ctx.arc(sx, sy, r, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          // Modo sólido: YARQ como estructura aeroespacial limpia y sólida (sin líneas de ruido)
+          if (solidMix > 0.04) {
+            const sm = Math.min(1, solidMix);
+            const letters = ["Y", "A", "R", "Q"];
+            const ly = h * 0.54;
+
+            // Fuselaje limpio de nave espacial (cerámica aeroespacial satinada + bisel de luz)
+            if (hctx) {
+              const hw = Math.floor(w * dpr);
+              const hh = Math.floor(h * dpr);
+              if (hullCanvas.width !== hw || hullCanvas.height !== hh) {
+                hullCanvas.width = hw;
+                hullCanvas.height = hh;
+              }
+              hctx.save();
+              hctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              hctx.globalCompositeOperation = "source-over";
+              hctx.clearRect(0, 0, w, h);
+              hctx.textAlign = "center";
+              hctx.textBaseline = "middle";
+              hctx.font = `700 ${cachedFontSize}px "Space Grotesk", "Manrope", sans-serif`;
+              hctx.fillStyle = "#ffffff";
+              letters.forEach((ch, idx) => {
+                hctx.fillText(ch, cachedStartX + idx * cachedSpacing, ly);
+              });
+
+              hctx.globalCompositeOperation = "source-in";
+
+              // Aleación aeroespacial sólida: cerámica blanca-titanio satinada (contrasta nítida sobre día y noche)
+              const hullGrad = hctx.createLinearGradient(0, ly - cachedFontSize * 0.46, 0, ly + cachedFontSize * 0.46);
+              const hullStops = [0, 0.36, 0.55, 0.84, 1];
+              hullStops.forEach((pos, si) => {
+                const L = HULL_LIGHT[si];
+                const I = HULL_INK[si];
+                hullGrad.addColorStop(pos, mixRGB(L, I, lensMix));
+              });
+              hctx.fillStyle = hullGrad;
+              hctx.fillRect(0, 0, w, h);
+
+              // source-atop conserva el relleno sólido y solo pinta costura y barrido sobre las letras
+              hctx.globalCompositeOperation = "source-atop";
+
+              // La costura clara solo vive en el casco de día. En tinta oscura dejaría una raya blanca en cada letra
+              const seamA = 0.85 * (1 - lensMix);
+              if (seamA > 0.05) {
+                hctx.strokeStyle = `rgba(186, 230, 253, ${seamA.toFixed(3)})`;
+                hctx.lineWidth = 1.25;
+                hctx.beginPath();
+                hctx.moveTo(0, ly + 1);
+                hctx.lineTo(w, ly + 1);
+                hctx.stroke();
+              }
+
+              const sheenA = 1 - lensMix;
+              if (sheenA > 0.05) {
+                const scanX = ((t * 78) % (w + 220)) - 110;
+                const sheen = hctx.createLinearGradient(scanX - 85, 0, scanX + 85, 0);
+                sheen.addColorStop(0, "rgba(255, 255, 255, 0)");
+                sheen.addColorStop(0.48, `rgba(224, 242, 254, ${(0.25 * sheenA).toFixed(3)})`);
+                sheen.addColorStop(0.52, `rgba(255, 255, 255, ${(0.48 * sheenA).toFixed(3)})`);
+                sheen.addColorStop(1, "rgba(255, 255, 255, 0)");
+                hctx.fillStyle = sheen;
+                hctx.fillRect(0, 0, w, h);
+              }
+              hctx.restore();
+
+              // Componer la nave YARQ con aura fría sutil y bisel cromado fino
+              ctx.save();
+              ctx.globalAlpha = sm;
+              ctx.shadowColor = "rgba(56, 189, 248, 0.42)";
+              ctx.shadowBlur = 16 * sm;
+              ctx.drawImage(hullCanvas, 0, 0, w, h);
+              ctx.shadowBlur = 0;
+
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.font = `700 ${cachedFontSize}px "Space Grotesk", "Manrope", sans-serif`;
+              const rimGrad = ctx.createLinearGradient(0, ly - cachedFontSize * 0.5, 0, ly + cachedFontSize * 0.5);
+              rimGrad.addColorStop(0, mixRGB(RIM_LIGHT[0], RIM_INK[0], lensMix));
+              rimGrad.addColorStop(0.55, mixRGB(RIM_LIGHT[1], RIM_INK[1], lensMix));
+              rimGrad.addColorStop(1, mixRGB(RIM_LIGHT[2], RIM_INK[2], lensMix));
+              ctx.strokeStyle = rimGrad;
+              ctx.lineWidth = 1.05;
+              letters.forEach((ch, idx) => {
+                ctx.strokeText(ch, cachedStartX + idx * cachedSpacing, ly);
+              });
+              ctx.restore();
+            }
+          }
+
+          raf = requestAnimationFrame(tick);
+        }
+
+        raf = requestAnimationFrame(tick);
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) cancelAnimationFrame(raf);
+          else raf = requestAnimationFrame(tick);
+        });
+      });
+    };
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(startAll);
+    } else {
+      startAll();
+    }
+  }
+</script>
+
+<style>
+  .yarq-3d {
+    position: relative;
+    width: min(100%, 720px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline: auto;
+  }
+
+  .yarq-3d__canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    cursor: pointer;
+  }
+
+  .yarq-3d__fallback {
+    display: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(3.4rem, 9vw, 6rem);
+    line-height: 0.95;
+    letter-spacing: 0.18em;
+    background: linear-gradient(120deg, #09101a 8%, #0284c7 52%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .yarq-3d__canvas {
+      display: none;
+    }
+    .yarq-3d__fallback {
+      display: block;
+    }
+  }
+</style>

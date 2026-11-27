@@ -1,0 +1,1357 @@
+---
+import { brainMap } from "../lib/identity";
+
+const base = import.meta.env.BASE_URL;
+const districts = brainMap.districts;
+const dockShort: Record<string, string> = {
+  multitenant: "Multi-Tenant",
+  ai: "Agentes",
+  domain: "Negocio",
+  apis: "APIs",
+  runtime: "Operación",
+  surface: "Clientes",
+};
+---
+
+<section id="yarq" class="brain-section" data-brain-section>
+  <!-- Continuación sutil del fondo del mar luminoso -->
+  <div class="brain-sea-bg" aria-hidden="true"></div>
+
+  <div class="wrap brain-shell">
+    <!-- Encabezado compacto, siempre 100% encuadrado bajo el navbar -->
+    <header class="brain-header">
+      <div class="brain-header__left">
+        <span class="brain-kicker">{brainMap.kicker}</span>
+        <h2 class="brain-title">{brainMap.title}</h2>
+      </div>
+      <div class="brain-header__right">
+        <p class="brain-lede">{brainMap.lede}</p>
+        <div class="brain-status" aria-hidden="true">
+          <span class="brain-status__dot"></span>
+          <span>NÚCLEO PYF ACTIVO</span>
+          <span class="brain-status__sep">·</span>
+          <span data-zoom-readout>VISTA PANORÁMICA 1.0×</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Gran Pizarra de Acrílico Templado Neón -->
+    <div class="acrylic-board" data-acrylic-board>
+      <!-- Reflejo especular de acrílico templado + borde neón grabado -->
+      <div class="acrylic-sheen" aria-hidden="true"></div>
+      <span class="acrylic-pin acrylic-pin--tl" aria-hidden="true"></span>
+      <span class="acrylic-pin acrylic-pin--tr" aria-hidden="true"></span>
+      <span class="acrylic-pin acrylic-pin--bl" aria-hidden="true"></span>
+      <span class="acrylic-pin acrylic-pin--br" aria-hidden="true"></span>
+
+      <!-- Canvas vivo: Ciudad arquitectónica + Partículas PYF + Rutas neón + Cámara con Zoom -->
+      <canvas
+        class="brain-canvas"
+        data-brain-canvas
+        aria-label="Diagrama interactivo del núcleo de partículas PYF y los 6 distritos de infraestructura de YARQ"
+      ></canvas>
+
+      <!-- Barra inferior de acceso rápido / indicador de zoom -->
+      <div class="board-dock" role="toolbar" aria-label="Distritos de la arquitectura YARQ">
+        <button
+          type="button"
+          class="dock-pill dock-pill--overview is-active"
+          data-district-pick=""
+        >
+          <span class="dock-pill__full">Vista completa</span>
+          <span class="dock-pill__short">Todo</span>
+        </button>
+        {
+          districts.map((d) => (
+            <button
+              type="button"
+              class="dock-pill"
+              style={`--d-color: ${d.color};`}
+              data-district-pick={d.id}
+            >
+              <span class="dock-pill__dot" aria-hidden="true"></span>
+              <span class="dock-pill__full">{d.name}</span>
+              <span class="dock-pill__short">{dockShort[d.id] ?? d.name}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <!-- HUD flotante de inspección al hacer zoom sobre un distrito -->
+      <aside class="board-hud" data-board-hud aria-live="polite" hidden>
+        <div class="board-hud__top">
+          <span class="board-hud__code" data-hud-code></span>
+          <button
+            type="button"
+            class="board-hud__close"
+            data-hud-close
+            aria-label="Volver a vista panorámica"
+          >
+            Vista 1.0×
+          </button>
+        </div>
+        <h3 class="board-hud__title" data-hud-title></h3>
+        <p class="board-hud__headline" data-hud-headline></p>
+        <p class="board-hud__summary" data-hud-summary></p>
+
+        <div class="board-hud__flow">
+          <span class="board-hud__label">FLUJO EN VIVO</span>
+          <span class="board-hud__flow-val" data-hud-flow></span>
+        </div>
+
+        <div class="board-hud__meta">
+          <div>
+            <span class="board-hud__label">MÓDULOS</span>
+            <div class="board-hud__chips" data-hud-modules></div>
+          </div>
+          <div>
+            <span class="board-hud__label">EN OPERACIÓN</span>
+            <div class="board-hud__chips" data-hud-products></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script
+  is:inline
+  define:vars={{ districtsData: districts, baseUrl: base }}
+>
+  window.__YARQ_BRAIN__ = { districts: districtsData, baseUrl };
+</script>
+
+<script>
+  type DistrictNode = {
+    label: string;
+    dx: number;
+    dy: number;
+    kind?: "core" | "service" | "app";
+  };
+
+  type District = {
+    id: string;
+    code: string;
+    name: string;
+    headline: string;
+    summary: string;
+    color: string;
+    nx: number;
+    ny: number;
+    nodes: DistrictNode[];
+    modules: string[];
+    flow: string;
+    products: string[];
+  };
+
+  const payload = (window as any).__YARQ_BRAIN__ as {
+    districts: District[];
+    baseUrl: string;
+  } | undefined;
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // 1. SCROLL GUIADO CINEMATOGRÁFICO (HERO 100vh ⇄ NOSOTROS 100vh)
+  //    Te sumerge suavemente al mar de datos y encuadra cada pantalla sola
+  // ═══════════════════════════════════════════════════════════════════════
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const heroEl = document.querySelector<HTMLElement>(".hero--sea");
+  const brainEl = document.querySelector<HTMLElement>("[data-brain-section]");
+  const nextEl = document.getElementById("capacidades");
+
+  if (heroEl && brainEl && !reduceMotion) {
+    let animating = false;
+    let cooldownUntil = 0;
+
+    const smoothScrollTo = (targetY: number, duration = 920) => {
+      animating = true;
+      const startY = window.scrollY;
+      const delta = targetY - startY;
+      const start = performance.now();
+
+      const easeInOutCubic = (x: number) =>
+        x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+
+      const step = (now: number) => {
+        const p = Math.min(1, (now - start) / duration);
+        window.scrollTo(0, startY + delta * easeInOutCubic(p));
+        if (p < 1) {
+          requestAnimationFrame(step);
+        } else {
+          animating = false;
+          cooldownUntil = performance.now() + 260;
+        }
+      };
+      requestAnimationFrame(step);
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      // Solo en pantallas donde el encuadre 100vh aplica limpiamente
+      if (window.innerWidth < 900 || Math.abs(e.deltaY) < 10) return;
+
+      const now = performance.now();
+      if (animating || now < cooldownUntil) {
+        e.preventDefault();
+        return;
+      }
+
+      const sy = window.scrollY;
+      const brainTop = brainEl.offsetTop;
+      const heroZone = sy < brainTop * 0.45;
+      const brainZone = Math.abs(sy - brainTop) < 110;
+
+      if (e.deltaY > 0 && heroZone) {
+        e.preventDefault();
+        smoothScrollTo(brainTop, 960);
+      } else if (e.deltaY < 0 && brainZone) {
+        e.preventDefault();
+        smoothScrollTo(0, 920);
+      } else if (e.deltaY > 0 && brainZone && nextEl) {
+        e.preventDefault();
+        smoothScrollTo(nextEl.offsetTop - 20, 780);
+      }
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+
+    // Clic en el dron flotante del hero para sumergirse guiado a la arquitectura
+    document.querySelector<HTMLButtonElement>("[data-dive-drone]")?.addEventListener("click", () => {
+      smoothScrollTo(brainEl.offsetTop, 980);
+    });
+  } else if (brainEl) {
+    document.querySelector<HTMLButtonElement>("[data-dive-drone]")?.addEventListener("click", () => {
+      brainEl.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // 2. PIZARRA ACRÍLICA TEMPLADA NEÓN · CEREBRO YARQ (PARTÍCULAS PYF)
+  // ═══════════════════════════════════════════════════════════════════════
+  const board = document.querySelector<HTMLElement>("[data-acrylic-board]");
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-brain-canvas]");
+
+  if (board && canvas && payload) {
+    const ctx = canvas.getContext("2d");
+    const districts = payload.districts;
+    const baseUrl = payload.baseUrl;
+
+    const hud = board.querySelector<HTMLElement>("[data-board-hud]");
+    const hudCode = board.querySelector<HTMLElement>("[data-hud-code]");
+    const hudTitle = board.querySelector<HTMLElement>("[data-hud-title]");
+    const hudHeadline = board.querySelector<HTMLElement>("[data-hud-headline]");
+    const hudSummary = board.querySelector<HTMLElement>("[data-hud-summary]");
+    const hudFlow = board.querySelector<HTMLElement>("[data-hud-flow]");
+    const hudModules = board.querySelector<HTMLElement>("[data-hud-modules]");
+    const hudProducts = board.querySelector<HTMLElement>("[data-hud-products]");
+    const hudClose = board.querySelector<HTMLButtonElement>("[data-hud-close]");
+    const dockBtns = board.querySelectorAll<HTMLButtonElement>("[data-district-pick]");
+    const zoomReadout = document.querySelector<HTMLElement>("[data-zoom-readout]");
+
+    if (ctx) {
+      let w = 0;
+      let h = 0;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let t = 0;
+      let raf = 0;
+
+      // Cámara suave (zoom + pan) sobre la pizarra
+      const cam = {
+        scale: 1,
+        targetScale: 1,
+        x: 0.5,
+        y: 0.5,
+        targetX: 0.5,
+        targetY: 0.5,
+      };
+
+      let hoveredId: string | null = null;
+      let lockedId: string | null = null;
+      let mouse = { x: -9999, y: -9999, inside: false };
+
+      // Partículas PYF del Cerebro Central
+      type PyfParticle = {
+        angle: number;
+        radius: number;
+        speed: number;
+        size: number;
+        hue: string;
+        layer: number;
+        phase: number;
+      };
+
+      const pyfParticles: PyfParticle[] = [];
+      const pyfHues = ["#0284c7", "#06b6d4", "#7c3aed", "#10b981", "#2563eb"];
+      for (let i = 0; i < 84; i++) {
+        const layer = i % 3;
+        pyfParticles.push({
+          angle: (i / 84) * Math.PI * 2 + Math.random() * 0.4,
+          radius: 14 + layer * 15 + Math.random() * 14,
+          speed: (0.22 + Math.random() * 0.45) * (layer % 2 === 0 ? 1 : -1),
+          size: 1.2 + Math.random() * 2.1,
+          hue: pyfHues[i % pyfHues.length],
+          layer,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+
+      // Micro-burbujas de fondo marino dentro de la pizarra
+      type SeaSpeck = { x: number; y: number; r: number; vy: number; phase: number };
+      const seaSpecks: SeaSpeck[] = [];
+      for (let i = 0; i < 36; i++) {
+        seaSpecks.push({
+          x: Math.random(),
+          y: Math.random(),
+          r: 0.8 + Math.random() * 1.4,
+          vy: 0.00018 + Math.random() * 0.0003,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+
+      function hexToRgba(hex: string, a: number) {
+        const clean = hex.replace("#", "");
+        const r = parseInt(clean.slice(0, 2), 16);
+        const g = parseInt(clean.slice(2, 4), 16);
+        const b = parseInt(clean.slice(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+      }
+
+      function activeDistrict(): District | null {
+        const id = lockedId || hoveredId;
+        if (!id) return null;
+        return districts.find((d) => d.id === id) || null;
+      }
+
+      const PORTRAIT: Record<string, { x: number; y: number }> = {
+        surface: { x: 0.5, y: 0.1 },
+        multitenant: { x: 0.26, y: 0.28 },
+        ai: { x: 0.74, y: 0.28 },
+        domain: { x: 0.26, y: 0.66 },
+        apis: { x: 0.74, y: 0.66 },
+        runtime: { x: 0.5, y: 0.84 },
+      };
+
+      const SHORT_NAME: Record<string, string> = {
+        multitenant: "Tenant",
+        ai: "Agentes",
+        domain: "Negocio",
+        apis: "APIs",
+        runtime: "Operación",
+        surface: "Clientes",
+      };
+
+      function isCompact() {
+        return w < 700;
+      }
+
+      function districtPoint(d: District) {
+        if (!isCompact()) return { x: d.nx * w, y: d.ny * h };
+        const p = PORTRAIT[d.id] || { x: d.nx, y: d.ny };
+        return { x: p.x * w, y: p.y * h };
+      }
+
+      function syncUI() {
+        const active = activeDistrict();
+        dockBtns.forEach((btn) => {
+          const id = btn.dataset.districtPick || "";
+          btn.classList.toggle("is-active", active ? id === active.id : id === "");
+        });
+
+        if (active) {
+          if (isCompact()) {
+            cam.targetScale = 1;
+            cam.targetX = 0.5;
+            cam.targetY = 0.46;
+          } else {
+            cam.targetScale = 1.38;
+            const offsetX = active.nx > 0.5 ? 0.055 : -0.055;
+            cam.targetX = Math.max(0.24, Math.min(0.76, active.nx + offsetX));
+            cam.targetY = Math.max(0.24, Math.min(0.76, active.ny));
+          }
+
+          if (hud) {
+            hud.hidden = false;
+            hud.dataset.side = active.nx > 0.5 ? "left" : "right";
+            hud.style.setProperty("--hud-color", active.color);
+          }
+          if (hudCode) hudCode.textContent = active.code;
+          if (hudTitle) hudTitle.textContent = active.name;
+          if (hudHeadline) hudHeadline.textContent = active.headline;
+          if (hudSummary) hudSummary.textContent = active.summary;
+          if (hudFlow) hudFlow.textContent = active.flow;
+          if (hudModules) {
+            hudModules.innerHTML = active.modules
+              .map(
+                (m) =>
+                  `<a class="hud-chip hud-chip--link" href="${baseUrl}modulos/${m}/">${m}</a>`
+              )
+              .join("");
+          }
+          if (hudProducts) {
+            hudProducts.innerHTML = active.products
+              .map((p) => `<span class="hud-chip">${p}</span>`)
+              .join("");
+          }
+          if (zoomReadout) {
+            zoomReadout.textContent = `ZOOM ${cam.targetScale.toFixed(1)}× · ${active.name.toUpperCase()}`;
+          }
+        } else {
+          cam.targetScale = 1;
+          cam.targetX = 0.5;
+          cam.targetY = 0.5;
+          if (hud) hud.hidden = true;
+          if (zoomReadout) zoomReadout.textContent = "VISTA PANORÁMICA 1.0×";
+        }
+      }
+
+      function resize() {
+        const rect = board.getBoundingClientRect();
+        w = Math.max(280, Math.floor(rect.width));
+        const narrow = window.innerWidth < 900;
+        h = narrow
+          ? Math.max(340, Math.round(window.innerHeight * 0.5))
+          : Math.max(360, Math.floor(rect.height));
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      // Convierte coordenadas del canvas (pantalla) a coordenadas del mundo de la pizarra (0..w, 0..h)
+      function screenToWorld(sx: number, sy: number) {
+        const wx = (sx - w * 0.5) / cam.scale + cam.x * w;
+        const wy = (sy - h * 0.5) / cam.scale + cam.y * h;
+        return { wx, wy };
+      }
+
+      // Detección precisa de distrito bajo el cursor
+      function hitTestDistrict(sx: number, sy: number): string | null {
+        const { wx, wy } = screenToWorld(sx, sy);
+        let bestId: string | null = null;
+        let bestDist = Infinity;
+        const threshold = Math.min(w, h) * (isCompact() ? 0.2 : 0.175);
+        for (const d of districts) {
+          const pt = districtPoint(d);
+          const dx = wx - pt.x;
+          const dy = wy - pt.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < threshold && dist < bestDist) {
+            bestDist = dist;
+            bestId = d.id;
+          }
+        }
+        return bestId;
+      }
+
+      canvas.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        mouse.inside = true;
+        if (!lockedId) {
+          const hit = hitTestDistrict(mouse.x, mouse.y);
+          if (hit !== hoveredId) {
+            hoveredId = hit;
+            canvas.style.cursor = hit ? "pointer" : "crosshair";
+            syncUI();
+          }
+        }
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        mouse.inside = false;
+        if (!lockedId && hoveredId) {
+          hoveredId = null;
+          syncUI();
+        }
+      });
+
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const hit = hitTestDistrict(e.clientX - rect.left, e.clientY - rect.top);
+        if (hit) {
+          lockedId = lockedId === hit ? null : hit;
+        } else {
+          lockedId = null;
+        }
+        hoveredId = hit;
+        syncUI();
+      });
+
+      dockBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.districtPick || "";
+          lockedId = id || null;
+          hoveredId = lockedId;
+          syncUI();
+        });
+      });
+
+      hudClose?.addEventListener("click", () => {
+        lockedId = null;
+        hoveredId = null;
+        syncUI();
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && (lockedId || hoveredId)) {
+          lockedId = null;
+          hoveredId = null;
+          syncUI();
+        }
+      });
+
+      // Dibuja un trazado tipo pizarra / circuito acrílico con codo de 45° + pulso neón
+      function drawCircuitRoute(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        color: string,
+        isActive: boolean,
+        dimmed: boolean,
+        phase: number
+      ) {
+        const midX = x1 + (x2 - x1) * 0.52;
+        const pts = [
+          { x: x1, y: y1 },
+          { x: midX, y: y1 },
+          { x: midX + (y2 - y1) * 0.16, y: y2 },
+          { x: x2, y: y2 },
+        ];
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+
+        // Halo acrílico neón
+        if (isActive) {
+          ctx.strokeStyle = hexToRgba(color, 0.22);
+          ctx.lineWidth = 7;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.stroke();
+        }
+
+        // Línea principal grabada
+        ctx.strokeStyle = hexToRgba(color, isActive ? 0.88 : dimmed ? 0.14 : 0.34);
+        ctx.lineWidth = isActive ? 1.9 : 1.1;
+        ctx.lineJoin = "round";
+        ctx.stroke();
+
+        // Paquete de energía viajando por el circuito
+        const segs = [];
+        let totalLen = 0;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const len = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+          segs.push({ a: pts[i], b: pts[i + 1], len });
+          totalLen += len;
+        }
+
+        const pulseCount = isActive ? 3 : 1;
+        for (let k = 0; k < pulseCount; k++) {
+          const u = (phase + t * (isActive ? 0.42 : 0.18) + k / pulseCount) % 1;
+          let target = u * totalLen;
+          for (const s of segs) {
+            if (target <= s.len) {
+              const r = s.len > 0 ? target / s.len : 0;
+              const px = s.a.x + (s.b.x - s.a.x) * r;
+              const py = s.a.y + (s.b.y - s.a.y) * r;
+              const g = ctx.createRadialGradient(px, py, 0, px, py, isActive ? 9 : 5.5);
+              g.addColorStop(0, hexToRgba(color, isActive ? 0.95 : dimmed ? 0.2 : 0.6));
+              g.addColorStop(1, hexToRgba(color, 0));
+              ctx.fillStyle = g;
+              ctx.beginPath();
+              ctx.arc(px, py, isActive ? 9 : 5.5, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.fillStyle = "#ffffff";
+              ctx.beginPath();
+              ctx.arc(px, py, isActive ? 2 : 1.2, 0, Math.PI * 2);
+              ctx.fill();
+              break;
+            }
+            target -= s.len;
+          }
+        }
+        ctx.restore();
+      }
+
+      // Dibuja el Cerebro Central YARQ (Partículas PYF + sinapsis)
+      function drawPyfBrain(cx: number, cy: number, dimmed: boolean) {
+        const baseR = Math.min(w, h) * 0.095;
+        ctx.save();
+
+        // Halo neón suave detrás del cerebro PYF
+        const halo = ctx.createRadialGradient(cx, cy, baseR * 0.15, cx, cy, baseR * 1.9);
+        halo.addColorStop(0, `rgba(6, 182, 212, ${dimmed ? 0.1 : 0.24})`);
+        halo.addColorStop(0.5, `rgba(124, 58, 237, ${dimmed ? 0.04 : 0.1})`);
+        halo.addColorStop(1, "rgba(255, 255, 255, 0)");
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(cx, cy, baseR * 1.9, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Anillos orbitales grabados en el acrílico
+        ctx.strokeStyle = `rgba(2, 132, 199, ${dimmed ? 0.12 : 0.28})`;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 6]);
+        ctx.beginPath();
+        ctx.arc(cx, cy, baseR * 1.18, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = `rgba(124, 58, 237, ${dimmed ? 0.08 : 0.22})`;
+        ctx.beginPath();
+        ctx.arc(cx, cy, baseR * 1.48, t * 0.25, t * 0.25 + Math.PI * 1.45);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Posiciones actuales de las partículas PYF
+        const coords: { x: number; y: number; hue: string; size: number }[] = [];
+        for (const p of pyfParticles) {
+          const a = p.angle + t * p.speed;
+          const r = (p.radius / 58) * baseR * (0.94 + Math.sin(t * 2 + p.phase) * 0.08);
+          coords.push({
+            x: cx + Math.cos(a) * r,
+            y: cy + Math.sin(a) * r * 0.88,
+            hue: p.hue,
+            size: p.size,
+          });
+        }
+
+        // Sinapsis sutiles entre partículas PYF cercanas
+        ctx.lineWidth = 0.65;
+        for (let i = 0; i < coords.length; i += 2) {
+          for (let j = i + 1; j < Math.min(i + 14, coords.length); j++) {
+            const d = Math.hypot(coords[i].x - coords[j].x, coords[i].y - coords[j].y);
+            if (d < baseR * 0.42) {
+              ctx.strokeStyle = `rgba(14, 165, 233, ${((1 - d / (baseR * 0.42)) * (dimmed ? 0.14 : 0.34)).toFixed(3)})`;
+              ctx.beginPath();
+              ctx.moveTo(coords[i].x, coords[i].y);
+              ctx.lineTo(coords[j].x, coords[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Partículas PYF
+        for (const c of coords) {
+          ctx.fillStyle = hexToRgba(c.hue, dimmed ? 0.35 : 0.88);
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Núcleo tipográfico central
+        ctx.fillStyle = `rgba(6, 11, 22, ${dimmed ? 0.55 : 0.92})`;
+        ctx.beginPath();
+        ctx.arc(cx, cy, baseR * 0.48, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.72)";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "700 13px 'Space Grotesk', system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("YARQ", cx, cy - 5);
+
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "600 8px 'JetBrains Mono', monospace";
+        ctx.fillText("NÚCLEO PYF", cx, cy + 9);
+        ctx.restore();
+      }
+
+      // Dibuja cada distrito de la ciudad arquitectónica + sus sub-nodos reales
+      function drawDistrict(d: District, isActive: boolean, dimmed: boolean) {
+        const pt = districtPoint(d);
+        const cx = pt.x;
+        const cy = pt.y;
+        const compact = isCompact();
+        const zoneR = Math.min(w, h) * (compact ? 0.062 : 0.115);
+
+        ctx.save();
+
+        // Plataforma de distrito grabada en el acrílico (hexágono/círculo técnico)
+        const padGrad = ctx.createRadialGradient(cx, cy, 4, cx, cy, zoneR * 1.25);
+        padGrad.addColorStop(0, hexToRgba(d.color, isActive ? 0.18 : dimmed ? 0.03 : 0.08));
+        padGrad.addColorStop(1, hexToRgba(d.color, 0));
+        ctx.fillStyle = padGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, zoneR * 1.25, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = hexToRgba(d.color, isActive ? 0.65 : dimmed ? 0.1 : 0.24);
+        ctx.lineWidth = isActive ? 1.4 : 0.9;
+        ctx.setLineDash(isActive ? [] : [3, 5]);
+        ctx.beginPath();
+        ctx.arc(cx, cy, zoneR * 0.86, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // En el teléfono los satélites se reservan al escritorio: aquí solo queda la cápsula
+        if (!compact) {
+        d.nodes.forEach((n, idx) => {
+          const nx = cx + n.dx * w;
+          const ny = cy + n.dy * h;
+
+          // Micro-conector al hub del distrito
+          ctx.strokeStyle = hexToRgba(d.color, isActive ? 0.55 : dimmed ? 0.09 : 0.22);
+          ctx.lineWidth = isActive ? 1.15 : 0.8;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(nx, ny);
+          ctx.stroke();
+
+          // Indicador luminoso del sub-nodo
+          const r = n.kind === "core" ? 4.2 : n.kind === "app" ? 3.8 : 3.2;
+          const pulse = 0.78 + 0.22 * Math.sin(t * 2.6 + idx * 1.3);
+          ctx.fillStyle = isActive
+            ? "#070d1c"
+            : hexToRgba(d.color, dimmed ? 0.22 : 0.82 * pulse);
+          ctx.beginPath();
+          ctx.arc(nx, ny, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (isActive) {
+            ctx.strokeStyle = d.color;
+            ctx.lineWidth = 1.4;
+            ctx.stroke();
+          }
+
+          // Etiqueta técnica del sub-nodo (más nítida al hacer zoom)
+          ctx.font = `${isActive ? "600 9.5px" : "500 8.5px"} 'JetBrains Mono', monospace`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "top";
+          ctx.fillStyle = isActive
+            ? "#060b16"
+            : dimmed
+              ? "rgba(71, 85, 105, 0.26)"
+              : "rgba(30, 41, 59, 0.72)";
+          ctx.fillText(n.label, nx, ny + r + 4);
+        });
+        }
+
+        const pillText = compact ? SHORT_NAME[d.id] || d.name : d.name;
+        ctx.font = compact
+          ? "600 10.5px 'Space Grotesk', system-ui, sans-serif"
+          : "600 11px 'Space Grotesk', system-ui, sans-serif";
+        const tw = ctx.measureText(pillText).width;
+        const pw = tw + 28;
+        const ph = 24;
+        const px = cx - pw / 2;
+        const py = cy - ph / 2;
+
+        ctx.beginPath();
+        ctx.roundRect(px, py, pw, ph, 12);
+        ctx.fillStyle = isActive
+          ? "#070d1c"
+          : dimmed
+            ? "rgba(255, 255, 255, 0.55)"
+            : "rgba(255, 255, 255, 0.9)";
+        ctx.fill();
+        ctx.strokeStyle = hexToRgba(d.color, isActive ? 0.95 : dimmed ? 0.2 : 0.55);
+        ctx.lineWidth = isActive ? 1.5 : 1;
+        ctx.stroke();
+
+        // Punto neón de estado en la cápsula
+        ctx.fillStyle = d.color;
+        ctx.beginPath();
+        ctx.arc(px + 11, cy, 3.3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = isActive ? "#f8fafc" : dimmed ? "rgba(15, 23, 42, 0.4)" : "#060b16";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(pillText, px + 19, cy + 0.5);
+
+        ctx.restore();
+      }
+
+      function drawFrame() {
+        ctx.clearRect(0, 0, w, h);
+
+        // Interpolar cámara suavemente (pan + zoom)
+        cam.scale += (cam.targetScale - cam.scale) * 0.085;
+        cam.x += (cam.targetX - cam.x) * 0.085;
+        cam.y += (cam.targetY - cam.y) * 0.085;
+
+        // 1. Retícula milimetrada grabada en el acrílico templado (en espacio de pantalla)
+        ctx.save();
+        const step = 36;
+        ctx.strokeStyle = "rgba(14, 165, 233, 0.065)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let x = step; x < w; x += step) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+        }
+        for (let y = step; y < h; y += step) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+        }
+        ctx.stroke();
+
+        // Burbujas sutiles del mar detrás del acrílico
+        for (const s of seaSpecks) {
+          if (!reduceMotion) {
+            s.y -= s.vy;
+            if (s.y < -0.02) s.y = 1.02;
+          }
+          const sx = s.x * w + Math.sin(t + s.phase) * 6;
+          const sy = s.y * h;
+          ctx.fillStyle = "rgba(14, 165, 233, 0.18)";
+          ctx.beginPath();
+          ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // 2. Mundo de la pizarra con transformación de cámara (Zoom + Pan)
+        const active = activeDistrict();
+        const hasFocus = Boolean(active);
+
+        ctx.save();
+        ctx.translate(w * 0.5, h * 0.5);
+        ctx.scale(cam.scale, cam.scale);
+        ctx.translate(-cam.x * w, -cam.y * h);
+
+        const coreX = w * 0.5;
+        const coreY = h * 0.5;
+
+        // Rutas troncales desde el Cerebro PYF hacia los 6 distritos
+        districts.forEach((d, idx) => {
+          const isAct = active?.id === d.id;
+          drawCircuitRoute(
+            coreX,
+            coreY,
+            districtPoint(d).x,
+            districtPoint(d).y,
+            d.color,
+            isAct,
+            hasFocus && !isAct,
+            idx * 0.17
+          );
+        });
+
+        // Conexiones cruzadas entre distritos (ciudad viva)
+        const crossLinks: [number, number][] = [
+          [0, 5],
+          [1, 5],
+          [0, 2],
+          [1, 3],
+          [2, 4],
+          [3, 4],
+        ];
+        if (!isCompact()) {
+        crossLinks.forEach(([aIdx, bIdx]) => {
+          const a = districts[aIdx];
+          const b = districts[bIdx];
+          const isRel = active && (active.id === a.id || active.id === b.id);
+          ctx.save();
+          ctx.strokeStyle = isRel
+            ? hexToRgba(active!.color, 0.35)
+            : `rgba(148, 163, 184, ${hasFocus ? 0.08 : 0.22})`;
+          ctx.lineWidth = isRel ? 1.1 : 0.75;
+          ctx.setLineDash([3, 5]);
+          ctx.beginPath();
+          ctx.moveTo(a.nx * w, a.ny * h);
+          ctx.lineTo(b.nx * w, b.ny * h);
+          ctx.stroke();
+          ctx.restore();
+        });
+        }
+
+        // Cerebro central PYF
+        drawPyfBrain(coreX, coreY, hasFocus);
+
+        // Los 6 distritos (el activo se dibuja al final para quedar siempre por encima)
+        districts.forEach((d) => {
+          if (active?.id !== d.id) drawDistrict(d, false, hasFocus);
+        });
+        if (active) drawDistrict(active, true, false);
+
+        ctx.restore();
+
+        if (!reduceMotion) {
+          t += 0.016;
+          raf = requestAnimationFrame(drawFrame);
+        }
+      }
+
+      window.addEventListener("resize", resize, { passive: true });
+      resize();
+      syncUI();
+      drawFrame();
+
+      if (!reduceMotion) {
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) cancelAnimationFrame(raf);
+          else raf = requestAnimationFrame(drawFrame);
+        });
+      }
+    }
+  }
+</script>
+
+<style>
+  .brain-section {
+    position: relative;
+    height: 100vh;
+    height: 100svh;
+    min-height: 680px;
+    max-height: 1080px;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.4rem, 3.2vh, 2.2rem) 0 1.4rem;
+    background: linear-gradient(
+      180deg,
+      #edf6fd 0%,
+      #e6f2fc 50%,
+      #f2f7fc 100%
+    );
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .brain-sea-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 68% 45% at 50% 0%, rgba(14, 165, 233, 0.13) 0%, transparent 70%),
+      radial-gradient(ellipse 46% 36% at 85% 88%, rgba(124, 58, 237, 0.08) 0%, transparent 72%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .brain-shell {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Encabezado compacto */
+  .brain-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 1.5rem;
+    align-items: end;
+    flex-shrink: 0;
+  }
+
+  .brain-kicker {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #0284c7;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .brain-title {
+    font-size: clamp(1.55rem, 2.8vw, 2.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: #060b16;
+    margin: 0;
+  }
+
+  .brain-header__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.45rem;
+    text-align: right;
+  }
+
+  .brain-lede {
+    font-size: 0.9rem;
+    line-height: 1.48;
+    color: #334155;
+    margin: 0;
+    max-width: 560px;
+  }
+
+  .brain-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: #0369a1;
+  }
+
+  .brain-status__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #06b6d4;
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
+  }
+
+  .brain-status__sep {
+    opacity: 0.35;
+  }
+
+  /* Pizarra de Acrílico Templado Neón */
+  .acrylic-board {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    border-radius: 26px;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(241, 249, 255, 0.56) 52%,
+      rgba(255, 255, 255, 0.68) 100%
+    );
+    border: 1.5px solid rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 0 0 1px rgba(14, 165, 233, 0.24),
+      0 0 28px -6px rgba(6, 182, 212, 0.26),
+      0 0 46px -14px rgba(124, 58, 237, 0.2),
+      0 28px 60px -28px rgba(15, 23, 42, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.98),
+      inset 0 0 28px rgba(56, 189, 248, 0.08);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    overflow: hidden;
+  }
+
+  /* Reflejo especular diagonal de acrílico templado */
+  .acrylic-sheen {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      125deg,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(255, 255, 255, 0.06) 24%,
+      transparent 44%,
+      rgba(56, 189, 248, 0.05) 72%,
+      rgba(124, 58, 237, 0.06) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Pines ópticos de anclaje del acrílico en las 4 esquinas */
+  .acrylic-pin {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffffff, #cbd5e1);
+    border: 1px solid rgba(14, 165, 233, 0.45);
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.32);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .acrylic-pin--tl { top: 14px; left: 14px; }
+  .acrylic-pin--tr { top: 14px; right: 14px; }
+  .acrylic-pin--bl { bottom: 14px; left: 14px; }
+  .acrylic-pin--br { bottom: 14px; right: 14px; }
+
+  .brain-canvas {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+  }
+
+  /* Dock inferior de distritos */
+  .board-dock {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.32rem;
+    padding: 0.34rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(14, 165, 233, 0.24);
+    box-shadow:
+      0 10px 28px -12px rgba(15, 23, 42, 0.18),
+      0 0 18px -6px rgba(6, 182, 212, 0.25);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    max-width: calc(100% - 2.5rem);
+  }
+
+  .dock-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    padding: 0.34rem 0.72rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #334155;
+    font-size: 0.73rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .dock-pill:hover {
+    background: rgba(15, 23, 42, 0.05);
+    color: #060b16;
+  }
+
+  .dock-pill.is-active {
+    background: #070d1c;
+    color: #f8fafc;
+    border-color: color-mix(in srgb, var(--d-color, #06b6d4) 70%, transparent);
+    box-shadow: 0 0 14px -4px color-mix(in srgb, var(--d-color, #06b6d4) 65%, transparent);
+  }
+
+  .dock-pill__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--d-color, #06b6d4);
+  }
+
+  .dock-pill__short {
+    display: none;
+  }
+
+  /* HUD flotante de inspección al hacer zoom */
+  .board-hud {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    width: min(350px, calc(100% - 44px));
+    z-index: 5;
+    padding: 1.15rem 1.25rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid color-mix(in srgb, var(--hud-color, #0284c7) 42%, rgba(255, 255, 255, 0.9));
+    box-shadow:
+      0 20px 44px -18px rgba(15, 23, 42, 0.24),
+      0 0 24px -8px color-mix(in srgb, var(--hud-color, #0284c7) 36%, transparent);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  }
+
+  .board-hud[data-side="left"] {
+    right: auto;
+    left: 22px;
+  }
+
+  .board-hud__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .board-hud__code {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    color: var(--hud-color, #0284c7);
+  }
+
+  .board-hud__close {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.14);
+    background: rgba(15, 23, 42, 0.04);
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .board-hud__close:hover {
+    background: #070d1c;
+    color: #f8fafc;
+    border-color: #070d1c;
+  }
+
+  .board-hud__title {
+    font-size: 1.15rem;
+    color: #060b16;
+    margin: 0 0 0.25rem;
+    line-height: 1.2;
+  }
+
+  .board-hud__headline {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.5rem;
+  }
+
+  .board-hud__summary {
+    font-size: 0.81rem;
+    line-height: 1.52;
+    color: #475569;
+    margin: 0 0 0.8rem;
+  }
+
+  .board-hud__flow {
+    padding: 0.5rem 0.7rem;
+    border-radius: 10px;
+    background: rgba(241, 247, 253, 0.9);
+    border: 1px solid rgba(14, 165, 233, 0.18);
+    margin-bottom: 0.75rem;
+  }
+
+  .board-hud__label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+  }
+
+  .board-hud__flow-val {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .board-hud__meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+  }
+
+  .board-hud__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  :global(.hud-chip) {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.05);
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    color: #334155;
+    text-decoration: none;
+  }
+
+  :global(.hud-chip--link) {
+    background: rgba(240, 249, 255, 0.95);
+    border-color: rgba(2, 132, 199, 0.28);
+    color: #0369a1;
+    font-weight: 600;
+  }
+
+  :global(.hud-chip--link:hover) {
+    background: #070d1c;
+    color: #f8fafc;
+    border-color: #070d1c;
+    text-decoration: none;
+  }
+
+  @media (max-width: 900px) {
+    .brain-section {
+      height: auto;
+      min-height: 100svh;
+      max-height: none;
+    }
+
+    .brain-header {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .brain-header__right {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .acrylic-board {
+      min-height: 0;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: visible;
+    }
+
+    .brain-canvas {
+      height: 52svh;
+      min-height: 360px;
+      flex: none;
+    }
+
+    .board-dock {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      transform: none;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      max-width: calc(100% - 1rem);
+      width: calc(100% - 1rem);
+      margin: 0.55rem auto 0.65rem;
+      border-radius: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .dock-pill {
+      font-size: 0.68rem;
+      padding: 0.32rem 0.58rem;
+    }
+
+    .dock-pill__full {
+      display: none;
+    }
+
+    .dock-pill__short {
+      display: inline;
+    }
+
+    .acrylic-board:has(.board-hud:not([hidden])) .board-dock {
+      margin-bottom: 0.35rem;
+    }
+
+    .board-hud {
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      left: auto !important;
+      width: auto;
+      max-height: none;
+      margin: 0 0.7rem 0.75rem;
+      padding: 0.85rem 0.95rem;
+    }
+
+    .board-hud__summary {
+      display: none;
+    }
+
+    .brain-status {
+      flex-wrap: wrap;
+      letter-spacing: 0.06em;
+      justify-content: flex-start;
+    }
+  }
+</style>

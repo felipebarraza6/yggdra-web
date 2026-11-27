@@ -5,6 +5,9 @@ import {
   getProject,
   activityForModules,
   githubForProject,
+  publicOrg,
+  publicLabel,
+  publicCopy,
 } from "../../lib/data";
 
 export function getStaticPaths() {
@@ -20,11 +23,12 @@ if (!project) {
 const base = import.meta.env.BASE_URL;
 const related = activityForModules(project.modules, 10);
 const gh = githubForProject(project);
-const label = project.product || project.name;
-const title = `${label} | YARQ Store`;
+const label = publicLabel(project);
+const org = publicOrg(project.company);
+const title = `${label} | YARQ`;
 const description =
-  project.description?.replace(/Yggdra/gi, "YARQ") ||
-  `${label} camina con el equipo YARQ.`;
+  publicCopy(project.description) ||
+  `${label} opera sobre la arquitectura YARQ.`;
 
 const mods = project.modules;
 const svgH = Math.max(240, 56 + mods.length * 40);
@@ -35,15 +39,15 @@ const svgH = Math.max(240, 56 + mods.length * 40);
     <div class="wrap">
       <ul class="breadcrumbs">
         <li><a href={base}>Inicio</a> /</li>
-        <li><a href={`${base}apps/`}>Store</a> /</li>
+        <li><a href={`${base}apps/`}>Catálogo</a> /</li>
         <li>{label}</li>
       </ul>
       <div class="product-identity__banner glass">
         <div class="product-identity__mark" aria-hidden="true">
-          <span>{label.slice(0, 1)}</span>
+          <span>{label.slice(0, 2).toUpperCase()}</span>
         </div>
         <div>
-          <p class="section-kicker">Producto en el Store</p>
+          <p class="section-kicker">Ficha técnica</p>
           <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;">
             <h1 style="margin:0;">{label}</h1>
             <span class="badge" data-status={project.statusLabel}>{project.statusLabel}</span>
@@ -51,13 +55,9 @@ const svgH = Math.max(240, 56 + mods.length * 40);
           <p style="color:var(--text-muted);max-width:40rem;margin:0.75rem 0 0;">
             {description}
           </p>
-          {
-            project.company && (
-              <p class="product-identity__org">
-                Organización: <strong>{project.company}</strong>
-              </p>
-            )
-          }
+          <p class="product-identity__org">
+            Ecosistema: <strong>{org}</strong>
+          </p>
         </div>
       </div>
     </div>
@@ -67,21 +67,21 @@ const svgH = Math.max(240, 56 + mods.length * 40);
     <div class="wrap two-col">
       <article class="glass panel panel--headed">
         <header class="panel-head">
-          <span class="panel-head__tag">Identidad</span>
-          <h2>Quién es</h2>
+          <span class="panel-head__tag">Resumen</span>
+          <h2>Datos generales</h2>
         </header>
         <dl style="margin:0;display:grid;gap:0.75rem;">
           <div>
-            <dt style="color:var(--text-muted);font-size:0.85rem;">Organización</dt>
-            <dd style="margin:0;font-weight:600;">{project.company || "Por confirmar"}</dd>
+            <dt style="color:var(--text-muted);font-size:0.85rem;">Ecosistema / Organización</dt>
+            <dd style="margin:0;font-weight:600;">{org}</dd>
           </div>
           <div>
             <dt style="color:var(--text-muted);font-size:0.85rem;">Estado</dt>
             <dd style="margin:0;">{project.statusLabel}</dd>
           </div>
           <div>
-            <dt style="color:var(--text-muted);font-size:0.85rem;">Cómo se integra</dt>
-            <dd style="margin:0;">{project.contract?.label || "Consumo del contrato público"}</dd>
+            <dt style="color:var(--text-muted);font-size:0.85rem;">Integración</dt>
+            <dd style="margin:0;">{publicCopy(project.contract?.label) || "Consumo del contrato público"}</dd>
           </div>
           {
             project.domains?.length > 0 && (
@@ -104,19 +104,19 @@ const svgH = Math.max(240, 56 + mods.length * 40);
 
       <article class="glass panel panel--headed">
         <header class="panel-head">
-          <span class="panel-head__tag">Mapa</span>
-          <h2>Oficios que usa</h2>
+          <span class="panel-head__tag">Contrato</span>
+          <h2>Módulos consumidos</h2>
         </header>
         <div class="diagram-wrap space-diagram">
-          <svg class="diagram" viewBox={`0 0 400 ${svgH}`} role="img" aria-label={`Oficios usados por ${label}`}>
+          <svg class="diagram" viewBox={`0 0 400 ${svgH}`} role="img" aria-label={`Módulos usados por ${label}`}>
             <defs>
               <linearGradient id="nodeGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#2ec4d4" stop-opacity="0.35"></stop>
-                <stop offset="100%" stop-color="#1a3f4a" stop-opacity="0.9"></stop>
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.18"></stop>
+                <stop offset="100%" stop-color="#0284c7" stop-opacity="0.08"></stop>
               </linearGradient>
             </defs>
             <rect class="node-strong" x="16" y={svgH / 2 - 28} width="130" height="56" rx="14" fill="url(#nodeGrad)"></rect>
-            <text x="81" y={svgH / 2 + 5} text-anchor="middle" font-size="12" font-weight="700" fill="#e8f2f4">
+            <text x="81" y={svgH / 2 + 5} text-anchor="middle" font-size="12" font-weight="700">
               {label.slice(0, 16)}
             </text>
             {
@@ -124,7 +124,7 @@ const svgH = Math.max(240, 56 + mods.length * 40);
                 const y = 32 + i * 40;
                 return (
                   <g>
-                    <path class="edge" d={`M146 ${svgH / 2} L210 ${y + 14}`} stroke="#2ec4d4" stroke-opacity="0.45"></path>
+                    <path class="edge" d={`M146 ${svgH / 2} L210 ${y + 14}`}></path>
                     <a href={`${base}modulos/${encodeURIComponent(m)}/`}>
                       <rect class="node" x="210" y={y} width="160" height="32" rx="10"></rect>
                       <text x="290" y={y + 20} text-anchor="middle" font-size="11">{m}</text>
@@ -137,7 +137,7 @@ const svgH = Math.max(240, 56 + mods.length * 40);
         </div>
         {
           mods.length === 0 && (
-            <p style="color:var(--text-muted);margin:0;">Oficios en definición (acompañamiento).</p>
+            <p style="color:var(--text-muted);margin:0;">Módulos en definición.</p>
           )
         }
       </article>
@@ -147,13 +147,14 @@ const svgH = Math.max(240, 56 + mods.length * 40);
   <section>
     <div class="wrap">
       <div class="section-head">
-        <h2>Cómo se conecta</h2>
-        <p>Estilo declarado en el Store público — sin rutas internas.</p>
+        <h2>Estilo de contrato</h2>
+        <p>Integración declarada en el inventario público — sin exponer rutas internas.</p>
       </div>
       <div class="glass panel">
         <p style="margin:0;">
           <strong>{project.contract?.style}</strong>
-          — {project.contract?.label}
+          {" — "}
+          {publicCopy(project.contract?.label)}
         </p>
       </div>
     </div>
@@ -164,14 +165,14 @@ const svgH = Math.max(240, 56 + mods.length * 40);
       <section>
         <div class="wrap">
           <div class="section-head">
-            <h2>Avances que la tocan</h2>
-            <p>Actividad reciente cuyos oficios intersectan con este producto.</p>
+            <h2>Actividad relacionada</h2>
+            <p>Hitos públicos recientes en los módulos que consume esta aplicación.</p>
           </div>
           <ol class="timeline">
             {related.map((item) => (
               <li>
                 <time datetime={item.date}>{item.date}</time>
-                <p class="summary">{item.summary}</p>
+                <p class="summary">{publicCopy(item.summary)}</p>
                 <a class="mod-chip" href={`${base}modulos/${encodeURIComponent(item.module)}/`}>
                   {item.module}
                 </a>
@@ -188,21 +189,15 @@ const svgH = Math.max(240, 56 + mods.length * 40);
       <section>
         <div class="wrap">
           <div class="section-head">
-            <h2>Señal pública del repositorio</h2>
-            <p>Cuando el repo es público, mostramos lo visible.</p>
+            <h2>Repositorio público</h2>
+            <p>Señal sincronizada desde GitHub.</p>
           </div>
           <div class="glass panel">
             <p style="margin:0 0 0.5rem;">
-              <a href={`https://github.com/${gh.fullName}`} rel="noopener noreferrer" target="_blank">
-                {gh.fullName}
-              </a>
-              {gh.language && <> · {gh.language}</>}
+              <a href={gh.url} target="_blank" rel="noreferrer">{gh.fullName}</a>
             </p>
-            {gh.description && <p style="margin:0 0 0.75rem;color:var(--text-muted);">{gh.description}</p>}
-            {gh.updatedAt && (
-              <p style="margin:0;font-size:0.9rem;color:var(--text-muted);">
-                Última actualización pública: {String(gh.updatedAt).slice(0, 10)}
-              </p>
+            {gh.description && (
+              <p style="margin:0;color:var(--text-muted);">{publicCopy(gh.description)}</p>
             )}
           </div>
         </div>

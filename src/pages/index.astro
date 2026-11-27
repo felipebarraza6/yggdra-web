@@ -1,157 +1,162 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import HeroMark from "../components/HeroMark.astro";
-import IsoArchitecture from "../components/IsoArchitecture.astro";
-import AgentFlow from "../components/AgentFlow.astro";
-import { projects, counts } from "../lib/data";
+import DataSea3D from "../components/DataSea3D.astro";
+import YarqParticleTitle from "../components/YarqParticleTitle.astro";
+import AbyssArchitecture from "../components/AbyssArchitecture.astro";
+import { counts } from "../lib/data";
+import {
+  brand,
+  services,
+  showcase,
+  consumerBrands,
+} from "../lib/identity";
 
 const base = import.meta.env.BASE_URL;
 
-/** Orgs en producción: company no vacío + al menos una app active */
-const orgMap = new Map<
-  string,
-  { company: string; apps: typeof projects; count: number }
->();
-for (const p of projects) {
-  const company = (p.company || "").trim();
-  if (!company || p.status !== "active") continue;
-  const cur = orgMap.get(company) || { company, apps: [], count: 0 };
-  cur.apps.push(p);
-  cur.count += 1;
-  orgMap.set(company, cur);
+function pieceHref(piece: (typeof showcase)[number]) {
+  if (piece.appId) return `${base}apps/${piece.appId}/`;
+  return piece.externalUrl || `${base}apps/`;
 }
-const orgs = [...orgMap.values()].sort((a, b) => b.count - a.count);
 
-const offerings = [
-  {
-    tag: "Gastronomía",
-    title: "Locales y sucursales",
-    body: "Acompañamos caja, cartas, inventarios y cobros para que varias sucursales respiren al mismo ritmo.",
-    tone: "a",
-  },
-  {
-    tag: "Territorio",
-    title: "Agua y servicios",
-    body: "Apoyamos cobros, vecinos y telemetría en agua potable rural y operación hídrica.",
-    tone: "b",
-  },
-  {
-    tag: "Cuidado",
-    title: "Salud y agenda",
-    body: "Cuidamos reservas, pagos y seguimiento para que la atención fluya con calma.",
-    tone: "c",
-  },
-  {
-    tag: "Hábitos",
-    title: "Entrenamiento",
-    body: "Sostenemos programas, coaches y progreso — para quienes viven de acompañar personas.",
-    tone: "d",
-  },
-  {
-    tag: "Comercio",
-    title: "Cotizaciones y ventas",
-    body: "Ordenamos cotizar, vender y dar seguimiento, en sintonía con el resto de tu operación.",
-    tone: "e",
-  },
-  {
-    tag: "Agentes",
-    title: "Equipo a tu lado",
-    body: "Muninn, Fly y el equipo YARQ atienden y coordinan pedidos reales, siempre dentro de tus límites.",
-    tone: "f",
-  },
-];
+function isExternal(piece: (typeof showcase)[number]) {
+  return !piece.appId && !!piece.externalUrl;
+}
 ---
 
 <BaseLayout>
-  <section class="hero">
-    <div class="hero-atmosphere" aria-hidden="true">
-      <span class="hero-mist hero-mist--a"></span>
-      <span class="hero-mist hero-mist--b"></span>
-      <span class="hero-mist hero-mist--c"></span>
-      <span class="hero-void-wash"></span>
-      <span class="hero-horizon"></span>
-      <span class="hero-grid"></span>
-    </div>
-    <div class="wrap hero-compose">
-      <div class="hero-mark-stage">
-        <HeroMark />
-      </div>
-      <div class="hero-copy hero-copy--center">
-        <p class="hero-brand">YARQ</p>
-        <h1>Un equipo de agentes que ordena tu operación</h1>
-        <p class="lede">
-          Agentes especializados, orquestados para entender tu día a día y
-          acompañarte mientras la operación se ordena.
-        </p>
-        <div class="cta-row cta-row--center">
-          <a class="btn btn-primary" href={`${base}#equipo`}>Conocer al equipo</a>
-          <a class="btn btn-ghost" href={`${base}#casos`}>Ver organizaciones</a>
+  <section class="hero hero--lab hero--sea">
+    <DataSea3D />
+    <div class="wrap hero-compose hero-compose--lab hero-compose--sea">
+      <div class="hero-stage-copy">
+        <div class="hero-mark-lockup">
+          <YarqParticleTitle />
+        </div>
+
+        <div class="hero-copy-stack">
+          <div class="hero-copy-base">
+            <h1 class="hero-headline hero-stagger hero-stagger--1">{brand.headline}</h1>
+            <p class="lede hero-stagger hero-stagger--2">{brand.lede}</p>
+          </div>
+          <div class="hero-copy-dark-lens" data-hero-dark-lens aria-hidden="true">
+            <span class="hero-headline">{brand.headline}</span>
+            <span class="lede">{brand.lede}</span>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Dron autónomo flotante para sumergirse a la siguiente sección (Nosotros / Arquitectura) -->
+    <button
+      type="button"
+      class="hero-drone-cta"
+      data-dive-drone
+      aria-label="Sumergirse a la arquitectura de YARQ"
+    >
+      <span class="hero-drone__beam" aria-hidden="true"></span>
+      <svg class="hero-drone__svg" viewBox="0 0 64 36" aria-hidden="true">
+        <defs>
+          <linearGradient id="droneGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="50%" stop-color="#06b6d4" />
+            <stop offset="100%" stop-color="#a855f7" />
+          </linearGradient>
+        </defs>
+        <!-- Brazos y rotores -->
+        <path d="M12 14h40" stroke="url(#droneGlow)" stroke-width="1.6" stroke-linecap="round" />
+        <ellipse cx="11" cy="11" rx="8.5" ry="2.2" fill="none" stroke="#06b6d4" stroke-width="1.2" opacity="0.85" />
+        <ellipse cx="53" cy="11" rx="8.5" ry="2.2" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.85" />
+        <circle cx="11" cy="14" r="2.2" fill="#070d1c" stroke="#38bdf8" stroke-width="1.1" />
+        <circle cx="53" cy="14" r="2.2" fill="#070d1c" stroke="#a855f7" stroke-width="1.1" />
+        <!-- Chasis central obsidiana -->
+        <path d="M22 14l5-5h10l5 5-4 7H26z" fill="#070d1c" stroke="url(#droneGlow)" stroke-width="1.2" stroke-linejoin="round" />
+        <!-- Sensor óptico central -->
+        <circle cx="32" cy="15.5" r="2.6" fill="#38bdf8" />
+        <circle cx="32" cy="15.5" r="1.1" fill="#ffffff" />
+        <!-- Flecha guía sutil bajo el dron -->
+        <path d="M28 27l4 4 4-4" fill="none" stroke="#0284c7" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />
+      </svg>
+      <span class="hero-drone__label">EXPLORAR NÚCLEO</span>
+    </button>
   </section>
 
-  <section id="equipo">
-    <div class="wrap">
-      <div class="section-head section-head--wide reveal">
-        <p class="section-kicker">Qué es YARQ</p>
-        <h2>Agentes con oficio, orquestados con cuidado</h2>
-        <p>
-          Cada agente tiene un rol claro. Juntos leen pedidos, coordinan pasos y
-          ejecutan solo donde tú autorizas. El desarrollo sigue vivo; el
-          servicio es acompañarte en la operación.
-        </p>
-      </div>
-      <div class="discipline-grid">
-        <article class="discipline-item reveal">
-          <span class="idx">Desarrollo</span>
-          <h3>El equipo crece contigo</h3>
-          <p>
-            Mejoramos agentes y flujos a medida que tu operación enseña qué
-            necesita. Es un trabajo continuo, abierto a aprender.
-          </p>
-        </article>
-        <article class="discipline-item reveal reveal-delay-1">
-          <span class="idx">Servicio</span>
-          <h3>Acompañamos el día a día</h3>
-          <p>
-            Seguimos la operación: entender excepciones, ordenar handoffs y
-            cuidar que nada se pierda entre un pedido y el resultado.
-          </p>
-        </article>
-        <article class="discipline-item reveal reveal-delay-2">
-          <span class="idx">Orquestación</span>
-          <h3>Nadie actúa solo</h3>
-          <p>
-            Muninn entiende, Fly coordina, el resto del equipo ejecuta en
-            sintonía. La fuerza está en el conjunto.
-          </p>
-        </article>
-      </div>
-    </div>
-  </section>
+  <!-- 01 · Nosotros: inmersión al universo subacuático de infraestructura YARQ -->
+  <AbyssArchitecture />
 
-  <section id="acompanamos">
+  <!-- 02 · Servicios (bahías técnicas con iconos obsidiana en capas) -->
+  <section id="capacidades" class="section-capabilities">
     <div class="wrap">
       <div class="section-head section-head--wide reveal">
-        <p class="section-kicker">Dónde aportamos</p>
-        <h2>Oficios reales en los que ya caminamos</h2>
-        <p>
-          Aprendimos acompañando gastronomía, agua, salud, entrenamiento y
-          comercio. Si tu mundo se parece a alguno, podemos empezar ahí — con
-          respeto por lo que ya construiste.
-        </p>
+        <p class="section-kicker">Servicios</p>
+        <h2>Lo que entregamos en cada producto</h2>
+        <p>{brand.support}</p>
       </div>
-      <div class="offer-grid">
+      <div class="service-grid">
         {
-          offerings.map((o, i) => (
-            <article class={`offer-card offer-card--${o.tone} reveal reveal-delay-${(i % 3) + 1}`}>
-              <header class="offer-card__head">
-                <span class="offer-card__tag">{o.tag}</span>
-                <span class={`offer-card__glyph offer-card__glyph--${o.tone}`} aria-hidden="true" />
+          services.map((s, i) => (
+            <article class={`service-bay glass glass--interactive reveal reveal-delay-${(i % 3) + 1}`}>
+              <header class="service-bay__head">
+                <span class="service-bay__icon" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    {s.icon === "isolation" && (
+                      <>
+                        <polygon points="16,4 27,10 16,16 5,10" fill="#22d3ee" fill-opacity="0.22" stroke="#38bdf8" stroke-width="1.4" />
+                        <path d="M5 16l11 6 11-6" stroke="#818cf8" stroke-width="1.4" />
+                        <path d="M5 22l11 6 11-6" stroke="#c084fc" stroke-width="1.3" stroke-opacity="0.85" />
+                        <circle cx="16" cy="10" r="2" fill="#f8fafc" />
+                      </>
+                    )}
+                    {s.icon === "api" && (
+                      <>
+                        <polygon points="16,3.5 26.5,9.5 26.5,22.5 16,28.5 5.5,22.5 5.5,9.5" stroke="#38bdf8" stroke-opacity="0.45" stroke-width="1.25" />
+                        <polygon points="16,9.5 21.5,12.7 21.5,19.3 16,22.5 10.5,19.3 10.5,12.7" fill="#6366f1" fill-opacity="0.28" stroke="#c084fc" stroke-width="1.4" />
+                        <path d="M16 3.5V9.5M26.5 22.5l-5-3.2M5.5 22.5l5-3.2" stroke="#22d3ee" stroke-width="1.4" />
+                        <circle cx="16" cy="16" r="1.8" fill="#f8fafc" />
+                      </>
+                    )}
+                    {s.icon === "infra" && (
+                      <>
+                        <polygon points="16,5 25.5,10.5 16,16 6.5,10.5" fill="#818cf8" fill-opacity="0.26" stroke="#c084fc" stroke-width="1.4" />
+                        <path d="M6.5 10.5v11L16 27l9.5-5.5v-11M16 16v11" stroke="#38bdf8" stroke-width="1.4" />
+                        <circle cx="16" cy="16" r="2.2" fill="#22d3ee" />
+                      </>
+                    )}
+                    {s.icon === "delivery" && (
+                      <>
+                        <ellipse cx="16" cy="16" rx="11.5" ry="5" transform="rotate(-28 16 16)" stroke="#22d3ee" stroke-width="1.35" />
+                        <ellipse cx="16" cy="16" rx="11.5" ry="5" transform="rotate(28 16 16)" stroke="#a855f7" stroke-width="1.35" stroke-opacity="0.85" />
+                        <circle cx="16" cy="16" r="3" fill="#f8fafc" />
+                        <circle cx="25.2" cy="11.2" r="1.8" fill="#22d3ee" />
+                      </>
+                    )}
+                    {s.icon === "telemetry" && (
+                      <>
+                        <circle cx="16" cy="16" r="11" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="1.2" stroke-dasharray="2.5 3.5" />
+                        <path d="M5.5 16.5h4.8l3-7.5 3.8 12.8 3-7.2 2.2 1.9h4.2" stroke="#22d3ee" stroke-width="1.6" />
+                        <circle cx="17.1" cy="21.8" r="1.9" fill="#c084fc" />
+                      </>
+                    )}
+                    {s.icon === "agents" && (
+                      <>
+                        <circle cx="16" cy="16" r="4.2" fill="#f8fafc" />
+                        <circle cx="16" cy="16" r="9.8" stroke="#38bdf8" stroke-width="1.3" stroke-dasharray="4.5 3.5" />
+                        <circle cx="16" cy="6.2" r="2" fill="#c084fc" />
+                        <circle cx="24.5" cy="20.9" r="2" fill="#22d3ee" />
+                        <circle cx="7.5" cy="20.9" r="2" fill="#818cf8" />
+                      </>
+                    )}
+                  </svg>
+                </span>
+                <span class="service-bay__tag">{s.code}</span>
               </header>
-              <h3>{o.title}</h3>
-              <p>{o.body}</p>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+              {s.stack && (
+                <div class="service-bay__stack-row">
+                  {s.stack.map((tech) => (
+                    <span class="stack-pill">{tech}</span>
+                  ))}
+                </div>
+              )}
             </article>
           ))
         }
@@ -159,109 +164,129 @@ const offerings = [
     </div>
   </section>
 
-  <section id="flujo" class="section-visual">
+  <!-- 03 · Productos -->
+  <section id="productos">
     <div class="wrap">
       <div class="section-head section-head--wide reveal">
-        <p class="section-kicker">Cómo actúa el equipo</p>
-        <h2>Del pedido al resultado, con cuidado</h2>
+        <p class="section-kicker">Impacto y Productos</p>
+        <h2>Productos reales en operación</h2>
         <p>
-          Un pedido llega. Muninn lo entiende. Fly ordena los pasos. El equipo
-          ejecuta solo donde tú diste permiso.
+          La mejor medida de nuestro trabajo son las plataformas que operan todos los días.
         </p>
       </div>
-      <AgentFlow />
-    </div>
-  </section>
 
-  <section id="estructura" class="section-visual">
-    <div class="wrap">
-      <div class="section-head section-head--wide reveal">
-        <p class="section-kicker">Lo que sostiene al equipo</p>
-        <h2>Estructura espacial que se arma al bajar</h2>
-        <p>
-          Cimientos, núcleo, puente de cambios y productos. No es el centro del
-          relato: es lo que permite que los agentes te cuiden bien.
-        </p>
+      <!-- Barra de telemetría oscura de contraste -->
+      <div class="impact-strip impact-strip--space reveal">
+        <div class="impact-cell">
+          <div class="num">{counts.active}</div>
+          <div class="lbl">productos activos</div>
+        </div>
+        <div class="impact-cell">
+          <div class="num">{consumerBrands.length}</div>
+          <div class="lbl">marcas y núcleos</div>
+        </div>
+        <div class="impact-cell">
+          <div class="num">{counts.modules}</div>
+          <div class="lbl">módulos de dominio</div>
+        </div>
+        <div class="impact-cell">
+          <div class="num">{counts.migrating}</div>
+          <div class="lbl">en integración</div>
+        </div>
       </div>
-      <div class="iso-hero reveal">
-        <IsoArchitecture />
-      </div>
-    </div>
-  </section>
 
-  <section id="casos">
-    <div class="wrap">
-      <div class="section-head section-head--wide reveal">
-        <p class="section-kicker">Casos</p>
-        <h2>Organizaciones que ya caminan con YARQ</h2>
-        <p>
-          Cada tarjeta es una organización en producción — no el catálogo de
-          productos. En Store encuentras cada app del ecosistema.
-        </p>
-      </div>
-      <div class="org-grid">
+      <div class="piece-grid">
         {
-          orgs.map((o, i) => {
-            const first = o.apps[0];
+          showcase.map((piece, i) => {
+            const href = pieceHref(piece);
+            const external = isExternal(piece);
             return (
               <a
-                class={`org-card reveal reveal-delay-${(i % 3) + 1}`}
-                href={`${base}apps/${first.id}/`}
+                class={`piece-card glass glass--interactive reveal reveal-delay-${(i % 3) + 1}`}
+                href={href}
+                target={external ? "_blank" : undefined}
+                rel={external ? "noreferrer" : undefined}
               >
-                <header class="org-card__head">
-                  <span class="org-card__label">En producción</span>
-                  <span class="badge" data-status="activa">activa</span>
+                <header class="piece-card__head">
+                  <div class="piece-card__id">
+                    <span class="brand-tile">
+                      {piece.logo ? (
+                        <img src={`${base}${piece.logo}`} alt={`Logo ${piece.name}`} loading="lazy" />
+                      ) : (
+                        <span>{piece.monogram || piece.name.slice(0, 2)}</span>
+                      )}
+                    </span>
+                    <div>
+                      <h3>{piece.name}</h3>
+                      <span class="piece-card__cat">{piece.category}</span>
+                    </div>
+                  </div>
+                  <span class="badge" data-status={piece.status}>
+                    {piece.status}
+                  </span>
                 </header>
-                <h3>{o.company}</h3>
-                <p class="meta">
-                  {o.count} {o.count === 1 ? "producto" : "productos"} con el equipo
-                </p>
-                <div class="org-card__apps">
-                  {o.apps.slice(0, 4).map((a) => (
-                    <span class="mod-chip">{a.product || a.name}</span>
-                  ))}
-                </div>
+                <p>{piece.description}</p>
+                <span class="piece-card__link">
+                  <span>{external ? "Repositorio" : "Ver ficha técnica"}</span>
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
               </a>
             );
           })
         }
       </div>
-      <p class="section-actions">
-        <a class="btn btn-ghost" href={`${base}apps/`}>Abrir el Store</a>
+
+      <div class="consumers-block reveal">
+        <div class="consumers-block__head">
+          <p class="section-kicker">En operación</p>
+          <h3>Organizaciones que operan con productos YARQ</h3>
+        </div>
+        <div class="consumer-grid">
+          {
+            consumerBrands.map((c) => (
+              <a class="consumer-card glass glass--interactive" href={`${base}apps/${c.appId}/`}>
+                <div class="consumer-card__top">
+                  <span class="brand-tile brand-tile--sm">
+                    {c.logo ? (
+                      <img src={`${base}${c.logo}`} alt={`Logo ${c.name}`} loading="lazy" />
+                    ) : (
+                      <span>{c.monogram || c.name.slice(0, 2)}</span>
+                    )}
+                  </span>
+                  <div>
+                    <h4>{c.name}</h4>
+                    <span class="consumer-card__sector">{c.sector}</span>
+                  </div>
+                </div>
+                <p>{c.role}</p>
+                <span class="consumer-card__prod">{c.product}</span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <p class="section-actions reveal">
+        <a class="btn btn-ghost" href={`${base}apps/`}>Ver catálogo completo ({counts.total} apps)</a>
       </p>
     </div>
   </section>
 
-  <div class="impact-strip wrap reveal" style="margin-bottom:3rem;">
-    <div>
-      <div class="num">{counts.active}</div>
-      <div class="lbl">operaciones activas</div>
-    </div>
-    <div>
-      <div class="num">{orgs.length}</div>
-      <div class="lbl">organizaciones</div>
-    </div>
-    <div>
-      <div class="num">{counts.modules}</div>
-      <div class="lbl">oficios cubiertos</div>
-    </div>
-    <div>
-      <div class="num">{counts.migrating}</div>
-      <div class="lbl">en acompañamiento</div>
-    </div>
-  </div>
-
-  <section>
+  <!-- 04 · Portal sideral de cierre -->
+  <section class="section-close">
     <div class="wrap">
-      <div class="cta-band reveal">
-        <h2>Si quieres ordenar tu operación con un equipo a tu lado</h2>
+      <div class="cta-band cta-band--space reveal">
+        <span class="cta-band__orbit" aria-hidden="true"></span>
+        <p class="section-kicker">YARQ · Propósito digital</p>
+        <h2>Digitalicemos lo que mueve al mundo real</h2>
         <p>
-          Estamos para escuchar cómo trabajas hoy y ver juntos cómo los agentes
-          pueden acompañarte — con desarrollo continuo y servicio cercano.
+          Tecnología pensada para operar todos los días, escalar con orden y construir un futuro más conectado.
         </p>
         <div class="cta-row cta-row--center">
-          <a class="btn btn-primary" href={`${base}#acompanamos`}>Ver dónde aportamos</a>
-          <a class="btn btn-ghost" href={`${base}apps/`}>Explorar el Store</a>
+          <a class="btn btn-light" href={`${base}#yarq`}>Ver arquitectura</a>
+          <a class="btn btn-ghost-dark" href={`${base}apps/`}>Explorar catálogo</a>
         </div>
       </div>
     </div>

@@ -1,0 +1,3097 @@
+---
+/**
+ * Mundo Dual 3D de YARQ:
+ * - Capa base: nubes sutiles en el cielo, cordillera topográfica, centros de datos y antenas en el horizonte, y mar de datos 3D.
+ * - Capa revelada al pasar el cursor: portal pixelado con aurora boreal que revela el mismo paisaje con colores vivos y reales.
+ */
+---
+
+<canvas class="datasea-canvas" data-datasea aria-hidden="true"></canvas>
+
+<script>
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canvases = document.querySelectorAll<HTMLCanvasElement>("[data-datasea]");
+
+  if (canvases.length > 0) {
+    canvases.forEach((canvas) => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      let w = 0;
+      let h = 0;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let raf = 0;
+      let t = 0;
+      // Regulador de calidad: si el cuadro se alarga, se dibuja la mitad de la bandada hasta recuperar fluidez
+      let frameEma = 16;
+      let lastFrameMs = 0;
+      let lowQuality = false;
+      let intro = reduce ? 1 : 0;
+      let dive = 0;
+      let diveTarget = 0;
+
+      const updateDive = () => {
+        const span = Math.max(420, h * 0.88);
+        diveTarget = Math.max(0, Math.min(1, window.scrollY / span));
+      };
+      window.addEventListener("scroll", updateDive, { passive: true });
+
+      // Canvas offscreen para fundir la realidad revelada con borde líquido suave (sin píxeles cuadrados)
+      const portalCanvas = document.createElement("canvas");
+      const pctx = portalCanvas.getContext("2d");
+
+      const mouse = {
+        x: 0,
+        tx: 0,
+        px: -9999,
+        py: -9999,
+        sx: -9999,
+        sy: -9999,
+        active: false,
+        reveal: 0,
+      };
+
+      const COLS = 72;
+      const ROWS = 36;
+      const SEP_X = 76;
+
+      // Nubes suaves en el cielo que se desplazan con calma
+      const clouds = [
+        { x: 0.14, y: 0.17, rx: 110, ry: 22, speed: 0.00008 },
+        { x: 0.38, y: 0.11, rx: 145, ry: 26, speed: 0.000055 },
+        { x: 0.72, y: 0.15, rx: 130, ry: 24, speed: 0.00007 },
+        { x: 0.89, y: 0.24, rx: 95, ry: 19, speed: 0.00009 },
+        { x: 0.24, y: 0.28, rx: 92, ry: 18, speed: 0.000065 },
+      ];
+
+      function mountainHeight(nx: number, seed: number, amp: number) {
+        const valley = 0.28 + 0.72 * Math.pow(Math.abs(nx * 2 - 1), 1.18);
+        const ridge =
+          Math.sin(nx * 8.2 + seed) * 0.44 +
+          Math.sin(nx * 19.6 + seed * 1.8) * 0.28 +
+          Math.cos(nx * 37.4 + seed * 0.6) * 0.17 +
+          Math.sin(nx * 71.2 + seed * 2.3) * 0.09;
+        return Math.max(0, 0.56 + ridge * 0.56) * valley * amp;
+      }
+
+      function cellHash(gx: number, gy: number) {
+        const n = Math.sin(gx * 127.1 + gy * 311.7) * 43758.5453;
+        return n - Math.floor(n);
+      }
+
+      let textSafe = {
+        cx: 0,
+        cy: 0,
+        rx: 320,
+        ry: 150,
+      };
+      const copyStackEl = canvas.parentElement?.querySelector(".hero-copy-stack") as HTMLElement | null;
+      const darkLensEl = canvas.parentElement?.querySelector(
+        "[data-hero-dark-lens]"
+      ) as HTMLElement | null;
+      let darkLensVisible = false;
+
+      function syncDarkLensText(lx: number, ly: number, hw: number, hh: number) {
+        if (!darkLensEl || !copyStackEl) return;
+        if (hw < 4 || hh < 4) {
+          if (darkLensVisible) {
+            darkLensEl.style.setProperty("--lens-t", "100%");
+            darkLensVisible = false;
+          }
+          return;
+        }
+        const cRect = canvas.getBoundingClientRect();
+        const sRect = copyStackEl.getBoundingClientRect();
+        const sL = sRect.left - cRect.left;
+        const sT = sRect.top - cRect.top;
+        const sW = sRect.width;
+        const sH = sRect.height;
+        if (sW <= 0 || sH <= 0) return;
+
+        const tPx = Math.max(0, Math.min(sH, ly - hh - sT));
+        const lPx = Math.max(0, Math.min(sW, lx - hw - sL));
+        const bPx = Math.max(0, Math.min(sH, sT + sH - (ly + hh)));
+        const rPx = Math.max(0, Math.min(sW, sL + sW - (lx + hw)));
+        if (tPx + bPx >= sH || lPx + rPx >= sW) {
+          if (darkLensVisible) {
+            darkLensEl.style.setProperty("--lens-t", "100%");
+            darkLensVisible = false;
+          }
+          return;
+        }
+        darkLensEl.style.setProperty("--lens-t", `${tPx.toFixed(1)}px`);
+        darkLensEl.style.setProperty("--lens-r", `${rPx.toFixed(1)}px`);
+        darkLensEl.style.setProperty("--lens-b", `${bPx.toFixed(1)}px`);
+        darkLensEl.style.setProperty("--lens-l", `${lPx.toFixed(1)}px`);
+        darkLensVisible = true;
+      }
+
+      // Origen exacto del logo de partículas YARQ desde donde despegan los drones estorninos
+      let yarqOrigin = { x: 0, y: 120 };
+      // Medio ancho y medio alto del logo YARQ sólido: zona que los estorninos no deben ensuciar
+      let yarqHalf = { x: 150, y: 60 };
+      let fullReality = false;
+      let fullReveal = 0;
+
+      window.addEventListener("yarq:reality", (e: Event) => {
+        const ce = e as CustomEvent<{ full?: boolean }>;
+        fullReality = Boolean(ce.detail?.full);
+      });
+
+      const fxSmooth = (a: number, b: number, v: number) => {
+        const x = Math.min(1, Math.max(0, (v - a) / (b - a)));
+        return x * x * (3 - 2 * x);
+      };
+
+      const lerpRGBA = (
+        r1: number,
+        g1: number,
+        b1: number,
+        a1: number,
+        r2: number,
+        g2: number,
+        b2: number,
+        a2: number,
+        k: number
+      ) =>
+        `rgba(${Math.round(r2 + (r1 - r2) * k)}, ${Math.round(g2 + (g1 - g2) * k)}, ${Math.round(
+          b2 + (b1 - b2) * k
+        )}, ${(a2 + (a1 - a2) * k).toFixed(3)})`;
+
+      // Tráfico aéreo y orbital compartido 1:1 entre el mundo real y los planos matemáticos del cuadrante de datos
+      type SkyCraft = {
+        yFrac: number;
+        speed: number;
+        dir: 1 | -1;
+        scale: number;
+        kind: "ship" | "sat";
+        col: string;
+        code: string;
+      };
+
+      const SKY_CRAFTS: SkyCraft[] = [
+        { yFrac: 0.16, speed: 0.032, dir: 1, scale: 1.05, kind: "ship", col: "#38bdf8", code: "FL-380" },
+        { yFrac: 0.28, speed: 0.024, dir: -1, scale: 0.85, kind: "sat", col: "#34d399", code: "SAT-02" },
+        { yFrac: 0.38, speed: 0.044, dir: 1, scale: 0.72, kind: "ship", col: "#c084fc", code: "FL-420" },
+        { yFrac: 0.22, speed: 0.019, dir: -1, scale: 0.78, kind: "sat", col: "#7dd3fc", code: "ORB-04" },
+        { yFrac: 0.12, speed: 0.027, dir: -1, scale: 0.7, kind: "ship", col: "#38bdf8", code: "FL-300" },
+        { yFrac: 0.33, speed: 0.021, dir: 1, scale: 0.8, kind: "sat", col: "#34d399", code: "SAT-07" },
+      ];
+
+      // Escuadrón de 4 micro-drones de precisión que salen desde YARQ y levitan en las 4 esquinas para rasgar y abrir el cuadrante
+      type QuadDrone = {
+        x: number;
+        y: number;
+        vx: number;
+        vy: number;
+        sx: -1 | 1;
+        sy: -1 | 1;
+        slot: number;
+        phase: number;
+        initialized: boolean;
+      };
+
+      const quadDrones: QuadDrone[] = [
+        { x: 0, y: 0, vx: 0, vy: 0, sx: -1, sy: -1, slot: 0, phase: 0.4, initialized: false },
+        { x: 0, y: 0, vx: 0, vy: 0, sx: 1, sy: -1, slot: 1, phase: 1.9, initialized: false },
+        { x: 0, y: 0, vx: 0, vy: 0, sx: 1, sy: 1, slot: 2, phase: 3.4, initialized: false },
+        { x: 0, y: 0, vx: 0, vy: 0, sx: -1, sy: 1, slot: 3, phase: 4.9, initialized: false },
+      ];
+
+      function resize() {
+        const rect = canvas.parentElement?.getBoundingClientRect();
+        w = Math.max(320, Math.floor(rect?.width || window.innerWidth));
+        h = Math.max(540, Math.floor(rect?.height || window.innerHeight));
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // Buffer del tamaño del cuadrante de hover, a la misma densidad que la pantalla: se ve nítido y no se pinta el resto
+        const lensCssW = 205 * 2 + 40;
+        const lensCssH = 145 * 2 + 40;
+        portalCanvas.width = Math.ceil(lensCssW * dpr);
+        portalCanvas.height = Math.ceil(lensCssH * dpr);
+        if (pctx) pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const markEl =
+          canvas.parentElement?.querySelector(".yarq-3d__canvas") ||
+          canvas.parentElement?.querySelector(".hero-mark-lockup");
+        if (rect && markEl) {
+          const mr = markEl.getBoundingClientRect();
+          yarqOrigin = {
+            x: mr.left - rect.left + mr.width * 0.5,
+            y: mr.top - rect.top + mr.height * 0.5,
+          };
+          yarqHalf = { x: mr.width * 0.41, y: mr.height * 0.34 };
+        } else {
+          yarqOrigin = { x: w * 0.5, y: h * 0.16 };
+          yarqHalf = { x: 130, y: 42 };
+        }
+
+        quadDrones.forEach((d) => {
+          if (!d.initialized) {
+            d.x = yarqOrigin.x + (d.slot - 1.5) * (yarqHalf.x * 0.45);
+            d.y = yarqOrigin.y;
+            d.initialized = true;
+          }
+        });
+
+        const copyEl = canvas.parentElement?.querySelector(".hero-stage-copy");
+        if (rect && copyEl) {
+          const cr = copyEl.getBoundingClientRect();
+          textSafe = {
+            cx: cr.left - rect.left + cr.width * 0.5,
+            cy: cr.top - rect.top + cr.height * 0.5,
+            rx: cr.width * 0.54 + 48,
+            ry: cr.height * 0.56 + 36,
+          };
+        } else {
+          textSafe = {
+            cx: w * 0.5,
+            cy: h * 0.36,
+            rx: Math.min(w * 0.36, 360),
+            ry: Math.min(h * 0.22, 185),
+          };
+        }
+      }
+
+      const onMove = (e: MouseEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        const lx = e.clientX - rect.left;
+        const ly = e.clientY - rect.top;
+        mouse.px = lx;
+        mouse.py = ly;
+        mouse.active = lx >= 0 && lx <= w && ly >= 0 && ly <= h;
+        mouse.tx = (lx / w - 0.5) * 2;
+        if (mouse.sx < -1000) {
+          mouse.sx = lx;
+          mouse.sy = ly;
+        }
+      };
+
+      const onLeave = () => {
+        mouse.active = false;
+        mouse.tx = 0;
+      };
+
+      window.addEventListener("mousemove", onMove, { passive: true });
+      canvas.parentElement?.addEventListener("mouseleave", onLeave, { passive: true });
+      window.addEventListener("resize", resize, { passive: true });
+      resize();
+
+      type Projected = {
+        sx: number;
+        sy: number;
+        syDeep: number;
+        scale: number;
+        elev: number;
+        depthNorm: number;
+        rip: number;
+      };
+
+      type HorizonNode = {
+        x: number;
+        y: number;
+        scale: number;
+        depth: number; // 0 = lejos, 1 = costa cercana
+        layerIdx: 1 | 2; // 1 = cordillera media, 2 = costa frontal (oclusión real por profundidad)
+        kind: "datacenter" | "campus" | "antenna";
+      };
+
+      // Red armónica de centros de datos, campus costeros y antenas anclados en su capa de relieve exacta
+      function computeHorizonNodes(coastY: number): HorizonNode[] {
+        const defs: {
+          nx: number;
+          seed: number;
+          amp: number;
+          yOff: number;
+          scale: number;
+          depth: number;
+          layerIdx: 1 | 2;
+          kind: HorizonNode["kind"];
+        }[] = [
+          // Capa 1 (cordillera media: quedan DETRÁS de la costa frontal)
+          { nx: 0.08, seed: 4.8, amp: Math.min(118, h * 0.165), yOff: -2, scale: 0.62, depth: 0.35, layerIdx: 1, kind: "antenna" },
+          { nx: 0.19, seed: 4.8, amp: Math.min(118, h * 0.165), yOff: -2, scale: 0.68, depth: 0.4, layerIdx: 1, kind: "datacenter" },
+          { nx: 0.37, seed: 4.8, amp: Math.min(118, h * 0.165), yOff: -2, scale: 0.54, depth: 0.3, layerIdx: 1, kind: "datacenter" },
+          { nx: 0.63, seed: 4.8, amp: Math.min(118, h * 0.165), yOff: -2, scale: 0.54, depth: 0.3, layerIdx: 1, kind: "datacenter" },
+          { nx: 0.82, seed: 4.8, amp: Math.min(118, h * 0.165), yOff: -2, scale: 0.68, depth: 0.4, layerIdx: 1, kind: "datacenter" },
+          { nx: 0.92, seed: 4.8, amp: Math.min(118, h * 0.165), yOff: -2, scale: 0.62, depth: 0.35, layerIdx: 1, kind: "antenna" },
+          // Capa 2 (costa frontal: se apoyan en primer plano sobre la costa)
+          { nx: 0.14, seed: 8.2, amp: Math.min(68, h * 0.095), yOff: 0, scale: 1.0, depth: 0.95, layerIdx: 2, kind: "campus" },
+          { nx: 0.28, seed: 8.2, amp: Math.min(68, h * 0.095), yOff: 0, scale: 0.88, depth: 0.85, layerIdx: 2, kind: "antenna" },
+          { nx: 0.72, seed: 8.2, amp: Math.min(68, h * 0.095), yOff: 0, scale: 0.88, depth: 0.85, layerIdx: 2, kind: "antenna" },
+          { nx: 0.86, seed: 8.2, amp: Math.min(68, h * 0.095), yOff: 0, scale: 1.0, depth: 0.95, layerIdx: 2, kind: "campus" },
+        ];
+        return defs.map((d) => ({
+          x: d.nx * w,
+          y: coastY + d.yOff - mountainHeight(d.nx, d.seed, d.amp),
+          scale: d.scale,
+          depth: d.depth,
+          layerIdx: d.layerIdx,
+          kind: d.kind,
+        }));
+      }
+
+      // Nubes suaves (versión abstracta minimal o versión realista iluminada por aurora)
+      function drawClouds(targetCtx: CanvasRenderingContext2D, realistic: boolean) {
+        clouds.forEach((c, idx) => {
+          const cx = ((c.x + t * c.speed * 42) % 1.24 - 0.12) * w;
+          const cy = c.y * h;
+          const puffs = [
+            { ox: 0, oy: 0, rx: c.rx, ry: c.ry },
+            { ox: -c.rx * 0.45, oy: 4, rx: c.rx * 0.65, ry: c.ry * 0.76 },
+            { ox: c.rx * 0.48, oy: 5, rx: c.rx * 0.6, ry: c.ry * 0.72 },
+          ];
+
+          puffs.forEach((p) => {
+            const g = targetCtx.createRadialGradient(
+              cx + p.ox,
+              cy + p.oy,
+              2,
+              cx + p.ox,
+              cy + p.oy,
+              p.rx
+            );
+            if (realistic) {
+              g.addColorStop(0, idx % 2 === 0 ? "rgba(186, 230, 253, 0.28)" : "rgba(167, 243, 208, 0.24)");
+              g.addColorStop(0.55, "rgba(56, 189, 248, 0.12)");
+              g.addColorStop(1, "rgba(15, 23, 42, 0)");
+            } else {
+              g.addColorStop(0, "rgba(255, 255, 255, 0.78)");
+              g.addColorStop(0.55, "rgba(226, 238, 248, 0.34)");
+              g.addColorStop(1, "rgba(226, 238, 248, 0)");
+            }
+            targetCtx.save();
+            targetCtx.translate(cx + p.ox, cy + p.oy);
+            targetCtx.scale(1, p.ry / p.rx);
+            targetCtx.fillStyle = g;
+            targetCtx.beginPath();
+            targetCtx.arc(0, 0, p.rx, 0, Math.PI * 2);
+            targetCtx.fill();
+            targetCtx.restore();
+          });
+        });
+      }
+
+      // Campo de partículas, matemáticas y telemetría numérica para el cielo del modo White
+      const skyParticles = Array.from({ length: 64 }, (_, i) => ({
+        nx: ((i * 37.3 + 11) % 100) / 100,
+        ny: 0.05 + ((i * 23.7 + 7) % 86) / 100,
+        r: 0.9 + (i % 4) * 0.45,
+        speed: 0.25 + (i % 5) * 0.14,
+        phase: i * 1.13,
+        hue: i % 3 === 0 ? "2, 132, 199" : i % 3 === 1 ? "124, 58, 237" : "15, 23, 42",
+      }));
+
+      const skyGlyphs = [
+        { nx: 0.07, ny: 0.18, text: "∇·E = ρ/ε₀", col: "2, 132, 199" },
+        { nx: 0.17, ny: 0.34, text: "33.4489° S · 70.6693° W", col: "15, 23, 42" },
+        { nx: 0.09, ny: 0.56, text: "f(x,t) = Σ aₙ eⁱᵏˣ", col: "124, 58, 237" },
+        { nx: 0.22, ny: 0.72, text: "0101 · 99.98%", col: "2, 132, 199" },
+        { nx: 0.14, ny: 0.12, text: "Δt → 0.012s", col: "71, 85, 105" },
+        { nx: 0.28, ny: 0.21, text: "∫ Ω dV", col: "124, 58, 237" },
+        { nx: 0.05, ny: 0.76, text: "MOD:26 // APP:18", col: "15, 23, 42" },
+        { nx: 0.74, ny: 0.19, text: "P(x|θ) = ∏ pᵢ", col: "124, 58, 237" },
+        { nx: 0.87, ny: 0.14, text: "λ = 480nm", col: "2, 132, 199" },
+        { nx: 0.83, ny: 0.35, text: "SYNC // v1.04", col: "15, 23, 42" },
+        { nx: 0.91, ny: 0.54, text: "∑ N = 18 · LIVE", col: "2, 132, 199" },
+        { nx: 0.77, ny: 0.69, text: "∂u/∂t = α∇²u", col: "124, 58, 237" },
+        { nx: 0.89, ny: 0.78, text: "0x7F · +42.8", col: "71, 85, 105" },
+        { nx: 0.69, ny: 0.11, text: "φ = 1.6180", col: "2, 132, 199" },
+      ];
+
+      // detailed = true solo dentro de la lente de datos: en el blanco inicial quedan únicamente partículas tenues
+      function drawWhiteSkyTelemetry(coastY: number, detailed: boolean) {
+        ctx.save();
+        const pxShift = mouse.x * 14;
+
+        // 1. Partículas finas flotando en el cielo + micro-vectores entre vecinas
+        const pts: { x: number; y: number; hue: string; r: number; a: number }[] = [];
+        for (const p of skyParticles) {
+          const x = p.nx * w + Math.sin(t * p.speed + p.phase) * 14 - pxShift * (0.4 + p.ny * 0.6);
+          const y = p.ny * (coastY - 22) + Math.cos(t * p.speed * 0.8 + p.phase) * 8;
+          // Atenuar suavemente justo detrás del bloque central de texto
+          const dx = (x - textSafe.cx) / Math.max(1, textSafe.rx * 0.92);
+          const dy = (y - textSafe.cy) / Math.max(1, textSafe.ry * 0.92);
+          const d2 = dx * dx + dy * dy;
+          // Piso de visibilidad: las partículas translúcidas no deben desaparecer al pasar por el texto
+          const safeAtten = d2 < 1 ? 0.4 : Math.min(1, 0.45 + (d2 - 1) * 0.55);
+          const a = (0.3 + 0.2 * Math.sin(t * 1.6 + p.phase)) * safeAtten;
+          pts.push({ x, y, hue: p.hue, r: p.r, a });
+        }
+
+        // Líneas muy finas entre partículas cercanas (sensación de espacio de datos vivo)
+        ctx.lineWidth = 0.6;
+        const linkCount = detailed ? pts.length : 0;
+        for (let i = 0; i < linkCount; i++) {
+          for (let j = i + 1; j < Math.min(i + 12, pts.length); j++) {
+            const dist = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+            if (dist < 115) {
+              const lineA = (1 - dist / 115) * Math.min(pts[i].a, pts[j].a) * 0.55;
+              if (lineA > 0.015) {
+                ctx.strokeStyle = `rgba(2, 132, 199, ${lineA.toFixed(3)})`;
+                ctx.beginPath();
+                ctx.moveTo(pts[i].x, pts[i].y);
+                ctx.lineTo(pts[j].x, pts[j].y);
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        for (const pt of pts) {
+          ctx.fillStyle = `rgba(${pt.hue}, ${pt.a.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 2. Fórmulas matemáticas, coordenadas y números en distintos lugares del cielo
+        ctx.font = "500 10.5px 'JetBrains Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        if (detailed) skyGlyphs.forEach((g, idx) => {
+          const gx = g.nx * w + Math.sin(t * 0.45 + idx * 1.4) * 9 - pxShift * 0.8;
+          const gy = g.ny * (coastY - 28) + Math.cos(t * 0.55 + idx) * 6;
+          const pulse = 0.72 + 0.28 * Math.sin(t * 1.3 + idx * 1.9);
+
+          // Micro-cruz de registro junto a algunas coordenadas
+          if (idx % 3 === 0) {
+            ctx.strokeStyle = `rgba(${g.col}, ${(0.22 * pulse).toFixed(3)})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(gx - 3, gy - 11);
+            ctx.lineTo(gx + 3, gy - 11);
+            ctx.moveTo(gx, gy - 14);
+            ctx.lineTo(gx, gy - 8);
+            ctx.stroke();
+          }
+
+          ctx.fillStyle = `rgba(${g.col}, ${(0.28 * pulse).toFixed(3)})`;
+          ctx.fillText(g.text, gx, gy);
+        });
+        ctx.restore();
+      }
+
+      // ─── CAPA 1: MUNDO ABSTRACTO DE DATOS (NUBES + PARTÍCULAS/MATEMÁTICAS + CORDILLERA + MAR 3D) ───
+      // overlay = true: capa de datos translúcida encima del mundo a color (dentro de la lente), sin tapar el detalle
+      type CityTower = {
+        nx: number;
+        bw: number;
+        bh: number;
+        style: "spire" | "slant" | "dome" | "twin" | "eco";
+        accent: string;
+      };
+
+      // Catálogo compartido entre el mundo real a color y los planos transparentes del mundo de datos
+      const CITY_TOWERS: CityTower[] = [
+        // Lado DÍA (izquierda): más piezas en el borde, el centro queda para el estadio y la municipalidad
+        { nx: 0.014, bw: 16, bh: 108, style: "spire", accent: "#38bdf8" },
+        { nx: 0.035, bw: 18, bh: 96, style: "slant", accent: "#38bdf8" },
+        { nx: 0.075, bw: 20, bh: 94, style: "eco", accent: "#34d399" },
+        { nx: 0.12, bw: 20, bh: 88, style: "eco", accent: "#34d399" },
+        { nx: 0.138, bw: 12, bh: 72, style: "dome", accent: "#7dd3fc" },
+        { nx: 0.155, bw: 18, bh: 66, style: "dome", accent: "#7dd3fc" },
+        { nx: 0.174, bw: 12, bh: 84, style: "eco", accent: "#34d399" },
+        { nx: 0.236, bw: 12, bh: 56, style: "slant", accent: "#7dd3fc" },
+        { nx: 0.252, bw: 18, bh: 76, style: "slant", accent: "#34d399" },
+        { nx: 0.28, bw: 22, bh: 114, style: "eco", accent: "#38bdf8" },
+        { nx: 0.294, bw: 12, bh: 78, style: "slant", accent: "#7dd3fc" },
+        { nx: 0.308, bw: 16, bh: 68, style: "twin", accent: "#7dd3fc" },
+        { nx: 0.335, bw: 18, bh: 84, style: "slant", accent: "#34d399" },
+        { nx: 0.354, bw: 14, bh: 118, style: "spire", accent: "#38bdf8" },
+        { nx: 0.37, bw: 24, bh: 128, style: "spire", accent: "#7dd3fc" },
+        { nx: 0.402, bw: 20, bh: 92, style: "eco", accent: "#34d399" },
+        { nx: 0.488, bw: 22, bh: 102, style: "twin", accent: "#38bdf8" },
+        { nx: 0.5025, bw: 14, bh: 70, style: "eco", accent: "#34d399" },
+        // Lado NOCHE (derecha)
+        { nx: 0.516, bw: 18, bh: 82, style: "slant", accent: "#34d399" },
+        { nx: 0.5293, bw: 14, bh: 84, style: "eco", accent: "#34d399" },
+        { nx: 0.545, bw: 28, bh: 152, style: "spire", accent: "#38bdf8" },
+        { nx: 0.576, bw: 18, bh: 94, style: "dome", accent: "#7dd3fc" },
+        { nx: 0.588, bw: 10, bh: 58, style: "slant", accent: "#38bdf8" },
+        { nx: 0.602, bw: 22, bh: 120, style: "eco", accent: "#34d399" },
+        { nx: 0.622, bw: 20, bh: 86, style: "slant", accent: "#38bdf8" },
+        { nx: 0.642, bw: 26, bh: 138, style: "twin", accent: "#7dd3fc" },
+        { nx: 0.66, bw: 10, bh: 64, style: "eco", accent: "#34d399" },
+        { nx: 0.676, bw: 18, bh: 78, style: "slant", accent: "#38bdf8" },
+        { nx: 0.704, bw: 20, bh: 96, style: "dome", accent: "#34d399" },
+        { nx: 0.725, bw: 16, bh: 104, style: "spire", accent: "#7dd3fc" },
+        { nx: 0.746, bw: 24, bh: 132, style: "spire", accent: "#a78bfa" },
+        { nx: 0.764, bw: 12, bh: 92, style: "spire", accent: "#7dd3fc" },
+        { nx: 0.782, bw: 20, bh: 88, style: "twin", accent: "#38bdf8" },
+        { nx: 0.814, bw: 22, bh: 108, style: "eco", accent: "#34d399" },
+        { nx: 0.835, bw: 12, bh: 70, style: "dome", accent: "#7dd3fc" },
+        { nx: 0.856, bw: 20, bh: 94, style: "slant", accent: "#7dd3fc" },
+        { nx: 0.896, bw: 24, bh: 118, style: "spire", accent: "#38bdf8" },
+        { nx: 0.9155, bw: 22, bh: 110, style: "twin", accent: "#34d399" },
+        { nx: 0.936, bw: 20, bh: 84, style: "eco", accent: "#34d399" },
+        { nx: 0.952, bw: 10, bh: 60, style: "slant", accent: "#38bdf8" },
+        { nx: 0.968, bw: 18, bh: 68, style: "dome", accent: "#7dd3fc" },
+        { nx: 0.99, bw: 14, bh: 62, style: "dome", accent: "#7dd3fc" },
+      ];
+
+      // ─── IOT + INFERENCIA + PARTÍCULAS: misma capa lógica en el mundo real a color y en el plano de datos ───
+      type IotNode = {
+        nx: number;
+        lift: number; // px sobre la costa (se escala con h)
+        label: string;
+        unit: string;
+        base: number;
+        amp: number;
+        dec: number;
+        col: string;
+      };
+
+      const IOT_NODES: IotNode[] = [
+        { nx: 0.018, lift: 26, label: "CO₂", unit: " ppm", base: 412, amp: 9, dec: 0, col: "52, 211, 153" },
+        { nx: 0.16, lift: 138, label: "VIENTO", unit: " m/s", base: 6.2, amp: 1.4, dec: 1, col: "125, 211, 252" },
+        { nx: 0.232, lift: 70, label: "pH", unit: "", base: 7.2, amp: 0.12, dec: 2, col: "186, 230, 253" },
+        { nx: 0.33, lift: 40, label: "RIEGO", unit: " %", base: 38, amp: 6, dec: 0, col: "134, 239, 172" },
+        { nx: 0.5, lift: 112, label: "TRÁFICO", unit: " %", base: 84, amp: 7, dec: 0, col: "125, 211, 252" },
+        { nx: 0.565, lift: 66, label: "ENERGÍA", unit: " MW", base: 1.24, amp: 0.18, dec: 2, col: "254, 240, 138" },
+        { nx: 0.676, lift: 36, label: "MEDIDOR", unit: " kWh", base: 23.4, amp: 0.9, dec: 1, col: "196, 181, 253" },
+        { nx: 0.764, lift: 50, label: "TEMP", unit: " °C", base: 24.1, amp: 0.6, dec: 1, col: "253, 186, 116" },
+        { nx: 0.944, lift: 58, label: "CAUDAL", unit: " L/s", base: 14, amp: 1.2, dec: 1, col: "103, 232, 249" },
+        { nx: 0.085, lift: 44, label: "HUMEDAD", unit: " %", base: 61, amp: 3, dec: 0, col: "134, 239, 172" },
+        { nx: 0.262, lift: 150, label: "RUIDO", unit: " dB", base: 48, amp: 2, dec: 0, col: "196, 181, 253" },
+        { nx: 0.395, lift: 60, label: "AQI", unit: "", base: 32, amp: 4, dec: 0, col: "134, 239, 172" },
+        { nx: 0.615, lift: 96, label: "5G", unit: " Gbps", base: 2.4, amp: 0.3, dec: 1, col: "125, 211, 252" },
+        { nx: 0.705, lift: 118, label: "ACCESOS", unit: "", base: 1243, amp: 20, dec: 0, col: "253, 186, 116" },
+        { nx: 0.84, lift: 104, label: "BOMBA", unit: " bar", base: 4.2, amp: 0.2, dec: 1, col: "103, 232, 249" },
+        { nx: 0.905, lift: 44, label: "NIVEL", unit: " m", base: 3.1, amp: 0.1, dec: 2, col: "134, 239, 172" },
+        { nx: 0.985, lift: 100, label: "SOLAR", unit: " kW", base: 86, amp: 6, dec: 0, col: "254, 240, 138" },
+      ];
+
+      // Partículas de datos translúcidas que ascienden por todo el cuadro (visibles en color y en el plano)
+      const DATA_MOTES = Array.from({ length: 64 }, (_, i) => ({
+        nx: ((i * 61.7 + 13) % 100) / 100,
+        ny: ((i * 37.9 + 29) % 100) / 100,
+        r: 0.9 + (i % 4) * 0.4,
+        sp: 0.5 + (i % 5) * 0.18,
+        phase: i * 0.91,
+        col: i % 3 === 0 ? "125, 211, 252" : i % 3 === 1 ? "167, 243, 208" : "224, 242, 254",
+      }));
+
+      function drawIotIndicators(c: CanvasRenderingContext2D, coastY: number, mode: "data" | "color") {
+        const scaleH = Math.min(1.2, Math.max(0.72, h / 740));
+        const isColor = mode === "color";
+        c.save();
+        c.font = "500 8.5px 'JetBrains Mono', monospace";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        IOT_NODES.forEach((n, i) => {
+          if (w < 760 && i % 2 === 1) return;
+          const x = n.nx * w;
+          const y = coastY - n.lift * scaleH;
+          const val = n.base + n.amp * Math.sin(t * 0.9 + i * 1.7);
+          const text = `${n.label} ${val.toFixed(n.dec)}${n.unit}`;
+
+          // Tallo de medición hasta la costa: solo en el plano de datos (en color la red queda limpia)
+          if (!isColor) {
+            c.lineWidth = 0.7;
+            c.strokeStyle = "rgba(15, 23, 42, 0.3)";
+            c.setLineDash([2, 3]);
+            c.beginPath();
+            c.moveTo(x, y + 4);
+            c.lineTo(x, coastY - 2);
+            c.stroke();
+            c.setLineDash([]);
+          }
+
+          // Chip de lectura (se mantiene dentro del cuadro)
+          const tw = c.measureText(text).width;
+          const pw = tw + 14;
+          const ph = 15;
+          const cxChip = Math.max(pw * 0.5 + 8, Math.min(w - pw * 0.5 - 8, x));
+          const cyChip = y - 14;
+
+          if (isColor) {
+            // Indicador final: un punto y la lectura. Sin anillo ni línea de enlace
+            c.fillStyle = `rgba(${n.col}, 0.95)`;
+            c.beginPath();
+            c.arc(x, y, 2.4, 0, Math.PI * 2);
+            c.fill();
+            c.fillStyle = "rgba(248, 250, 252, 0.92)";
+            c.shadowColor = "rgba(2, 6, 23, 0.7)";
+            c.shadowBlur = 5;
+            c.fillText(text, cxChip, cyChip + 0.5);
+            c.shadowBlur = 0;
+          } else {
+            // Plano CAD: cruz de registro y cota técnica
+            c.strokeStyle = "rgba(15, 23, 42, 0.62)";
+            c.lineWidth = 0.8;
+            c.beginPath();
+            c.arc(x, y, 3.6, 0, Math.PI * 2);
+            c.moveTo(x - 6, y);
+            c.lineTo(x - 2.4, y);
+            c.moveTo(x + 2.4, y);
+            c.lineTo(x + 6, y);
+            c.moveTo(x, y - 6);
+            c.lineTo(x, y - 2.4);
+            c.moveTo(x, y + 2.4);
+            c.lineTo(x, y + 6);
+            c.stroke();
+            c.fillStyle = "rgba(255, 255, 255, 0.62)";
+            c.strokeStyle = "rgba(2, 132, 199, 0.6)";
+            c.lineWidth = 0.7;
+            c.beginPath();
+            c.rect(cxChip - pw * 0.5, cyChip - ph * 0.5, pw, ph);
+            c.fill();
+            c.stroke();
+            c.fillStyle = "rgba(15, 23, 42, 0.86)";
+            c.fillText(text, cxChip, cyChip + 0.5);
+          }
+        });
+        c.restore();
+      }
+
+      // Lecturas de lugar: solo dentro del visor de datos, sin tallos ni enlaces
+      function drawPlaceReadings(c: CanvasRenderingContext2D, coastY: number, mode: "data" | "color") {
+        const stats = [
+          { nx: 0.11, y: coastY - 102, label: "ECO-ENERGÍA · 100%" },
+          { nx: 0.21, y: coastY - 48, label: "ESTADIO · ACTIVO" },
+          { nx: 0.445, y: coastY - 56, label: "MUNICIPALIDAD · DIGITAL" },
+          { nx: 0.74, y: coastY - 148, label: "ORBIT LINK · 12ms" },
+          { nx: 0.84, y: coastY - 38, label: "ECO-CIUDAD · LIVE" },
+          { nx: 0.24, y: coastY + (h - coastY) * 0.44, label: "H₂O · ÓPTIMO" },
+          { nx: 0.72, y: coastY + (h - coastY) * 0.48, label: "DATA SEA · 18 APPS" },
+        ];
+        const ink = mode === "color";
+        c.save();
+        c.font = "500 8.5px 'JetBrains Mono', monospace";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        stats.forEach((st, idx) => {
+          const sx = st.nx * w;
+          const sy = st.y + Math.sin(t * 1.4 + idx * 1.3) * 2.5;
+          const tw = c.measureText(st.label).width;
+          const pw = tw + 14;
+          const ph = 15;
+          c.fillStyle = ink ? "rgba(6, 16, 30, 0.42)" : "rgba(255, 255, 255, 0.82)";
+          c.strokeStyle = ink ? "rgba(226, 232, 240, 0.35)" : "rgba(2, 132, 199, 0.45)";
+          c.lineWidth = 0.7;
+          c.beginPath();
+          c.roundRect(sx - pw * 0.5, sy - ph * 0.5, pw, ph, 8);
+          c.fill();
+          c.stroke();
+          c.fillStyle = ink ? "#f8fafc" : "rgba(15, 23, 42, 0.86)";
+          c.fillText(st.label, sx, sy + 0.5);
+        });
+        c.restore();
+      }
+
+      // Posición de cada satélite, con la misma fórmula que usa el cielo para que el enlace caiga sobre la nave real
+      function craftPosition(cr: SkyCraft, idx: number, coastY: number) {
+        let u = (0.18 + idx * 0.31 + t * cr.speed * cr.dir) % 1;
+        if (u < 0) u += 1;
+        return { x: u * w, y: coastY * cr.yFrac + Math.sin(t * 1.1 + idx) * 6 };
+      }
+
+      function drawLinkPacket(
+        c: CanvasRenderingContext2D,
+        x0: number,
+        y0: number,
+        x1: number,
+        y1: number,
+        u: number,
+        isColor: boolean,
+        col: string
+      ) {
+        const px = x0 + (x1 - x0) * u;
+        const py = y0 + (y1 - y0) * u;
+        if (isColor) {
+          c.fillStyle = `rgba(${col}, 0.6)`;
+          c.beginPath();
+          c.arc(px, py, 1.4, 0, Math.PI * 2);
+          c.fill();
+        } else {
+          c.fillStyle = "#ffffff";
+          c.strokeStyle = "rgba(2, 132, 199, 0.9)";
+          c.lineWidth = 0.7;
+          c.fillRect(px - 2, py - 2, 4, 4);
+          c.strokeRect(px - 2, py - 2, 4, 4);
+        }
+      }
+
+      // Sensores → satélites → YARQ: los datos suben al satélite más cercano y de ahí bajan a YARQ
+      function drawInferenceFlows(c: CanvasRenderingContext2D, coastY: number, mode: "data" | "color") {
+        const scaleH = Math.min(1.2, Math.max(0.72, h / 740));
+        const isColor = mode === "color";
+        const sats = SKY_CRAFTS.map((cr, idx) => ({ ...craftPosition(cr, idx, coastY), col: cr.col })).filter(
+          (_, idx) => SKY_CRAFTS[idx].kind === "sat"
+        );
+        if (sats.length === 0) return;
+        c.save();
+        c.lineWidth = 0.6;
+
+        // Cada sensor se enlaza con el satélite más cercano en horizontal
+        IOT_NODES.forEach((n, i) => {
+          const x0 = n.nx * w;
+          const y0 = coastY - n.lift * scaleH;
+          let sat = sats[0];
+          for (const s of sats) if (Math.abs(s.x - x0) < Math.abs(sat.x - x0)) sat = s;
+
+          c.strokeStyle = isColor ? `rgba(${n.col}, 0.1)` : "rgba(15, 23, 42, 0.14)";
+          c.beginPath();
+          c.moveTo(x0, y0);
+          c.lineTo(sat.x, sat.y);
+          c.stroke();
+
+          drawLinkPacket(c, x0, y0, sat.x, sat.y, (t * 0.16 + i * 0.11) % 1, isColor, n.col);
+        });
+
+        // Cada satélite reenvía lo recibido hacia YARQ
+        const yx = yarqOrigin.x;
+        const yy = yarqOrigin.y;
+        sats.forEach((sat, i) => {
+          const rgb = sat.col
+            .replace("#", "")
+            .match(/../g)!
+            .map((h) => parseInt(h, 16))
+            .join(", ");
+          c.strokeStyle = isColor ? `rgba(${rgb}, 0.16)` : "rgba(2, 132, 199, 0.2)";
+          c.beginPath();
+          c.moveTo(sat.x, sat.y);
+          c.lineTo(yx, yy);
+          c.stroke();
+
+          drawLinkPacket(c, sat.x, sat.y, yx, yy, (t * 0.14 + i * 0.33) % 1, isColor, rgb);
+        });
+        c.restore();
+      }
+
+      // Matriz de confianza de los modelos: solo dentro del revelador de datos, muestra la inferencia que corre por detrás
+      function drawInferenceMatrix(c: CanvasRenderingContext2D, coastY: number) {
+        const cols = 18;
+        const rows = 6;
+        // Franja del mar de datos bajo la costa: ahí es donde el revelador se posiciona al cruzar la ciudad
+        const top = coastY + 14;
+        const bottom = coastY + (h - coastY) * 0.85;
+        const cellW = w / cols;
+        const cellH = (bottom - top) / rows;
+        c.save();
+        c.font = "500 7px 'JetBrains Mono', monospace";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        c.lineWidth = 0.5;
+        for (let r = 0; r < rows; r++) {
+          for (let k = 0; k < cols; k++) {
+            const x = k * cellW;
+            const y = top + r * cellH;
+            const wave = 0.5 + 0.5 * Math.sin(t * 1.2 + k * 0.45 - r * 0.8);
+            c.strokeStyle = `rgba(2, 132, 199, ${(0.06 + wave * 0.12).toFixed(3)})`;
+            c.strokeRect(x + 1, y + 1, cellW - 2, cellH - 2);
+            if (wave > 0.82) {
+              c.fillStyle = "rgba(2, 132, 199, 0.05)";
+              c.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
+            }
+            const conf = 0.8 + 0.19 * wave;
+            c.fillStyle = `rgba(15, 23, 42, ${(0.2 + wave * 0.3).toFixed(3)})`;
+            c.fillText(conf.toFixed(2), x + cellW * 0.5, y + cellH * 0.5);
+          }
+        }
+        c.restore();
+      }
+
+      // Teléfonos en movimiento: referencias de sensores que se desplazan por la ciudad, nunca sobre el mar
+      const PHONES = Array.from({ length: 4 }, (_, i) => ({
+        start: ((i * 67) % 100) / 100,
+        dir: (i % 2 === 0 ? 1 : -1) as 1 | -1,
+        speed: 0.004 + (i % 4) * 0.0015,
+        lane: (i % 3) * 5,
+        metric: ["PASOS", "PULSO", "RUTA"][i % 3],
+        base: [4200, 78, 1.2][i % 3],
+        amp: [600, 6, 0.3][i % 3],
+        dec: [0, 0, 1][i % 3],
+        unit: ["", " bpm", " km"][i % 3],
+        col: ["125, 211, 252", "253, 186, 116", "134, 239, 172"][i % 3],
+      }));
+
+      function drawPhones(c: CanvasRenderingContext2D, coastY: number, mode: "data" | "color") {
+        const isColor = mode === "color";
+        const scaleH = Math.min(1.2, Math.max(0.72, h / 740));
+        // Franja de tierra frente a las montañas: la costa frontal sube como máximo ~68px
+        const baseY = coastY - 30 * scaleH;
+        const sats = SKY_CRAFTS.map((cr, idx) => craftPosition(cr, idx, coastY)).filter(
+          (_, idx) => SKY_CRAFTS[idx].kind === "sat"
+        );
+        c.save();
+        c.font = "500 7.5px 'JetBrains Mono', monospace";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+
+        PHONES.forEach((p, i) => {
+          if (w < 760 && i > 1) return;
+          let u = (p.start + t * p.speed * p.dir) % 1;
+          if (u < 0) u += 1;
+          const x = u * w;
+          const y = baseY - p.lane * scaleH;
+
+          // Enlace tenue hacia el satélite más cercano
+          if (sats.length > 0) {
+            let sat = sats[0];
+            for (const s of sats) if (Math.abs(s.x - x) < Math.abs(sat.x - x)) sat = s;
+            c.strokeStyle = isColor ? `rgba(${p.col}, 0.05)` : "rgba(15, 23, 42, 0.08)";
+            c.lineWidth = 0.5;
+            c.beginPath();
+            c.moveTo(x, y);
+            c.lineTo(sat.x, sat.y);
+            c.stroke();
+          }
+
+          // Silueta de teléfono con pantalla encendida
+          const pw = 5 * scaleH;
+          const ph = 9 * scaleH;
+          if (isColor) {
+            c.fillStyle = `rgba(${p.col}, 0.85)`;
+            c.beginPath();
+            c.roundRect(x - pw * 0.5, y - ph * 0.5, pw, ph, 1.4);
+            c.fill();
+            c.fillStyle = "rgba(248, 250, 252, 0.8)";
+            c.fillRect(x - pw * 0.28, y - ph * 0.26, pw * 0.56, ph * 0.42);
+          } else {
+            c.strokeStyle = "rgba(15, 23, 42, 0.75)";
+            c.lineWidth = 0.8;
+            c.strokeRect(x - pw * 0.5, y - ph * 0.5, pw, ph);
+            c.strokeStyle = "rgba(2, 132, 199, 0.7)";
+            c.strokeRect(x - pw * 0.28, y - ph * 0.26, pw * 0.56, ph * 0.42);
+          }
+
+          const val = p.base + p.amp * Math.sin(t * 0.8 + p.start * 30);
+          const label = `${p.metric} ${p.dec ? val.toFixed(p.dec) : Math.round(val)}${p.unit}`;
+          c.fillStyle = isColor ? `rgba(${p.col}, 0.55)` : "rgba(15, 23, 42, 0.6)";
+          c.fillText(label, x, y - ph * 0.5 - 7);
+        });
+        c.restore();
+      }
+
+      // Carta marina del modo modelo: rutas de muestreo, calidad de agua y especies identificadas
+      const SURVEY_ROUTES = [
+        { yFrac: 0.24, amp: 16, phase: 0.4, label: "RUTA-S1", quality: "OD 8.4 mg/L · BUENA" },
+        { yFrac: 0.5, amp: 22, phase: 1.6, label: "RUTA-S2", quality: "TURBIDEZ 1.2 NTU · ÓPTIMA" },
+        { yFrac: 0.74, amp: 14, phase: 2.8, label: "RUTA-S3", quality: "CLOROFILA 2.1 µg/L · BUENA" },
+      ];
+
+      const SPECIES = [
+        { nx: 0.16, yFrac: 0.32, name: "JUREL", n: 1280 },
+        { nx: 0.58, yFrac: 0.28, name: "SARDINA", n: 6400 },
+        { nx: 0.36, yFrac: 0.56, name: "HUIRO", n: 86 },
+        { nx: 0.76, yFrac: 0.52, name: "LOCO", n: 42 },
+        { nx: 0.46, yFrac: 0.78, name: "CHUNGUNGO", n: 6 },
+        { nx: 0.14, yFrac: 0.7, name: "CHORITO", n: 2100 },
+      ];
+
+      function drawMarineSurvey(c: CanvasRenderingContext2D, coastY: number) {
+        if (w < 760) return;
+        const seaH = h - coastY;
+        c.save();
+        c.font = "500 8px 'JetBrains Mono', monospace";
+        c.textBaseline = "middle";
+        c.lineWidth = 1;
+
+        SURVEY_ROUTES.forEach((r, i) => {
+          const y0 = coastY + seaH * r.yFrac;
+          const wave = (x: number) => y0 + Math.sin(x * 0.007 + t * 0.35 + r.phase) * r.amp;
+          c.beginPath();
+          for (let x = 0; x <= w; x += 16) {
+            if (x === 0) c.moveTo(x, wave(x));
+            else c.lineTo(x, wave(x));
+          }
+          c.strokeStyle = "rgba(2, 132, 199, 0.5)";
+          c.setLineDash([6, 7]);
+          c.stroke();
+          c.setLineDash([]);
+
+          const u = (t * 0.04 + i * 0.31) % 1;
+          const sx = u * w;
+          const sy = wave(sx);
+          c.fillStyle = "#0f172a";
+          c.beginPath();
+          c.arc(sx, sy, 2.6, 0, Math.PI * 2);
+          c.fill();
+          c.fillStyle = "rgba(15, 23, 42, 0.78)";
+          c.textAlign = "left";
+          c.fillText(`${r.label} · ${r.quality}`, Math.min(w - 210, sx + 8), sy - 10);
+        });
+
+        SPECIES.forEach((sp, i) => {
+          const x = sp.nx * w;
+          const y = coastY + seaH * sp.yFrac + Math.sin(t * 0.5 + i) * 3;
+          c.strokeStyle = "rgba(15, 23, 42, 0.72)";
+          c.beginPath();
+          c.arc(x, y, 3.4, 0, Math.PI * 2);
+          c.moveTo(x - 6.5, y);
+          c.lineTo(x - 2.6, y);
+          c.moveTo(x + 2.6, y);
+          c.lineTo(x + 6.5, y);
+          c.moveTo(x, y - 6.5);
+          c.lineTo(x, y - 2.6);
+          c.moveTo(x, y + 2.6);
+          c.lineTo(x, y + 6.5);
+          c.stroke();
+          const count = Math.round(sp.n * (0.94 + 0.06 * Math.sin(t * 0.45 + i)));
+          c.fillStyle = "rgba(15, 23, 42, 0.8)";
+          c.textAlign = "left";
+          c.fillText(`${sp.name} · ${count}`, x + 10, y);
+        });
+        c.restore();
+      }
+
+      // Drones de entrega sustentables: vuelan sobre la ciudad y bajan su carga en ciclos
+      const DELIVERY_DRONES = [
+        { start: 0.15, dir: 1 as 1 | -1, speed: 0.012, alt: 150, col: "134, 239, 172" },
+        { start: 0.6, dir: -1 as 1 | -1, speed: 0.01, alt: 190, col: "125, 211, 252" },
+        { start: 0.38, dir: 1 as 1 | -1, speed: 0.014, alt: 120, col: "253, 186, 116" },
+      ];
+
+      function drawDeliveryDrones(c: CanvasRenderingContext2D, coastY: number, mode: "data" | "color") {
+        const isColor = mode === "color";
+        const scaleH = Math.min(1.2, Math.max(0.72, h / 740));
+        c.save();
+        c.lineCap = "round";
+
+        DELIVERY_DRONES.forEach((d, i) => {
+          let u = (d.start + t * d.speed * d.dir) % 1;
+          if (u < 0) u += 1;
+          const x = u * w;
+          // Ciclo de entrega: desciende, suelta y vuelve a subir
+          const cycle = (Math.sin(t * 0.7 + i * 2.1) + 1) * 0.5;
+          const y = coastY - (d.alt - cycle * 70) * scaleH;
+          const dropY = coastY - 40 * scaleH;
+
+          if (isColor) {
+            c.strokeStyle = `rgba(${d.col}, 0.8)`;
+            c.lineWidth = 1.1;
+            c.beginPath();
+            c.moveTo(x - 7, y);
+            c.lineTo(x + 7, y);
+            c.stroke();
+            c.fillStyle = `rgba(${d.col}, 0.9)`;
+            c.beginPath();
+            c.arc(x, y, 2, 0, Math.PI * 2);
+            c.fill();
+            // Carga colgando
+            c.strokeStyle = `rgba(${d.col}, 0.45)`;
+            c.lineWidth = 0.6;
+            c.beginPath();
+            c.moveTo(x, y + 2);
+            c.lineTo(x, y + 8);
+            c.stroke();
+            c.strokeRect(x - 2.2, y + 8, 4.4, 3.4);
+            // Haz de entrega al descender
+            if (cycle > 0.72) {
+              c.strokeStyle = `rgba(${d.col}, 0.25)`;
+              c.setLineDash([2, 3]);
+              c.beginPath();
+              c.moveTo(x, y + 12);
+              c.lineTo(x, dropY);
+              c.stroke();
+              c.setLineDash([]);
+            }
+          } else {
+            c.strokeStyle = "rgba(15, 23, 42, 0.7)";
+            c.lineWidth = 0.9;
+            c.beginPath();
+            c.moveTo(x - 7, y);
+            c.lineTo(x + 7, y);
+            c.moveTo(x, y - 3);
+            c.lineTo(x, y + 3);
+            c.stroke();
+            c.strokeRect(x - 2.2, y + 8, 4.4, 3.4);
+          }
+        });
+        c.restore();
+      }
+
+      function drawDataMotes(c: CanvasRenderingContext2D, mode: "data" | "color") {
+        const isColor = mode === "color";
+        c.save();
+        for (const m of DATA_MOTES) {
+          const frac = (((m.ny - t * m.sp * 0.02) % 1) + 1) % 1;
+          const y = frac * h;
+          const x = m.nx * w + Math.sin(t * 0.7 + m.phase) * 12;
+          const edge = Math.sin(Math.PI * frac);
+          const a = (0.4 + 0.2 * Math.sin(t * 1.5 + m.phase)) * (0.6 + 0.4 * edge);
+          c.fillStyle = isColor
+            ? `rgba(${m.col}, ${Math.min(0.5, a * 0.5).toFixed(3)})`
+            : `rgba(2, 132, 199, ${a.toFixed(3)})`;
+          c.beginPath();
+          c.arc(x, y, m.r, 0, Math.PI * 2);
+          c.fill();
+        }
+        c.restore();
+      }
+
+      // Masa urbana en tres planos: lo lejano es bajo y pálido, lo cercano es alto. El centro queda más bajo que los bordes
+      function cityHash(i: number) {
+        const n = Math.sin(i * 127.1 + 19.7) * 43758.5453;
+        return n - Math.floor(n);
+      }
+
+      type MassBlock = { nx: number; bw: number; bh: number; row: 0 | 1 | 2 };
+      const CITY_MASS: MassBlock[] = [];
+      const pushMassRow = (
+        count: number,
+        row: 0 | 1 | 2,
+        bw0: number,
+        bwSpan: number,
+        bh0: number,
+        bhSpan: number,
+        seed: number,
+        floor: number
+      ) => {
+        for (let i = 0; i < count; i++) {
+          const nx = (i + 0.5) / count;
+          const hsh = cityHash(i + seed);
+          const edge = Math.pow(Math.abs(nx - 0.5) * 2, 0.72);
+          const mul = floor + (1 - floor) * edge;
+          CITY_MASS.push({ nx, bw: bw0 + hsh * bwSpan, bh: (bh0 + hsh * bhSpan) * mul, row });
+        }
+      };
+      pushMassRow(96, 2, 5, 4, 14, 20, 3, 0.4);
+      pushMassRow(64, 0, 8, 6, 30, 44, 40, 0.42);
+      pushMassRow(36, 1, 12, 9, 56, 84, 90, 0.48);
+
+      function drawCityMass(c: CanvasRenderingContext2D, coastY: number, mode: "data" | "color") {
+        const scaleH = Math.min(1.2, Math.max(0.72, h / 740));
+        const isColor = mode === "color";
+        // El plano más lejano apoya más arriba, cerca del horizonte, y se ve más chico
+        const lift = [14, 6, 26];
+        const size = [0.84, 1, 0.6];
+        const keep = w < 520 ? 0.32 : w < 760 ? 0.5 : 1;
+        c.save();
+        for (const row of [2, 0, 1] as const) {
+          for (const b of CITY_MASS) {
+            if (b.row !== row) continue;
+            if (keep < 1 && cityHash(b.nx * 97 + b.row * 13) > keep) continue;
+            const s = size[row] * scaleH;
+            const x = b.nx * w;
+            const bw = b.bw * s;
+            const bh = b.bh * s;
+            const base = coastY - lift[row] * scaleH;
+            const top = base - bh;
+            if (isColor) {
+              const dayMix = 1 - fxSmooth(0.3, 0.7, b.nx);
+              const far = row === 2 ? 0.5 : row === 0 ? 0.78 : 1;
+              c.fillStyle =
+                row === 2
+                  ? lerpRGBA(186, 214, 230, 0.5 * far, 22, 40, 64, 0.62, dayMix)
+                  : row === 0
+                    ? lerpRGBA(148, 184, 208, 0.8, 12, 26, 46, 0.88, dayMix)
+                    : lerpRGBA(112, 154, 184, 0.92, 7, 16, 32, 0.96, dayMix);
+              c.fillRect(x - bw * 0.5, top, bw, bh);
+            } else {
+              c.fillStyle = row === 2 ? "rgba(255, 255, 255, 0.28)" : "rgba(255, 255, 255, 0.4)";
+              c.strokeStyle = row === 2 ? "rgba(15, 23, 42, 0.2)" : "rgba(15, 23, 42, 0.4)";
+              c.lineWidth = 0.6;
+              c.fillRect(x - bw * 0.5, top, bw, bh);
+              c.strokeRect(x - bw * 0.5, top, bw, bh);
+            }
+          }
+        }
+        c.restore();
+      }
+
+      // Arquitectura transparente tipo plano CAD en el mundo de datos blanco (mismas piezas 1:1 que el mundo real)
+      function drawBlueprintCity(bctx: CanvasRenderingContext2D, coastY: number) {
+        bctx.save();
+        const scaleH = Math.min(1.2, Math.max(0.72, h / 740));
+        const baseY = coastY + 2;
+        drawCityMass(bctx, coastY, "data");
+
+        // 1. Aerogeneradores en plano lineal
+        [0.055, 0.095, 0.135].forEach((nx, wIdx) => {
+          const wx = nx * w;
+          const wy = baseY - (30 + (wIdx % 2) * 14) * scaleH;
+          const mastH = (44 + (wIdx % 2) * 10) * scaleH;
+          bctx.strokeStyle = "rgba(15, 23, 42, 0.55)";
+          bctx.lineWidth = 1.05;
+          bctx.beginPath();
+          bctx.moveTo(wx, wy);
+          bctx.lineTo(wx, wy - mastH);
+          bctx.stroke();
+
+          const hubY = wy - mastH;
+          const rot = t * (1.25 + wIdx * 0.18) + wIdx * 1.1;
+          const bladeLen = 14 * scaleH;
+          bctx.strokeStyle = "rgba(2, 132, 199, 0.72)";
+          bctx.lineWidth = 0.95;
+          for (let b = 0; b < 3; b++) {
+            const ba = rot + (b * Math.PI * 2) / 3;
+            bctx.beginPath();
+            bctx.moveTo(wx, hubY);
+            bctx.lineTo(wx + Math.cos(ba) * bladeLen, hubY + Math.sin(ba) * bladeLen);
+            bctx.stroke();
+          }
+        });
+
+        // 2. Torres transparentes tipo plano arquitectónico (sin que desaparezca ninguna)
+        CITY_TOWERS.forEach((tw, idx) => {
+          const x = tw.nx * w;
+          const bw = tw.bw * scaleH;
+          const bh = tw.bh * scaleH;
+          const topY = baseY - bh;
+
+          const fillCol = idx % 2 === 0 ? "rgba(255, 255, 255, 0.38)" : "rgba(224, 242, 254, 0.28)";
+          const strokeCol = "rgba(15, 23, 42, 0.56)";
+          const accentCol = "rgba(2, 132, 199, 0.52)";
+
+          bctx.fillStyle = fillCol;
+          bctx.strokeStyle = strokeCol;
+          bctx.lineWidth = 0.9;
+
+          if (tw.style === "spire") {
+            bctx.beginPath();
+            bctx.moveTo(x - bw * 0.5, baseY);
+            bctx.lineTo(x - bw * 0.34, topY + bh * 0.22);
+            bctx.lineTo(x, topY);
+            bctx.lineTo(x + bw * 0.34, topY + bh * 0.22);
+            bctx.lineTo(x + bw * 0.5, baseY);
+            bctx.closePath();
+            bctx.fill();
+            bctx.stroke();
+
+            bctx.strokeStyle = accentCol;
+            bctx.beginPath();
+            bctx.moveTo(x, topY);
+            bctx.lineTo(x, topY - 14 * scaleH);
+            bctx.moveTo(x, topY);
+            bctx.lineTo(x, baseY);
+            bctx.stroke();
+          } else if (tw.style === "slant") {
+            bctx.beginPath();
+            bctx.moveTo(x - bw * 0.5, baseY);
+            bctx.lineTo(x - bw * 0.45, topY + 12);
+            bctx.lineTo(x + bw * 0.45, topY);
+            bctx.lineTo(x + bw * 0.5, baseY);
+            bctx.closePath();
+            bctx.fill();
+            bctx.stroke();
+          } else if (tw.style === "dome") {
+            bctx.beginPath();
+            bctx.rect(x - bw * 0.55, topY + bh * 0.34, bw * 1.1, bh * 0.66);
+            bctx.fill();
+            bctx.stroke();
+            bctx.beginPath();
+            bctx.arc(x, topY + bh * 0.34, bw * 0.55, Math.PI, 0);
+            bctx.fill();
+            bctx.stroke();
+          } else if (tw.style === "twin") {
+            bctx.fillRect(x - bw * 0.52, topY, bw * 0.4, bh);
+            bctx.strokeRect(x - bw * 0.52, topY, bw * 0.4, bh);
+            bctx.fillRect(x + bw * 0.12, topY + bh * 0.1, bw * 0.4, bh * 0.9);
+            bctx.strokeRect(x + bw * 0.12, topY + bh * 0.1, bw * 0.4, bh * 0.9);
+            bctx.strokeStyle = accentCol;
+            bctx.beginPath();
+            bctx.moveTo(x - bw * 0.12, topY + bh * 0.34);
+            bctx.lineTo(x + bw * 0.12, topY + bh * 0.34);
+            bctx.moveTo(x - bw * 0.12, topY + bh * 0.6);
+            bctx.lineTo(x + bw * 0.12, topY + bh * 0.6);
+            bctx.stroke();
+          } else {
+            bctx.fillRect(x - bw * 0.5, topY + bh * 0.12, bw, bh * 0.88);
+            bctx.strokeRect(x - bw * 0.5, topY + bh * 0.12, bw, bh * 0.88);
+            bctx.fillRect(x - bw * 0.35, topY, bw * 0.7, bh * 0.14);
+            bctx.strokeRect(x - bw * 0.35, topY, bw * 0.7, bh * 0.14);
+            bctx.strokeStyle = accentCol;
+            bctx.lineWidth = 0.8;
+            for (let g = 1; g <= 3; g++) {
+              const gy = topY + bh * (0.22 * g);
+              bctx.beginPath();
+              bctx.moveTo(x - bw * 0.54, gy);
+              bctx.lineTo(x + bw * 0.54, gy);
+              bctx.stroke();
+            }
+          }
+
+          // Retícula interior de pisos / estructura tipo plano
+          bctx.strokeStyle = "rgba(15, 23, 42, 0.16)";
+          bctx.lineWidth = 0.55;
+          const rows = Math.floor(bh / 13);
+          bctx.beginPath();
+          for (let r = 2; r < rows; r++) {
+            const wy = topY + r * 12;
+            const halfSpan = tw.style === "spire" ? bw * (0.24 + (r / rows) * 0.2) : bw * 0.4;
+            bctx.moveTo(x - halfSpan, wy);
+            bctx.lineTo(x + halfSpan, wy);
+          }
+          bctx.stroke();
+        });
+
+        // 3. Estadio en plano transparente
+        {
+          const sx = w * 0.205;
+          const sw = 86 * scaleH;
+          const sh = 30 * scaleH;
+          const sy = baseY - 2;
+          bctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+          bctx.strokeStyle = "rgba(15, 23, 42, 0.58)";
+          bctx.lineWidth = 0.95;
+          bctx.beginPath();
+          bctx.ellipse(sx, sy, sw * 0.5, sh, 0, Math.PI, 0);
+          bctx.closePath();
+          bctx.fill();
+          bctx.stroke();
+
+          bctx.strokeStyle = "rgba(2, 132, 199, 0.48)";
+          bctx.lineWidth = 0.7;
+          for (let k = -3; k <= 3; k++) {
+            bctx.beginPath();
+            bctx.moveTo(sx + k * (sw * 0.11), sy);
+            bctx.quadraticCurveTo(sx + k * (sw * 0.08), sy - sh * 0.85, sx + k * (sw * 0.04), sy - sh * 0.96);
+            bctx.stroke();
+          }
+        }
+
+        // 4. Municipalidad en plano transparente
+        {
+          const cx = w * 0.445;
+          const cw = 92 * scaleH;
+          const ch = 36 * scaleH;
+          const cy = baseY - 2;
+
+          bctx.fillStyle = "rgba(255, 255, 255, 0.42)";
+          bctx.strokeStyle = "rgba(15, 23, 42, 0.58)";
+          bctx.lineWidth = 0.95;
+          bctx.fillRect(cx - cw * 0.5, cy - ch * 0.62, cw, ch * 0.62);
+          bctx.strokeRect(cx - cw * 0.5, cy - ch * 0.62, cw, ch * 0.62);
+          bctx.fillRect(cx - cw * 0.34, cy - ch, cw * 0.68, ch * 0.38);
+          bctx.strokeRect(cx - cw * 0.34, cy - ch, cw * 0.68, ch * 0.38);
+
+          bctx.beginPath();
+          bctx.arc(cx, cy - ch, cw * 0.15, Math.PI, 0);
+          bctx.fill();
+          bctx.stroke();
+
+          bctx.strokeStyle = "rgba(2, 132, 199, 0.55)";
+          bctx.lineWidth = 0.75;
+          for (let col = -4; col <= 4; col++) {
+            const colX = cx + col * (cw * 0.095);
+            bctx.beginPath();
+            bctx.moveTo(colX, cy - ch * 0.58);
+            bctx.lineTo(colX, cy - 2);
+            bctx.stroke();
+          }
+        }
+
+        // 5. Viaducto técnico de datos
+        {
+          const railY = coastY - 28 * scaleH;
+          bctx.strokeStyle = "rgba(2, 132, 199, 0.35)";
+          bctx.lineWidth = 0.85;
+          bctx.setLineDash([5, 5]);
+          bctx.beginPath();
+          bctx.moveTo(0, railY);
+          bctx.lineTo(w, railY);
+          bctx.stroke();
+          bctx.setLineDash([]);
+
+          const tx = ((t * 0.055) % 1.2 - 0.1) * w;
+          bctx.strokeStyle = "rgba(2, 132, 199, 0.85)";
+          bctx.lineWidth = 1.8;
+          bctx.beginPath();
+          bctx.moveTo(tx - 28, railY);
+          bctx.lineTo(tx + 10, railY);
+          bctx.stroke();
+        }
+
+        bctx.restore();
+      }
+
+      // Cielo matemático en plano CAD: rutas aéreas, aviones, satélites, sol, planeta y ondas de aurora 1:1
+      function drawBlueprintSky(bctx: CanvasRenderingContext2D, coastY: number) {
+        bctx.save();
+
+        // 1. Sol en plano astronómico (izquierda, misma posición 1:1 que en el mundo real)
+        const sunX = w * 0.18;
+        const sunY = coastY * 0.3;
+        bctx.strokeStyle = "rgba(2, 132, 199, 0.45)";
+        bctx.lineWidth = 0.85;
+        bctx.beginPath();
+        bctx.arc(sunX, sunY, 18, 0, Math.PI * 2);
+        bctx.stroke();
+        bctx.setLineDash([3, 4]);
+        bctx.beginPath();
+        bctx.arc(sunX, sunY, 32, 0, Math.PI * 2);
+        bctx.stroke();
+        bctx.setLineDash([]);
+        bctx.strokeStyle = "rgba(15, 23, 42, 0.25)";
+        bctx.beginPath();
+        bctx.moveTo(sunX - 40, sunY);
+        bctx.lineTo(sunX + 40, sunY);
+        bctx.moveTo(sunX, sunY - 40);
+        bctx.lineTo(sunX, sunY + 40);
+        bctx.stroke();
+
+        // 2. Planeta orbital en plano geométrico (derecha arriba, misma posición 1:1)
+        const plX = w * 0.84;
+        const plY = coastY * 0.24;
+        bctx.fillStyle = "rgba(255, 255, 255, 0.45)";
+        bctx.strokeStyle = "rgba(15, 23, 42, 0.55)";
+        bctx.lineWidth = 0.9;
+        bctx.beginPath();
+        bctx.arc(plX, plY, 16, 0, Math.PI * 2);
+        bctx.fill();
+        bctx.stroke();
+        bctx.strokeStyle = "rgba(2, 132, 199, 0.6)";
+        bctx.beginPath();
+        bctx.ellipse(plX, plY, 32, 7, -0.26, 0, Math.PI * 2);
+        bctx.stroke();
+        bctx.strokeStyle = "rgba(15, 23, 42, 0.24)";
+        bctx.setLineDash([2, 3]);
+        bctx.beginPath();
+        bctx.ellipse(plX, plY, 16, 6, 0, 0, Math.PI * 2);
+        bctx.stroke();
+        bctx.setLineDash([]);
+
+        // 3. Curvas matemáticas de aurora / corrientes atmosféricas (derecha)
+        for (let band = 0; band < 3; band++) {
+          const baseY = coastY * (0.26 + band * 0.18);
+          bctx.strokeStyle = band === 1 ? "rgba(99, 102, 241, 0.28)" : "rgba(2, 132, 199, 0.28)";
+          bctx.lineWidth = 0.75;
+          bctx.setLineDash([4, 6]);
+          bctx.beginPath();
+          for (let x = w * 0.36; x <= w; x += 28) {
+            const y =
+              baseY +
+              Math.sin(x * 0.007 + t * (0.7 + band * 0.2) + band * 2) * 28 +
+              Math.cos(x * 0.014 - t * 0.5) * 14;
+            if (x === w * 0.36) bctx.moveTo(x, y);
+            else bctx.lineTo(x, y);
+          }
+          bctx.stroke();
+        }
+        bctx.setLineDash([]);
+
+        // 4. Rutas del aire (corredores aéreos y orbitales) + aviones y satélites en plano CAD 1:1
+        bctx.font = "500 8px 'JetBrains Mono', monospace";
+        SKY_CRAFTS.forEach((cr, idx) => {
+          let u = (0.18 + idx * 0.31 + t * cr.speed * cr.dir) % 1;
+          if (u < 0) u += 1;
+          const cx = u * w;
+          const cy = coastY * cr.yFrac + Math.sin(t * 1.1 + idx) * 6;
+
+          // Ruta aérea / corredor matemático completo cruzando el cielo
+          bctx.strokeStyle = cr.kind === "sat" ? "rgba(2, 132, 199, 0.32)" : "rgba(15, 23, 42, 0.22)";
+          bctx.lineWidth = 0.75;
+          bctx.setLineDash(cr.kind === "sat" ? [3, 5] : [6, 5]);
+          bctx.beginPath();
+          for (let x = 0; x <= w; x += 32) {
+            const ry = coastY * cr.yFrac + Math.sin(x * 0.004 + idx * 1.4) * 5;
+            if (x === 0) bctx.moveTo(x, ry);
+            else bctx.lineTo(x, ry);
+          }
+          bctx.stroke();
+          bctx.setLineDash([]);
+
+          // Vector de velocidad y trayectoria proyectada delante de la nave/satélite
+          const vecLen = 42 * cr.dir;
+          bctx.strokeStyle = "rgba(2, 132, 199, 0.65)";
+          bctx.lineWidth = 0.85;
+          bctx.beginPath();
+          bctx.moveTo(cx, cy);
+          bctx.lineTo(cx + vecLen, cy);
+          bctx.stroke();
+
+          // Pequeñas marcas de cota / telemetría del avión o satélite
+          bctx.fillStyle = "rgba(15, 23, 42, 0.58)";
+          bctx.textAlign = cr.dir > 0 ? "left" : "right";
+          bctx.fillText(cr.code, cx + cr.dir * 14, cy - 8);
+
+          // Silueta CAD transparente de avión o satélite (misma posición, escala y dirección 1:1)
+          bctx.save();
+          bctx.translate(cx, cy);
+          bctx.scale(cr.dir * cr.scale, cr.scale);
+          bctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+          bctx.strokeStyle = "rgba(15, 23, 42, 0.72)";
+          bctx.lineWidth = 0.95;
+
+          if (cr.kind === "ship") {
+            bctx.beginPath();
+            bctx.moveTo(14, 0);
+            bctx.lineTo(-8, -4.5);
+            bctx.lineTo(-4, 0);
+            bctx.lineTo(-8, 4.5);
+            bctx.closePath();
+            bctx.fill();
+            bctx.stroke();
+            // Eje central técnico
+            bctx.strokeStyle = "rgba(2, 132, 199, 0.75)";
+            bctx.beginPath();
+            bctx.moveTo(-10, 0);
+            bctx.lineTo(14, 0);
+            bctx.stroke();
+          } else {
+            // Satélite en plano CAD con paneles en retícula
+            bctx.fillRect(-12, -5.5, 8, 3);
+            bctx.strokeRect(-12, -5.5, 8, 3);
+            bctx.fillRect(-12, 2.5, 8, 3);
+            bctx.strokeRect(-12, 2.5, 8, 3);
+            bctx.fillRect(4, -5.5, 8, 3);
+            bctx.strokeRect(4, -5.5, 8, 3);
+            bctx.fillRect(4, 2.5, 8, 3);
+            bctx.strokeRect(4, 2.5, 8, 3);
+            bctx.fillRect(-3.5, -3.5, 7, 7);
+            bctx.strokeRect(-3.5, -3.5, 7, 7);
+            // Cono de enlace orbital hacia abajo
+            bctx.strokeStyle = "rgba(2, 132, 199, 0.35)";
+            bctx.setLineDash([2, 3]);
+            bctx.beginPath();
+            bctx.moveTo(0, 4);
+            bctx.lineTo(-10, 26);
+            bctx.moveTo(0, 4);
+            bctx.lineTo(10, 26);
+            bctx.stroke();
+            bctx.setLineDash([]);
+          }
+          bctx.restore();
+        });
+
+        bctx.restore();
+      }
+
+      function drawAbstractWorld(
+        coastY: number,
+        grid: Projected[][],
+        nodes: HorizonNode[],
+        inDataLens = false
+      ) {
+        drawClouds(ctx, false);
+        drawWhiteSkyTelemetry(coastY, inDataLens);
+        if (inDataLens) drawBlueprintSky(ctx, coastY);
+
+        const layers = [
+          {
+            seed: 2.6,
+            amp: Math.min(230, h * 0.32),
+            yOff: -22,
+            stroke: "rgba(99, 102, 241, 0.14)",
+            fillTop: "rgba(124, 58, 237, 0.04)",
+            fillBot: "rgba(234, 241, 248, 0)",
+            meshStep: 5,
+          },
+          {
+            seed: 1.4,
+            amp: Math.min(165, h * 0.23),
+            yOff: -6,
+            stroke: "rgba(99, 102, 241, 0.2)",
+            fillTop: "rgba(124, 58, 237, 0.065)",
+            fillBot: "rgba(234, 241, 248, 0)",
+            meshStep: 4,
+          },
+          {
+            seed: 4.8,
+            amp: Math.min(118, h * 0.165),
+            yOff: -2,
+            stroke: "rgba(2, 132, 199, 0.26)",
+            fillTop: "rgba(2, 132, 199, 0.075)",
+            fillBot: "rgba(234, 241, 248, 0)",
+            meshStep: 3,
+          },
+          {
+            seed: 8.2,
+            amp: Math.min(68, h * 0.095),
+            yOff: 0,
+            stroke: "rgba(15, 23, 42, 0.28)",
+            fillTop: "rgba(15, 23, 42, 0.065)",
+            fillBot: "rgba(234, 241, 248, 0)",
+            meshStep: 2,
+          },
+        ];
+
+        // Helper para dibujar los nodos de una capa respetando oclusión real de montañas
+        function drawAbstractNodesForLayer(layerIdx: 1 | 2) {
+          const group = nodes.filter((n) => n.layerIdx === layerIdx);
+          if (group.length === 0) return;
+
+          ctx.save();
+          ctx.strokeStyle = layerIdx === 1 ? "rgba(99, 102, 241, 0.14)" : "rgba(6, 182, 212, 0.24)";
+          ctx.lineWidth = layerIdx === 1 ? 0.6 : 0.85;
+          ctx.setLineDash([4, 6]);
+          ctx.beginPath();
+          group.forEach((n, i) => {
+            const anchorY = n.kind === "antenna" ? n.y - 20 * n.scale : n.y - 7 * n.scale;
+            if (i === 0) ctx.moveTo(n.x, anchorY);
+            else ctx.lineTo(n.x, anchorY);
+          });
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          for (let i = 0; i < group.length - 1; i++) {
+            const a = group[i];
+            const b = group[i + 1];
+            const u = (t * (0.26 + layerIdx * 0.08) + i * 0.23) % 1;
+            const ay = a.kind === "antenna" ? a.y - 20 * a.scale : a.y - 7 * a.scale;
+            const by = b.kind === "antenna" ? b.y - 20 * b.scale : b.y - 7 * b.scale;
+            ctx.fillStyle = layerIdx === 1 ? "rgba(124, 58, 237, 0.55)" : "#06b6d4";
+            ctx.beginPath();
+            ctx.arc(a.x + (b.x - a.x) * u, ay + (by - ay) * u, 1.3 + layerIdx * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          group.forEach((n, idx) => {
+            ctx.save();
+            ctx.translate(n.x, n.y);
+            ctx.scale(n.scale, n.scale);
+            ctx.globalAlpha = 0.52 + n.depth * 0.45;
+
+            if (n.kind === "campus") {
+              if (inDataLens) {
+                // Plano transparente CAD del campus
+                ctx.fillStyle = "rgba(255, 255, 255, 0.44)";
+                ctx.strokeStyle = "rgba(15, 23, 42, 0.58)";
+                ctx.lineWidth = 0.9;
+                ctx.fillRect(-24, -10, 48, 12);
+                ctx.strokeRect(-24, -10, 48, 12);
+                ctx.fillRect(-14, -16, 22, 6);
+                ctx.strokeRect(-14, -16, 22, 6);
+                ctx.beginPath();
+                ctx.arc(16, -10, 6, Math.PI, 0);
+                ctx.fill();
+                ctx.stroke();
+                ctx.strokeStyle = "rgba(2, 132, 199, 0.62)";
+                ctx.beginPath();
+                ctx.moveTo(-24, -4);
+                ctx.lineTo(24, -4);
+                ctx.stroke();
+              } else {
+                // Edificio plano digital: volúmenes sólidos, losa de color y ventanas en malla, sin sombras ni contornos
+                ctx.fillStyle = "rgba(15, 23, 42, 0.84)";
+                ctx.fillRect(-24, -10, 48, 12);
+                ctx.fillRect(-14, -16, 22, 6);
+                ctx.beginPath();
+                ctx.arc(16, -10, 6, Math.PI, 0);
+                ctx.fill();
+                ctx.fillStyle = "#a855f7";
+                ctx.fillRect(-14, -17.6, 22, 1.4);
+                ctx.fillStyle = "#38bdf8";
+                for (let k = 0; k < 6; k++) ctx.fillRect(-20 + k * 7, -6.5, 4, 2.4);
+                ctx.fillStyle = "#06b6d4";
+                ctx.fillRect(-24, -1.5, 48, 1.2);
+              }
+            } else if (n.kind === "datacenter") {
+              if (inDataLens) {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.44)";
+                ctx.strokeStyle = "rgba(15, 23, 42, 0.58)";
+                ctx.lineWidth = 0.9;
+                ctx.fillRect(-16, -10, 32, 11);
+                ctx.strokeRect(-16, -10, 32, 11);
+                ctx.fillRect(-9, -15, 18, 4);
+                ctx.strokeRect(-9, -15, 18, 4);
+                ctx.strokeStyle = "rgba(2, 132, 199, 0.62)";
+                ctx.beginPath();
+                ctx.moveTo(-12, -5);
+                ctx.lineTo(12, -5);
+                ctx.stroke();
+              } else {
+                // Racks planos: tres bandejas sólidas con LEDs de estado
+                ctx.fillStyle = "rgba(15, 23, 42, 0.78)";
+                ctx.fillRect(-16, -10, 32, 11);
+                ctx.fillStyle = "rgba(99, 102, 241, 0.72)";
+                ctx.fillRect(-9, -15, 18, 4);
+                ctx.fillStyle = "#38bdf8";
+                for (let k = 0; k < 4; k++) ctx.fillRect(-12 + k * 6.5, -7.5, 3.2, 2);
+                ctx.fillStyle = "#06b6d4";
+                ctx.fillRect(-12, -3.2, 24, 1.2);
+              }
+            } else {
+              ctx.strokeStyle = "rgba(15, 23, 42, 0.8)";
+              ctx.lineWidth = 1.25;
+              ctx.beginPath();
+              ctx.moveTo(-4, 2);
+              ctx.lineTo(0, -22);
+              ctx.lineTo(4, 2);
+              ctx.moveTo(-2.5, -7);
+              ctx.lineTo(2.5, -7);
+              ctx.moveTo(-1.5, -14);
+              ctx.lineTo(1.5, -14);
+              ctx.stroke();
+
+              const pulseR = 5 + ((t * 14 + idx * 4) % 14);
+              ctx.strokeStyle = `rgba(6, 182, 212, ${Math.max(0, 0.4 - pulseR / 34).toFixed(3)})`;
+              ctx.lineWidth = 0.85;
+              ctx.beginPath();
+              ctx.arc(0, -22, pulseR, 0, Math.PI * 2);
+              ctx.stroke();
+
+              ctx.fillStyle = "#06b6d4";
+              ctx.beginPath();
+              ctx.arc(0, -22, 2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+          });
+          ctx.restore();
+        }
+
+        const samples = 96;
+        layers.forEach((L, lIdx) => {
+          const baseY = coastY + L.yOff;
+          const pts: { x: number; y: number }[] = [];
+          for (let i = 0; i <= samples; i++) {
+            const nx = i / samples;
+            pts.push({ x: nx * w, y: baseY - mountainHeight(nx, L.seed, L.amp) });
+          }
+
+          // Relleno sólido opaco del color del cielo para ocluir limpiamente capas traseras
+          ctx.beginPath();
+          ctx.moveTo(0, baseY + 8);
+          for (let i = 0; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+          ctx.lineTo(w, baseY + 8);
+          ctx.closePath();
+
+          // Plano digital: relleno sólido blanco-laboratorio para ocluir capas traseras
+          ctx.fillStyle = lIdx === 0 ? "#f3f7fb" : lIdx === 1 ? "#e9f0f7" : lIdx === 2 ? "#e6eef6" : "#e3ecf5";
+          ctx.fill();
+
+          ctx.fillStyle = L.fillTop;
+          ctx.fill();
+
+          // Textura topográfica de laboratorio: facetas de arista (volumen 3D) + curvas de nivel paralelas
+          ctx.save();
+          for (let i = 1; i < pts.length - 1; i++) {
+            const prev = pts[i - 1];
+            const cur = pts[i];
+            const next = pts[i + 1];
+            // Detectar cumbres locales para proyectar arista y vertiente sombreada
+            if (cur.y < prev.y && cur.y <= next.y && baseY - cur.y > 16) {
+              const ridgeFootX = cur.x + (i % 2 === 0 ? 18 : -14);
+              // Cara plana de la cumbre, sin volumen sombreado
+              ctx.fillStyle = lIdx === 3 ? "rgba(15, 23, 42, 0.07)" : "rgba(2, 132, 199, 0.06)";
+              ctx.beginPath();
+              ctx.moveTo(cur.x, cur.y);
+              ctx.lineTo(pts[Math.min(pts.length - 1, i + 4)].x, pts[Math.min(pts.length - 1, i + 4)].y);
+              ctx.lineTo(ridgeFootX + 28, baseY);
+              ctx.lineTo(ridgeFootX, baseY);
+              ctx.closePath();
+              ctx.fill();
+
+              // Arista fina de cumbre
+              ctx.strokeStyle = L.stroke;
+              ctx.globalAlpha = 0.45;
+              ctx.lineWidth = 0.7;
+              ctx.beginPath();
+              ctx.moveTo(cur.x, cur.y);
+              ctx.lineTo(ridgeFootX, baseY);
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+            }
+          }
+
+          // 3 curvas de nivel topográficas suaves siguiendo el relieve
+          for (let iso = 1; iso <= 3; iso++) {
+            const factor = 1 - iso * 0.24;
+            ctx.beginPath();
+            for (let i = 0; i < pts.length; i++) {
+              const p = pts[i];
+              const iy = baseY - (baseY - p.y) * factor;
+              if (i === 0) ctx.moveTo(p.x, iy);
+              else ctx.lineTo(p.x, iy);
+            }
+            ctx.strokeStyle = L.stroke;
+            ctx.globalAlpha = 0.28 - iso * 0.06;
+            ctx.lineWidth = 0.65;
+            ctx.stroke();
+          }
+          ctx.restore();
+
+          ctx.beginPath();
+          for (let i = 0; i < pts.length; i++) {
+            if (i === 0) ctx.moveTo(pts[i].x, pts[i].y);
+            else ctx.lineTo(pts[i].x, pts[i].y);
+          }
+          ctx.strokeStyle = L.stroke;
+          ctx.lineWidth = 1.15;
+          ctx.stroke();
+
+          // En modo lente de datos: emerge toda la ciudad como planos transparentes con la misma oclusión que el mundo real
+          if (inDataLens) {
+            if (lIdx === 1) drawBlueprintCity(ctx, coastY);
+            if (lIdx === 2) drawAbstractNodesForLayer(1);
+            if (lIdx === 3) drawAbstractNodesForLayer(2);
+          }
+        });
+
+        // Línea de costa + demarcación white-label (hemisferio positivo izquierda / negativo derecha)
+        const shoreGrad = ctx.createLinearGradient(0, 0, w, 0);
+        shoreGrad.addColorStop(0, "rgba(6, 182, 212, 0.14)");
+        shoreGrad.addColorStop(0.5, "rgba(124, 58, 237, 0.34)");
+        shoreGrad.addColorStop(1, "rgba(15, 23, 42, 0.22)");
+        ctx.strokeStyle = shoreGrad;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, coastY);
+        ctx.lineTo(w, coastY);
+        ctx.stroke();
+
+        // Delimitación sutil white-label en el eje central (Positivo ⇄ Negativo)
+        ctx.save();
+        const midX = w * 0.5;
+        ctx.strokeStyle = "rgba(15, 23, 42, 0.08)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 7]);
+        ctx.beginPath();
+        ctx.moveTo(midX, coastY - 68);
+        ctx.lineTo(midX, h);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Micro-marcas de sectorización white-label en los costados de la costa
+        ctx.font = "600 9px 'JetBrains Mono', monospace";
+        ctx.fillStyle = "rgba(2, 132, 199, 0.42)";
+        ctx.textAlign = "left";
+        ctx.fillText("+ DATA · POSITIVO", 26, coastY - 10);
+
+        ctx.fillStyle = "rgba(71, 85, 105, 0.46)";
+        ctx.textAlign = "right";
+        ctx.fillText("- DATA · NEGATIVO", w - 26, coastY - 10);
+        ctx.restore();
+
+        // Velo oceánico base
+        const seaTint = ctx.createLinearGradient(0, coastY, 0, h);
+        seaTint.addColorStop(0, "rgba(224, 242, 254, 0.18)");
+        seaTint.addColorStop(0.5, "rgba(186, 230, 253, 0.16)");
+        seaTint.addColorStop(1, "rgba(224, 231, 255, 0.24)");
+        ctx.fillStyle = seaTint;
+        ctx.fillRect(0, coastY, w, h - coastY);
+
+        // Superficie del mar de datos 3D
+        // Un solo degradado compartido para todas las filas: la profundidad entra por globalAlpha
+        const rowGrad = ctx.createLinearGradient(0, 0, w, 0);
+        rowGrad.addColorStop(0, "rgba(6, 182, 212, 0.45)");
+        rowGrad.addColorStop(0.3, "rgba(2, 132, 199, 1)");
+        rowGrad.addColorStop(0.5, "rgba(124, 58, 237, 1)");
+        rowGrad.addColorStop(0.7, "rgba(6, 182, 212, 1)");
+        rowGrad.addColorStop(1, "rgba(6, 182, 212, 0.45)");
+        ctx.strokeStyle = rowGrad;
+        for (let rz = ROWS - 1; rz >= 0; rz--) {
+          const row = grid[rz];
+          ctx.globalAlpha = 0.06 + row[0].depthNorm * 0.34;
+          ctx.beginPath();
+          for (let cx = 0; cx < COLS; cx++) {
+            const p = row[cx];
+            if (cx === 0) ctx.moveTo(p.sx, p.sy);
+            else ctx.lineTo(p.sx, p.sy);
+          }
+          ctx.lineWidth = 0.65 + row[0].depthNorm * 0.9;
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        for (let cx = 0; cx < COLS; cx += 2) {
+          ctx.beginPath();
+          for (let rz = ROWS - 1; rz >= 0; rz--) {
+            const p = grid[rz][cx];
+            if (rz === ROWS - 1) ctx.moveTo(p.sx, p.sy);
+            else ctx.lineTo(p.sx, p.sy);
+          }
+          ctx.strokeStyle = "rgba(15, 23, 42, 0.085)";
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+        }
+
+        // Puntos de la malla agrupados por color y nivel de alpha: unas pocas llamadas de dibujo en vez de miles
+        const dotBatches = new Map<string, { style: string; path: Path2D }>();
+        for (let rz = ROWS - 1; rz >= 0; rz--) {
+          const row = grid[rz];
+          for (let cx = 0; cx < COLS; cx++) {
+            const p = row[cx];
+            if (p.sx < -24 || p.sx > w + 24 || p.sy < -24 || p.sy > h + 24) continue;
+            const r = 0.9 + p.depthNorm * 2.1 + p.elev * 1.05;
+            const alpha = Math.min(0.95, 0.16 + p.depthNorm * 0.52 + p.elev * 0.28);
+            const level = Math.round(alpha * 10) / 10;
+
+            let family: string;
+            if (p.elev > 0.62) family = `124, 58, 237|${level}`;
+            else if (p.elev > 0.48 || (cx + rz) % 3 === 0) family = `6, 182, 212|${level}`;
+            else family = `15, 23, 42|${Math.round(level * 76) / 100}`;
+
+            let batch = dotBatches.get(family);
+            if (!batch) {
+              const [rgb, a] = family.split("|");
+              batch = { style: `rgba(${rgb}, ${a})`, path: new Path2D() };
+              dotBatches.set(family, batch);
+            }
+            batch.path.moveTo(p.sx + r, p.sy);
+            batch.path.arc(p.sx, p.sy, r, 0, Math.PI * 2);
+          }
+        }
+        dotBatches.forEach((batch) => {
+          ctx.fillStyle = batch.style;
+          ctx.fill(batch.path);
+        });
+
+        // Capa de datos: sensores IoT, flujo de inferencia y partículas visibles (también dentro del revelador)
+        if (inDataLens) drawInferenceMatrix(ctx, coastY);
+        // El primer blanco (sin revelador) queda limpio: el detalle de sensores e inferencia solo aparece dentro de la lente
+        if (inDataLens) {
+          drawInferenceFlows(ctx, coastY, "data");
+          drawIotIndicators(ctx, coastY, "data");
+          drawPlaceReadings(ctx, coastY, "data");
+          drawMarineSurvey(ctx, coastY);
+          drawPhones(ctx, coastY, "data");
+          drawDeliveryDrones(ctx, coastY, "data");
+          drawDataMotes(ctx, "data");
+        }
+      }
+
+      // ─── CAPA 2: MUNDO REAL REVELADO (DÍA IZQ ⇄ NOCHE/ESPACIO DER + NAVES + PASTO + CIUDAD AUTÓNOMA + STATS) ───
+      function drawRealisticWorld(
+        rctx: CanvasRenderingContext2D,
+        coastY: number,
+        grid: Projected[][],
+        nodes: HorizonNode[]
+      ) {
+        // 1. Cielo horizontal continuo y sedoso: DÍA luminoso → Crepúsculo suave → NOCHE / ESPACIO
+        const horizSky = rctx.createLinearGradient(0, 0, w, 0);
+        horizSky.addColorStop(0, "#38bdf8");
+        horizSky.addColorStop(0.18, "#60c5f5");
+        horizSky.addColorStop(0.32, "#7dd3fc");
+        horizSky.addColorStop(0.42, "#5ea4d8");
+        horizSky.addColorStop(0.52, "#385b96");
+        horizSky.addColorStop(0.62, "#1c3260");
+        horizSky.addColorStop(0.74, "#0d1a36");
+        horizSky.addColorStop(0.88, "#050b1c");
+        horizSky.addColorStop(1, "#030712");
+        rctx.fillStyle = horizSky;
+        rctx.fillRect(0, 0, w, coastY + 4);
+
+        // Velo radial cálido solar sin recorte abrupto (cubre todo el ancho)
+        const dayWarmth = rctx.createRadialGradient(
+          w * 0.18,
+          coastY * 0.32,
+          8,
+          w * 0.18,
+          coastY * 0.32,
+          w * 0.52
+        );
+        dayWarmth.addColorStop(0, "rgba(254, 249, 195, 0.92)");
+        dayWarmth.addColorStop(0.16, "rgba(253, 224, 71, 0.42)");
+        dayWarmth.addColorStop(0.5, "rgba(186, 230, 253, 0.22)");
+        dayWarmth.addColorStop(0.82, "rgba(56, 189, 248, 0.05)");
+        dayWarmth.addColorStop(1, "rgba(56, 189, 248, 0)");
+        rctx.fillStyle = dayWarmth;
+        rctx.fillRect(0, 0, w, coastY + 4);
+
+        // Sol limpio en el cielo diurno (izquierda)
+        rctx.fillStyle = "rgba(255, 253, 235, 0.95)";
+        rctx.beginPath();
+        rctx.arc(w * 0.18, coastY * 0.3, 18, 0, Math.PI * 2);
+        rctx.fill();
+
+        // Estrellas + Planeta orbital con anillo en el hemisferio nocturno/espacial (derecha)
+        for (let s = 0; s < 78; s++) {
+          const sx = w * (0.46 + ((s * 97) % 54) / 100);
+          const sy = coastY * (0.04 + ((s * 53) % 72) / 100);
+          const fade = Math.min(1, (sx / w - 0.46) / 0.24);
+          const tw = 0.45 + 0.55 * Math.sin(t * 2.4 + s * 1.7);
+          rctx.fillStyle = `rgba(224, 242, 254, ${(fade * tw * 0.85).toFixed(3)})`;
+          rctx.beginPath();
+          rctx.arc(sx, sy, 0.7 + (s % 3) * 0.45, 0, Math.PI * 2);
+          rctx.fill();
+        }
+
+        // Planeta orbital sutil en el cielo espacial (derecha arriba)
+        const plX = w * 0.84;
+        const plY = coastY * 0.24;
+        rctx.save();
+        const plGlow = rctx.createRadialGradient(plX - 6, plY - 6, 4, plX, plY, 34);
+        plGlow.addColorStop(0, "rgba(186, 230, 253, 0.7)");
+        plGlow.addColorStop(0.45, "rgba(99, 102, 241, 0.45)");
+        plGlow.addColorStop(1, "rgba(15, 23, 42, 0)");
+        rctx.fillStyle = plGlow;
+        rctx.beginPath();
+        rctx.arc(plX, plY, 34, 0, Math.PI * 2);
+        rctx.fill();
+
+        rctx.fillStyle = "#1e293b";
+        rctx.beginPath();
+        rctx.arc(plX, plY, 16, 0, Math.PI * 2);
+        rctx.fill();
+        const cres = rctx.createLinearGradient(plX - 16, plY - 12, plX + 16, plY + 12);
+        cres.addColorStop(0, "rgba(125, 211, 252, 0.85)");
+        cres.addColorStop(0.55, "rgba(99, 102, 241, 0.25)");
+        cres.addColorStop(1, "rgba(3, 7, 18, 0.95)");
+        rctx.fillStyle = cres;
+        rctx.beginPath();
+        rctx.arc(plX, plY, 16, 0, Math.PI * 2);
+        rctx.fill();
+
+        // Anillo orbital del planeta
+        rctx.strokeStyle = "rgba(125, 211, 252, 0.45)";
+        rctx.lineWidth = 1.2;
+        rctx.beginPath();
+        rctx.ellipse(plX, plY, 32, 7, -0.26, 0, Math.PI * 2);
+        rctx.stroke();
+        rctx.restore();
+
+        // Cortinas de aurora boreal con nacimiento orgánico suave (sin corte vertical a la izquierda)
+        for (let band = 0; band < 3; band++) {
+          const baseY = coastY * (0.26 + band * 0.18);
+          const startX = w * 0.36;
+          const topPts: { x: number; y: number }[] = [];
+          const botPts: { x: number; y: number }[] = [];
+          for (let x = startX; x <= w + 28; x += 28) {
+            const cx = Math.min(w, x);
+            const fade = fxSmooth(0.36, 0.66, cx / w);
+            const wave =
+              Math.sin(cx * 0.007 + t * (0.7 + band * 0.2) + band * 2) * 28 +
+              Math.cos(cx * 0.014 - t * 0.5) * 14;
+            const yTop = baseY + wave;
+            topPts.push({ x: cx, y: yTop });
+            // El espesor nace desde 0 en el borde izquierdo para disolver cualquier corte
+            botPts.push({ x: cx, y: yTop + 95 * fade });
+          }
+
+          rctx.beginPath();
+          for (let i = 0; i < topPts.length; i++) {
+            if (i === 0) rctx.moveTo(topPts[i].x, topPts[i].y);
+            else rctx.lineTo(topPts[i].x, topPts[i].y);
+          }
+          for (let i = botPts.length - 1; i >= 0; i--) {
+            rctx.lineTo(botPts[i].x, botPts[i].y);
+          }
+          rctx.closePath();
+
+          const aGrad = rctx.createLinearGradient(0, baseY - 30, 0, baseY + 85);
+          if (band === 0) {
+            aGrad.addColorStop(0, "rgba(52, 211, 153, 0)");
+            aGrad.addColorStop(0.35, "rgba(52, 211, 153, 0.3)");
+            aGrad.addColorStop(0.7, "rgba(56, 189, 248, 0.18)");
+            aGrad.addColorStop(1, "rgba(139, 92, 246, 0)");
+          } else if (band === 1) {
+            aGrad.addColorStop(0, "rgba(34, 211, 238, 0)");
+            aGrad.addColorStop(0.4, "rgba(45, 212, 191, 0.25)");
+            aGrad.addColorStop(0.75, "rgba(168, 85, 247, 0.2)");
+            aGrad.addColorStop(1, "rgba(15, 23, 42, 0)");
+          } else {
+            aGrad.addColorStop(0, "rgba(167, 139, 250, 0)");
+            aGrad.addColorStop(0.45, "rgba(56, 189, 248, 0.22)");
+            aGrad.addColorStop(1, "rgba(15, 23, 42, 0)");
+          }
+          rctx.fillStyle = aGrad;
+          rctx.fill();
+        }
+
+        // Naves espaciales y satélites en órbita (mismo catálogo SKY_CRAFTS 1:1 con el plano matemático)
+        SKY_CRAFTS.forEach((cr, idx) => {
+          let u = (0.18 + idx * 0.31 + t * cr.speed * cr.dir) % 1;
+          if (u < 0) u += 1;
+          const cx = u * w;
+          const cy = coastY * cr.yFrac + Math.sin(t * 1.1 + idx) * 6;
+
+          rctx.save();
+          // Estela iónica
+          // Los satélites no dejan estela: en el mundo color solo las naves tienen rastro
+          const trail = (cr.kind === "ship" ? 40 : 0) * cr.dir;
+          const trG = rctx.createLinearGradient(cx - trail, cy, cx, cy);
+          trG.addColorStop(0, "rgba(56, 189, 248, 0)");
+          trG.addColorStop(1, cr.col);
+          rctx.strokeStyle = trG;
+          rctx.lineWidth = 1.4;
+          rctx.beginPath();
+          rctx.moveTo(cx - trail, cy);
+          rctx.lineTo(cx, cy);
+          rctx.stroke();
+
+
+          // Silueta de nave espacial o satélite
+          rctx.translate(cx, cy);
+          rctx.scale(cr.dir * cr.scale, cr.scale);
+          if (cr.kind === "ship") {
+            rctx.fillStyle = "#f8fafc";
+            rctx.beginPath();
+            rctx.moveTo(14, 0);
+            rctx.lineTo(-8, -4.5);
+            rctx.lineTo(-4, 0);
+            rctx.lineTo(-8, 4.5);
+            rctx.closePath();
+            rctx.fill();
+            rctx.fillStyle = cr.col;
+            rctx.fillRect(-10, -1.2, 5, 2.4);
+          } else {
+            // Satélite con paneles solares
+            rctx.fillStyle = "#38bdf8";
+            rctx.fillRect(-12, -5.5, 8, 3);
+            rctx.fillRect(-12, 2.5, 8, 3);
+            rctx.fillRect(4, -5.5, 8, 3);
+            rctx.fillRect(4, 2.5, 8, 3);
+            rctx.fillStyle = "#e2e8f0";
+            rctx.fillRect(-3.5, -3.5, 7, 7);
+          }
+          rctx.restore();
+        });
+
+        // Nubes (blancas luminosas en el día, iluminadas por aurora en la noche)
+        drawClouds(rctx, true);
+
+        // Cordillera realista con nieves y facetas
+        const realLayers = [
+          {
+            // Cordillera lejana: alta en los bordes y baja al centro, para enmarcar la ciudad
+            seed: 2.6,
+            amp: Math.min(230, h * 0.32),
+            yOff: -22,
+            topCol: "#8eafc4",
+            midCol: "#6d8eab",
+            botCol: "#243044",
+            snowLine: 0.9,
+            snowCol: "rgba(224, 242, 254, 0.35)",
+          },
+          {
+            seed: 1.4,
+            amp: Math.min(165, h * 0.23),
+            yOff: -6,
+            topCol: "#355c78",
+            midCol: "#1e3a56",
+            botCol: "#10233a",
+            snowLine: 0.64,
+            snowCol: "rgba(224, 242, 254, 0.72)",
+          },
+          {
+            seed: 4.8,
+            amp: Math.min(118, h * 0.165),
+            yOff: -2,
+            topCol: "#254963",
+            midCol: "#132c45",
+            botCol: "#091829",
+            snowLine: 0.68,
+            snowCol: "rgba(207, 250, 254, 0.85)",
+          },
+          {
+            seed: 8.2,
+            amp: Math.min(68, h * 0.095),
+            yOff: 0,
+            topCol: "#1a3847",
+            midCol: "#0d222e",
+            botCol: "#06111a",
+            snowLine: 0.82,
+            snowCol: "rgba(186, 230, 253, 0.55)",
+          },
+        ];
+
+        function drawRealNodesForLayer(layerIdx: 1 | 2) {
+          nodes
+            .filter((n) => n.layerIdx === layerIdx)
+            .forEach((n) => {
+              rctx.save();
+              rctx.translate(n.x, n.y);
+              rctx.scale(n.scale, n.scale);
+              rctx.globalAlpha = 0.65 + n.depth * 0.35;
+
+              const gy = n.kind === "antenna" ? -20 : -6;
+              const glow = rctx.createRadialGradient(0, gy, 1, 0, gy, 32);
+              glow.addColorStop(0, n.kind === "antenna" ? "rgba(251, 191, 36, 0.85)" : "rgba(56, 189, 248, 0.88)");
+              glow.addColorStop(0.45, "rgba(52, 211, 153, 0.34)");
+              glow.addColorStop(1, "rgba(56, 189, 248, 0)");
+              rctx.fillStyle = glow;
+              rctx.beginPath();
+              rctx.arc(0, gy, 32, 0, Math.PI * 2);
+              rctx.fill();
+
+              if (n.kind === "campus") {
+                rctx.fillStyle = "#071120";
+                rctx.fillRect(-24, -10, 48, 12);
+                rctx.fillRect(-14, -16, 22, 6);
+                rctx.beginPath();
+                rctx.arc(16, -10, 6, Math.PI, 0);
+                rctx.fill();
+                rctx.fillStyle = "#67e8f9";
+                rctx.fillRect(-19, -6.5, 9, 1.8);
+                rctx.fillRect(-7, -6.5, 9, 1.8);
+                rctx.fillRect(5, -6.5, 8, 1.8);
+                rctx.fillStyle = "#fef08a";
+                rctx.fillRect(-10, -13.5, 14, 1.5);
+              } else if (n.kind === "datacenter") {
+                rctx.fillStyle = "#081222";
+                rctx.fillRect(-16, -10, 32, 11);
+                rctx.fillRect(-9, -15, 18, 5);
+                rctx.fillStyle = "#67e8f9";
+                rctx.fillRect(-11, -6.5, 22, 1.6);
+              } else {
+                rctx.strokeStyle = "#e2e8f0";
+                rctx.lineWidth = 1.2;
+                rctx.beginPath();
+                rctx.moveTo(-4, 2);
+                rctx.lineTo(0, -22);
+                rctx.lineTo(4, 2);
+                rctx.stroke();
+                rctx.fillStyle = "#fef08a";
+                rctx.beginPath();
+                rctx.arc(0, -22, 2.6, 0, Math.PI * 2);
+                rctx.fill();
+              }
+              rctx.restore();
+            });
+        }
+
+        // Ciudad ecológica y arquitectura futurista (estadio, municipalidad, torres verdes y aerogeneradores)
+        function drawFuturisticCity(cctx: CanvasRenderingContext2D) {
+          cctx.save();
+          // Bruma atmosférica muy suave y transparente (sin exceso de neón)
+          const cityGlow = cctx.createRadialGradient(
+            w * 0.52,
+            coastY - 14,
+            12,
+            w * 0.52,
+            coastY - 14,
+            w * 0.44
+          );
+          cityGlow.addColorStop(0, "rgba(56, 189, 248, 0.14)");
+          cityGlow.addColorStop(0.45, "rgba(52, 211, 153, 0.08)");
+          cityGlow.addColorStop(1, "rgba(5, 13, 29, 0)");
+          cctx.fillStyle = cityGlow;
+          cctx.fillRect(0, coastY - 200, w, 210);
+
+          const scaleH = Math.min(1.2, Math.max(0.72, h / 740));
+          const baseY = coastY + 2;
+          drawCityMass(cctx, coastY, "color");
+
+          // 1. Aerogeneradores limpios en la colina solar izquierda
+          [0.055, 0.095, 0.135].forEach((nx, wIdx) => {
+            const wx = nx * w;
+            const wy = baseY - (30 + (wIdx % 2) * 14) * scaleH;
+            const mastH = (44 + (wIdx % 2) * 10) * scaleH;
+            cctx.strokeStyle = "rgba(241, 245, 249, 0.72)";
+            cctx.lineWidth = 1.4;
+            cctx.beginPath();
+            cctx.moveTo(wx, wy);
+            cctx.lineTo(wx, wy - mastH);
+            cctx.stroke();
+
+            const hubY = wy - mastH;
+            const rot = t * (1.25 + wIdx * 0.18) + wIdx * 1.1;
+            const bladeLen = 14 * scaleH;
+            cctx.strokeStyle = "rgba(248, 250, 252, 0.85)";
+            cctx.lineWidth = 1.1;
+            for (let b = 0; b < 3; b++) {
+              const ba = rot + (b * Math.PI * 2) / 3;
+              cctx.beginPath();
+              cctx.moveTo(wx, hubY);
+              cctx.lineTo(wx + Math.cos(ba) * bladeLen, hubY + Math.sin(ba) * bladeLen);
+              cctx.stroke();
+            }
+          });
+
+          // 2. Torres ecológicas con terrazas verdes y vidrio limpio (mismo catálogo CITY_TOWERS en día y noche)
+          CITY_TOWERS.forEach((tw, idx) => {
+            const x = tw.nx * w;
+            const bw = tw.bw * scaleH;
+            const bh = tw.bh * scaleH;
+            const topY = baseY - bh;
+            // Transición continua día → crepúsculo → noche en fachadas (sin corte brusco en el centro)
+            const dayMix = 1 - fxSmooth(0.32, 0.66, tw.nx);
+
+            const bGrad = cctx.createLinearGradient(x, topY, x, baseY);
+            bGrad.addColorStop(0, lerpRGBA(226, 238, 248, 0.92, 19, 41, 68, 0.98, dayMix));
+            bGrad.addColorStop(0.55, lerpRGBA(148, 184, 212, 0.88, 11, 27, 48, 0.98, dayMix));
+            bGrad.addColorStop(1, lerpRGBA(51, 92, 122, 0.92, 5, 13, 28, 1, dayMix));
+            cctx.fillStyle = bGrad;
+
+            if (tw.style === "spire") {
+              cctx.beginPath();
+              cctx.moveTo(x - bw * 0.5, baseY);
+              cctx.lineTo(x - bw * 0.34, topY + bh * 0.22);
+              cctx.lineTo(x, topY);
+              cctx.lineTo(x + bw * 0.34, topY + bh * 0.22);
+              cctx.lineTo(x + bw * 0.5, baseY);
+              cctx.closePath();
+              cctx.fill();
+
+              cctx.strokeStyle = lerpRGBA(248, 250, 252, 0.8, 125, 211, 252, 0.55, dayMix);
+              cctx.lineWidth = 1;
+              cctx.beginPath();
+              cctx.moveTo(x, topY);
+              cctx.lineTo(x, topY - 14 * scaleH);
+              cctx.stroke();
+            } else if (tw.style === "slant") {
+              cctx.beginPath();
+              cctx.moveTo(x - bw * 0.5, baseY);
+              cctx.lineTo(x - bw * 0.45, topY + 12);
+              cctx.lineTo(x + bw * 0.45, topY);
+              cctx.lineTo(x + bw * 0.5, baseY);
+              cctx.closePath();
+              cctx.fill();
+            } else if (tw.style === "dome") {
+              cctx.fillRect(x - bw * 0.55, topY + bh * 0.34, bw * 1.1, bh * 0.66);
+              cctx.beginPath();
+              cctx.arc(x, topY + bh * 0.34, bw * 0.55, Math.PI, 0);
+              cctx.fill();
+            } else if (tw.style === "twin") {
+              cctx.fillRect(x - bw * 0.52, topY, bw * 0.4, bh);
+              cctx.fillRect(x + bw * 0.12, topY + bh * 0.1, bw * 0.4, bh * 0.9);
+              cctx.fillStyle = "rgba(186, 230, 253, 0.45)";
+              cctx.fillRect(x - bw * 0.12, topY + bh * 0.34, bw * 0.24, 1.8);
+              cctx.fillRect(x - bw * 0.12, topY + bh * 0.6, bw * 0.24, 1.6);
+            } else {
+              // Torre ecológica escalonada con terrazas de bosque vertical
+              cctx.fillRect(x - bw * 0.5, topY + bh * 0.12, bw, bh * 0.88);
+              cctx.fillRect(x - bw * 0.35, topY, bw * 0.7, bh * 0.14);
+              // Jardines en terrazas verdes
+              cctx.fillStyle = lerpRGBA(34, 197, 94, 0.88, 52, 211, 153, 0.62, dayMix);
+              for (let g = 1; g <= 3; g++) {
+                const gy = topY + bh * (0.22 * g);
+                cctx.fillRect(x - bw * 0.52, gy, bw * 1.04, 3);
+              }
+            }
+
+            // Ventanas arquitectónicas suaves y sutiles (sin brillo excesivo)
+            const pulse = 0.72 + 0.28 * Math.sin(t * 1.4 + idx * 1.1);
+            cctx.fillStyle = dayMix > 0.5 ? "rgba(255, 255, 255, 0.42)" : tw.accent;
+            cctx.globalAlpha = (0.28 + 0.14 * dayMix) * pulse;
+            const rows = Math.floor(bh / 15);
+            for (let r = 2; r < rows - 1; r++) {
+              if ((r + idx) % 2 === 0) {
+                const wy = topY + r * 13;
+                cctx.fillRect(x - bw * 0.28, wy, bw * 0.56, 1.2);
+              }
+            }
+            cctx.globalAlpha = 1;
+          });
+
+          // 3. Estadio futurista biomórfico (izquierda-centro, cúpula blanca-cristal con arcos y luz interior cálida)
+          {
+            const sx = w * 0.205;
+            const sw = 86 * scaleH;
+            const sh = 30 * scaleH;
+            const sy = baseY - 2;
+
+            const stadGrad = cctx.createLinearGradient(sx, sy - sh, sx, sy);
+            stadGrad.addColorStop(0, "rgba(248, 250, 252, 0.94)");
+            stadGrad.addColorStop(0.55, "rgba(203, 213, 225, 0.9)");
+            stadGrad.addColorStop(1, "rgba(71, 85, 105, 0.92)");
+            cctx.fillStyle = stadGrad;
+            cctx.beginPath();
+            cctx.ellipse(sx, sy, sw * 0.5, sh, 0, Math.PI, 0);
+            cctx.closePath();
+            cctx.fill();
+
+            // Luz suave interior de la cancha / óculo superior
+            const fieldGlow = cctx.createRadialGradient(sx, sy - sh * 0.55, 2, sx, sy - sh * 0.55, sw * 0.42);
+            fieldGlow.addColorStop(0, "rgba(187, 247, 208, 0.55)");
+            fieldGlow.addColorStop(0.6, "rgba(125, 211, 252, 0.2)");
+            fieldGlow.addColorStop(1, "rgba(56, 189, 248, 0)");
+            cctx.fillStyle = fieldGlow;
+            cctx.beginPath();
+            cctx.ellipse(sx, sy - sh * 0.55, sw * 0.4, sh * 0.45, 0, 0, Math.PI * 2);
+            cctx.fill();
+
+            // Costillas estructurales del estadio
+            cctx.strokeStyle = "rgba(100, 116, 139, 0.45)";
+            cctx.lineWidth = 0.9;
+            for (let k = -3; k <= 3; k++) {
+              cctx.beginPath();
+              cctx.moveTo(sx + k * (sw * 0.11), sy);
+              cctx.quadraticCurveTo(sx + k * (sw * 0.08), sy - sh * 0.85, sx + k * (sw * 0.04), sy - sh * 0.96);
+              cctx.stroke();
+            }
+          }
+
+          // 4. Municipalidad / Centro Cívico Ecológico (centro-izquierda, arquitectura horizontal con columnas y techo verde)
+          {
+            const cx = w * 0.445;
+            const cw = 92 * scaleH;
+            const ch = 36 * scaleH;
+            const cy = baseY - 2;
+
+            // Basamento y cuerpo principal
+            const hallGrad = cctx.createLinearGradient(cx, cy - ch, cx, cy);
+            hallGrad.addColorStop(0, "rgba(241, 245, 249, 0.92)");
+            hallGrad.addColorStop(1, "rgba(100, 116, 139, 0.88)");
+            cctx.fillStyle = hallGrad;
+            cctx.fillRect(cx - cw * 0.5, cy - ch * 0.62, cw, ch * 0.62);
+            // Nivel superior recedido + domo cívico transparente
+            cctx.fillRect(cx - cw * 0.34, cy - ch, cw * 0.68, ch * 0.38);
+            cctx.fillStyle = "rgba(186, 230, 253, 0.55)";
+            cctx.beginPath();
+            cctx.arc(cx, cy - ch, cw * 0.15, Math.PI, 0);
+            cctx.fill();
+
+            // Techo jardín verde vivo
+            cctx.fillStyle = "rgba(34, 197, 94, 0.85)";
+            cctx.fillRect(cx - cw * 0.52, cy - ch * 0.65, cw * 1.04, 3);
+            cctx.fillRect(cx - cw * 0.36, cy - ch - 2.5, cw * 0.72, 2.5);
+
+            // Columnata frontal limpia
+            cctx.strokeStyle = "rgba(15, 23, 42, 0.45)";
+            cctx.lineWidth = 1.2;
+            for (let col = -4; col <= 4; col++) {
+              const colX = cx + col * (cw * 0.095);
+              cctx.beginPath();
+              cctx.moveTo(colX, cy - ch * 0.58);
+              cctx.lineTo(colX, cy - 2);
+              cctx.stroke();
+            }
+          }
+
+          // 5. Viaducto limpio de transporte eléctrico ligero (una sola línea aérea muy fina y elegante)
+          {
+            const railY = coastY - 28 * scaleH;
+            cctx.strokeStyle = "rgba(226, 232, 240, 0.22)";
+            cctx.lineWidth = 1;
+            cctx.beginPath();
+            cctx.moveTo(0, railY);
+            cctx.lineTo(w, railY);
+            cctx.stroke();
+
+            // Tren ligero deslizándose con suavidad
+            const tx = ((t * 0.055) % 1.2 - 0.1) * w;
+            const trGrad = cctx.createLinearGradient(tx - 34, railY, tx + 10, railY);
+            trGrad.addColorStop(0, "rgba(125, 211, 252, 0)");
+            trGrad.addColorStop(0.7, "rgba(224, 242, 254, 0.65)");
+            trGrad.addColorStop(1, "rgba(255, 255, 255, 0.9)");
+            cctx.strokeStyle = trGrad;
+            cctx.lineWidth = 2.2;
+            cctx.beginPath();
+            cctx.moveTo(tx - 34, railY);
+            cctx.lineTo(tx + 10, railY);
+            cctx.stroke();
+          }
+
+          cctx.restore();
+        }
+
+        const samples = 96;
+        realLayers.forEach((L, lIdx) => {
+          const baseY = coastY + L.yOff;
+          const pts: { x: number; y: number; hNorm: number }[] = [];
+          for (let i = 0; i <= samples; i++) {
+            const nx = i / samples;
+            const elev = mountainHeight(nx, L.seed, L.amp);
+            pts.push({ x: nx * w, y: baseY - elev, hNorm: elev / L.amp });
+          }
+
+          rctx.beginPath();
+          rctx.moveTo(0, baseY + 8);
+          for (let i = 0; i < pts.length; i++) rctx.lineTo(pts[i].x, pts[i].y);
+          rctx.lineTo(w, baseY + 8);
+          rctx.closePath();
+
+          // Relieve geológico realista con iluminación direccional (Día izquierda ⇄ Noche derecha)
+          const mGrad = rctx.createLinearGradient(0, baseY - L.amp, w, baseY + 6);
+          if (lIdx === 0) {
+            mGrad.addColorStop(0, "#b7d0e2");
+            mGrad.addColorStop(0.35, "#8eafc6");
+            mGrad.addColorStop(0.65, "#4d6d8a");
+            mGrad.addColorStop(1, "#1c3148");
+          } else if (lIdx === 1) {
+            mGrad.addColorStop(0, "#6489a8");
+            mGrad.addColorStop(0.35, "#3d6282");
+            mGrad.addColorStop(0.65, "#1d3552");
+            mGrad.addColorStop(1, "#0d1c33");
+          } else if (lIdx === 2) {
+            mGrad.addColorStop(0, "#4b7485");
+            mGrad.addColorStop(0.35, "#2b5266");
+            mGrad.addColorStop(0.65, "#132942");
+            mGrad.addColorStop(1, "#081426");
+          } else {
+            mGrad.addColorStop(0, "#22c55e");
+            mGrad.addColorStop(0.28, "#16a34a");
+            mGrad.addColorStop(0.5, "#0f766e");
+            mGrad.addColorStop(0.75, "#064e3b");
+            mGrad.addColorStop(1, "#042f2e");
+          }
+          rctx.fillStyle = mGrad;
+          rctx.fill();
+
+          // Facetas de luz/sombra en las vertientes de cada cumbre (textura rocosa 3D real)
+          rctx.save();
+          for (let i = 1; i < pts.length - 1; i++) {
+            const pPrev = pts[i - 1];
+            const p = pts[i];
+            const pNext = pts[i + 1];
+            const height = baseY - p.y;
+            if (p.y < pPrev.y && p.y <= pNext.y && height > 18) {
+              const dayMix = 1 - fxSmooth(0.28, 0.72, p.x / w);
+              const ridgeX = p.x + (18 - 4 * dayMix);
+
+              // Vertiente izquierda iluminada suavemente por el sol → crepúsculo → aurora
+              const litGrad = rctx.createLinearGradient(p.x - 28, p.y, ridgeX, baseY);
+              litGrad.addColorStop(
+                0,
+                lIdx === 3
+                  ? lerpRGBA(134, 239, 172, 0.36, 52, 211, 153, 0.16, dayMix)
+                  : lerpRGBA(254, 249, 195, 0.32, 125, 211, 252, 0.22, dayMix)
+              );
+              litGrad.addColorStop(1, "rgba(15, 23, 42, 0)");
+              rctx.fillStyle = litGrad;
+              rctx.beginPath();
+              rctx.moveTo(p.x, p.y);
+              rctx.lineTo(pts[Math.max(0, i - 4)].x, pts[Math.max(0, i - 4)].y);
+              rctx.lineTo(p.x - 26, baseY);
+              rctx.lineTo(ridgeX, baseY);
+              rctx.closePath();
+              rctx.fill();
+
+              // Vertiente derecha en sombra profunda (da volumen real de cordillera)
+              const shGrad = rctx.createLinearGradient(p.x, p.y, ridgeX + 34, baseY);
+              shGrad.addColorStop(0, "rgba(3, 10, 24, 0.48)");
+              shGrad.addColorStop(1, "rgba(3, 10, 24, 0.08)");
+              rctx.fillStyle = shGrad;
+              rctx.beginPath();
+              rctx.moveTo(p.x, p.y);
+              rctx.lineTo(pts[Math.min(pts.length - 1, i + 4)].x, pts[Math.min(pts.length - 1, i + 4)].y);
+              rctx.lineTo(ridgeX + 36, baseY);
+              rctx.lineTo(ridgeX, baseY);
+              rctx.closePath();
+              rctx.fill();
+            }
+          }
+          rctx.restore();
+
+          // Pradera ecológica con arboledas y briznas de pasto en la costa frontal
+          if (lIdx === 3) {
+            rctx.save();
+            // Arboledas ecológicas suaves a lo largo del parque costero
+            for (let i = 4; i < pts.length - 4; i += 5) {
+              const p = pts[i];
+              const dayMix = 1 - fxSmooth(0.28, 0.72, p.x / w);
+              const treeH = 9 + (i % 3) * 4;
+              rctx.fillStyle = lerpRGBA(21, 128, 61, 0.85, 6, 95, 70, 0.72, dayMix);
+              rctx.beginPath();
+              rctx.moveTo(p.x, p.y - treeH);
+              rctx.lineTo(p.x - 4.5, p.y + 1);
+              rctx.lineTo(p.x + 4.5, p.y + 1);
+              rctx.closePath();
+              rctx.fill();
+            }
+            for (let i = 2; i < pts.length - 2; i += 2) {
+              const p = pts[i];
+              const dayMix = 1 - fxSmooth(0.28, 0.72, p.x / w);
+              rctx.strokeStyle = lerpRGBA(134, 239, 172, 0.68, 52, 211, 153, 0.32, dayMix);
+              rctx.lineWidth = 0.9;
+              const sway = Math.sin(t * 2.1 + i * 0.6) * 2;
+              rctx.beginPath();
+              rctx.moveTo(p.x, p.y + 1);
+              rctx.lineTo(p.x + sway, p.y - 4.5 - (i % 3) * 1.8);
+              rctx.stroke();
+            }
+            rctx.restore();
+          }
+
+          // Ciudad ecológica emerge detrás de la cordillera media y la costa frontal (oclusión natural)
+          if (lIdx === 1) drawFuturisticCity(rctx);
+          if (lIdx === 2) drawRealNodesForLayer(1);
+          if (lIdx === 3) drawRealNodesForLayer(2);
+        });
+
+        // Océano dual con textura líquida real: turquesa soleado (DÍA) → profundo con reflejos (NOCHE)
+        const oceanGrad = rctx.createLinearGradient(0, coastY, w, h);
+        oceanGrad.addColorStop(0, "#0284c7");
+        oceanGrad.addColorStop(0.28, "#0e7490");
+        oceanGrad.addColorStop(0.52, "#0b354a");
+        oceanGrad.addColorStop(0.78, "#061b2f");
+        oceanGrad.addColorStop(1, "#030b18");
+        rctx.fillStyle = oceanGrad;
+        rctx.fillRect(0, coastY, w, h - coastY);
+
+        // Destello solar suave sobre el agua sin recorte lateral
+        const sunWater = rctx.createRadialGradient(w * 0.18, coastY + 12, 6, w * 0.18, coastY + 88, w * 0.42);
+        sunWater.addColorStop(0, "rgba(254, 249, 195, 0.32)");
+        sunWater.addColorStop(0.45, "rgba(56, 189, 248, 0.14)");
+        sunWater.addColorStop(1, "rgba(2, 132, 199, 0)");
+        rctx.fillStyle = sunWater;
+        rctx.fillRect(0, coastY, w, h - coastY);
+
+        // Bandas de volumen de agua (textura de olas 3D con transición continua día → noche)
+        for (let rz = ROWS - 2; rz >= 0; rz--) {
+          const row = grid[rz];
+          const nextRow = grid[rz + 1];
+          const dn = row[0].depthNorm;
+
+          // Sombra de valle + cresta iluminada entre filas para volumen real de oleaje
+          for (let cx = 0; cx < COLS - 1; cx += 2) {
+            const p0 = row[cx];
+            const p1 = row[Math.min(COLS - 1, cx + 2)];
+            const p2 = nextRow[Math.min(COLS - 1, cx + 2)];
+            const p3 = nextRow[cx];
+            const dayMix = 1 - fxSmooth(0.28, 0.72, p0.sx / w);
+            const crest = (p0.elev + p1.elev) * 0.5;
+
+            if (crest > 0.52) {
+              const a = (crest - 0.52) * (0.14 + dn * 0.22);
+              rctx.fillStyle = lerpRGBA(186, 230, 253, a, 56, 189, 248, a * 0.65, dayMix);
+            } else {
+              const a = (0.52 - crest) * (0.16 + dn * 0.2);
+              rctx.fillStyle = `rgba(2, 12, 26, ${a.toFixed(3)})`;
+            }
+            rctx.beginPath();
+            rctx.moveTo(p0.sx, p0.sy);
+            rctx.lineTo(p1.sx, p1.sy);
+            rctx.lineTo(p2.sx, p2.sy);
+            rctx.lineTo(p3.sx, p3.sy);
+            rctx.closePath();
+            rctx.fill();
+          }
+
+          // Filamento de ola + micro-espuma y destellos especulares
+          const depthAlpha = 0.08 + dn * 0.24;
+          rctx.beginPath();
+          for (let cx = 0; cx < COLS; cx++) {
+            const p = row[cx];
+            if (cx === 0) rctx.moveTo(p.sx, p.sy);
+            else rctx.lineTo(p.sx, p.sy);
+          }
+          const wGrad = rctx.createLinearGradient(0, 0, w, 0);
+          wGrad.addColorStop(0, `rgba(254, 249, 195, ${(depthAlpha * 0.72).toFixed(3)})`);
+          wGrad.addColorStop(0.32, `rgba(125, 211, 252, ${depthAlpha.toFixed(3)})`);
+          wGrad.addColorStop(0.58, `rgba(52, 211, 153, ${(depthAlpha * 0.82).toFixed(3)})`);
+          wGrad.addColorStop(1, `rgba(125, 211, 252, ${(depthAlpha * 0.42).toFixed(3)})`);
+          rctx.strokeStyle = wGrad;
+          rctx.lineWidth = 0.8 + dn * 1.1;
+          rctx.stroke();
+
+          // Destellos especulares y micro-espuma sobre las crestas altas (transición suave sin corte central)
+          for (let cx = 0; cx < COLS; cx += 2) {
+            const p = row[cx];
+            if (p.elev > 0.68) {
+              const dayMix = 1 - fxSmooth(0.28, 0.72, p.sx / w);
+              rctx.fillStyle = lerpRGBA(
+                255,
+                251,
+                235,
+                0.22 + dn * 0.34,
+                186,
+                230,
+                253,
+                0.16 + dn * 0.24,
+                dayMix
+              );
+              rctx.fillRect(p.sx - 7 * p.scale, p.sy - 0.8, 14 * p.scale, 1.4);
+            }
+          }
+        }
+
+        // Costa irregular con espuma y una segunda línea de resaca
+        rctx.save();
+        rctx.beginPath();
+        for (let x = 0; x <= w; x += 14) {
+          const y = coastY + Math.sin(x * 0.018 + t * 1.4) * 2.4 + Math.cos(x * 0.007 - t * 0.6) * 1.6;
+          if (x === 0) rctx.moveTo(x, y);
+          else rctx.lineTo(x, y);
+        }
+        rctx.strokeStyle = "rgba(224, 242, 254, 0.55)";
+        rctx.lineWidth = 1.4;
+        rctx.stroke();
+        rctx.beginPath();
+        for (let x = 0; x <= w; x += 18) {
+          const y = coastY + 7 + Math.sin(x * 0.012 + t * 0.9) * 1.8;
+          if (x === 0) rctx.moveTo(x, y);
+          else rctx.lineTo(x, y);
+        }
+        rctx.strokeStyle = "rgba(224, 242, 254, 0.22)";
+        rctx.lineWidth = 0.8;
+        rctx.stroke();
+        rctx.restore();
+
+        // Mundo a color: solo los indicadores IoT finales. Líneas, enlaces y lecturas viven en el visor blanco
+        drawIotIndicators(rctx, coastY, "color");
+        drawDeliveryDrones(rctx, coastY, "color");
+      }
+
+      // ─── CUADRANTE DE RASGADURA ESPACIAL + 4 MICRO-DRONES QUE SALEN DE YARQ ───
+      function traceRiftQuadrant(
+        targetCtx: CanvasRenderingContext2D,
+        cx: number,
+        cy: number,
+        hw: number,
+        hh: number
+      ) {
+        const corners = [
+          { x: cx - hw, y: cy - hh },
+          { x: cx + hw, y: cy - hh },
+          { x: cx + hw, y: cy + hh },
+          { x: cx - hw, y: cy + hh },
+        ];
+        const tearScale = Math.min(1.1, Math.max(0.2, Math.min(hw, hh) / 140));
+        const steps = 18;
+        targetCtx.beginPath();
+        for (let e = 0; e < 4; e++) {
+          const a = corners[e];
+          const b = corners[(e + 1) % 4];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const len = Math.max(1, Math.hypot(dx, dy));
+          const nx = dy / len;
+          const ny = -dx / len;
+          for (let s = 0; s < steps; s++) {
+            const u = s / steps;
+            const env = Math.sin(u * Math.PI);
+            const jag =
+              (Math.sin(u * 13 + e * 2.3 + t * 1.3) * 3.4 +
+                Math.sin(u * 29 - e * 1.7 - t * 2.1) * 1.7) *
+              env *
+              tearScale;
+            const px = a.x + dx * u + nx * jag;
+            const py = a.y + dy * u + ny * jag;
+            if (e === 0 && s === 0) targetCtx.moveTo(px, py);
+            else targetCtx.lineTo(px, py);
+          }
+        }
+        targetCtx.closePath();
+      }
+
+      // Borde fino de refracción dimensional al rasgar el espacio + escuadras de cuadrante
+      function drawRiftEdge(cx: number, cy: number, hw: number, hh: number, alpha: number, inverse: boolean) {
+        if (alpha < 0.02 || hw < 4 || hh < 4) return;
+        ctx.save();
+        // Separación cromática sutil de rasgadura espacial
+        ctx.save();
+        ctx.translate(1.3, 0.8);
+        traceRiftQuadrant(ctx, cx, cy, hw, hh);
+        ctx.strokeStyle = `rgba(167, 139, 250, ${(0.28 * alpha).toFixed(3)})`;
+        ctx.lineWidth = 1.1;
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(-1.2, -0.7);
+        traceRiftQuadrant(ctx, cx, cy, hw, hh);
+        ctx.strokeStyle = `rgba(56, 189, 248, ${(0.42 * alpha).toFixed(3)})`;
+        ctx.lineWidth = 1.25;
+        ctx.stroke();
+        ctx.restore();
+
+        // Filamento central de la fisura
+        traceRiftQuadrant(ctx, cx, cy, hw, hh);
+        ctx.strokeStyle = inverse
+          ? `rgba(2, 132, 199, ${(0.75 * alpha).toFixed(3)})`
+          : `rgba(240, 249, 255, ${(0.88 * alpha).toFixed(3)})`;
+        ctx.lineWidth = 1.1;
+        ctx.stroke();
+
+        // Escuadras limpias en las 4 esquinas del cuadrante
+        const arm = Math.min(13, hw * 0.12, hh * 0.15);
+        ctx.strokeStyle = inverse
+          ? `rgba(15, 23, 42, ${(0.55 * alpha).toFixed(3)})`
+          : `rgba(224, 242, 254, ${(0.78 * alpha).toFixed(3)})`;
+        ctx.lineWidth = 1.25;
+        const signs: [-1 | 1, -1 | 1][] = [
+          [-1, -1],
+          [1, -1],
+          [1, 1],
+          [-1, 1],
+        ];
+        signs.forEach(([sx, sy]) => {
+          const x = cx + sx * hw;
+          const y = cy + sy * hh;
+          ctx.beginPath();
+          ctx.moveTo(x - sx * arm, y);
+          ctx.lineTo(x, y);
+          ctx.lineTo(x, y - sy * arm);
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+
+      // En el teléfono el cuadrante se achica para dejar aire al titular y al paisaje
+      function lensHalf(kind: "portal" | "data") {
+        if (w < 760) {
+          const hw = Math.max(78, Math.min(118, w * 0.28));
+          const hh = Math.max(56, Math.min(84, h * 0.13));
+          return kind === "data" ? { hw: hw * 1.04, hh: hh * 1.04 } : { hw, hh };
+        }
+        return kind === "data" ? { hw: 215, hh: 152 } : { hw: 205, hh: 145 };
+      }
+
+      // Cuadrante inverso: en el mundo real a color, los 4 drones abren un cuadrante hacia el mundo de datos blanco con planos
+      function drawDataLens(coastY: number, grid: Projected[][], nodes: HorizonNode[]) {
+        const lens = lensHalf("data");
+        const hw = lens.hw * mouse.reveal;
+        const hh = lens.hh * mouse.reveal;
+        if (hw < 4 || hh < 4) {
+          syncDarkLensText(0, 0, 0, 0);
+          return;
+        }
+        const lx = mouse.sx;
+        const ly = mouse.sy;
+        syncDarkLensText(lx, ly, hw, hh);
+
+        ctx.save();
+        traceRiftQuadrant(ctx, lx, ly, hw, hh);
+        ctx.clip();
+        const labBg = ctx.createLinearGradient(0, 0, 0, h);
+        labBg.addColorStop(0, "#f8fbff");
+        labBg.addColorStop(0.55, "#eef4fb");
+        labBg.addColorStop(1, "#e6eff8");
+        ctx.fillStyle = labBg;
+        ctx.fillRect(lx - hw - 16, ly - hh - 16, hw * 2 + 32, hh * 2 + 32);
+        drawAbstractWorld(coastY, grid, nodes, true);
+        ctx.restore();
+
+        drawRiftEdge(lx, ly, hw, hh, Math.min(1, mouse.reveal * 1.25), true);
+      }
+
+      function drawLiquidRealityPortal(
+        coastY: number,
+        grid: Projected[][],
+        nodes: HorizonNode[]
+      ) {
+        if (fullReveal > 0.995) {
+          // Mundo real a pantalla completa a color; el cuadrante de datos blancos aparece al pasar el cursor
+          drawRealisticWorld(ctx, coastY, grid, nodes);
+          drawDataLens(coastY, grid, nodes);
+          return;
+        }
+        syncDarkLensText(0, 0, 0, 0);
+
+        const isExpanding = fullReveal > 0.01;
+        if (!isExpanding && (mouse.reveal < 0.02 || !pctx)) return;
+        if (!pctx) return;
+
+        const easeFull = fullReveal * fullReveal * (3 - 2 * fullReveal);
+        const fullHw = w * 0.62;
+        const fullHh = h * 0.64;
+        const portal = lensHalf("portal");
+        const hw = isExpanding
+          ? portal.hw * mouse.reveal * (1 - easeFull) + fullHw * easeFull
+          : portal.hw * mouse.reveal;
+        const hh = isExpanding
+          ? portal.hh * mouse.reveal * (1 - easeFull) + fullHh * easeFull
+          : portal.hh * mouse.reveal;
+        const cx = isExpanding
+          ? mouse.sx * (1 - easeFull) + w * 0.5 * easeFull
+          : mouse.sx;
+        const cy = isExpanding
+          ? mouse.sy * (1 - easeFull) + h * 0.5 * easeFull
+          : mouse.sy;
+
+        if (!isExpanding) {
+          // Solo el cuadrante, 1:1 con la pantalla: nada de estirar un lienzo a media resolución
+          const originX = Math.round(cx - hw - 20);
+          const originY = Math.round(cy - hh - 20);
+          pctx.setTransform(1, 0, 0, 1, 0, 0);
+          pctx.clearRect(0, 0, portalCanvas.width, portalCanvas.height);
+          pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          pctx.save();
+          pctx.translate(-originX, -originY);
+          traceRiftQuadrant(pctx, cx, cy, hw, hh);
+          pctx.clip();
+          drawRealisticWorld(pctx, coastY, grid, nodes);
+          pctx.restore();
+
+          const prevSmooth = ctx.imageSmoothingEnabled;
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(
+            portalCanvas,
+            0,
+            0,
+            portalCanvas.width,
+            portalCanvas.height,
+            originX,
+            originY,
+            portalCanvas.width / dpr,
+            portalCanvas.height / dpr
+          );
+          ctx.imageSmoothingEnabled = prevSmooth;
+        } else {
+          // La apertura hacia pantalla completa ya se dibuja nítida, recortada al cuadrante que crece
+          ctx.save();
+          traceRiftQuadrant(ctx, cx, cy, hw, hh);
+          ctx.clip();
+          drawRealisticWorld(ctx, coastY, grid, nodes);
+          ctx.restore();
+        }
+
+        const rimAlpha = isExpanding ? (1 - easeFull) * 0.95 : Math.min(1, mouse.reveal * 1.25);
+        drawRiftEdge(cx, cy, hw, hh, rimAlpha, false);
+      }
+
+      // ─── 4 MICRO-DRONES DE PRECISIÓN QUE SALEN DE YARQ Y LEVITAN PARA ABRIR EL CUADRANTE ───
+      function drawQuadrantDrones() {
+        const settledFull = fullReality && fullReveal > 0.995;
+        const isExpanding = !settledFull && fullReveal > 0.01;
+        const easeFull = fullReveal * fullReveal * (3 - 2 * fullReveal);
+
+        // Cuadrante objetivo al que vuelan los 4 drones desde YARQ
+        let showDrones = false;
+        let cx = mouse.sx;
+        let cy = mouse.sy;
+        let hw = 0;
+        let hh = 0;
+        let droneAlpha = 0;
+        let inverse = false;
+
+        if (settledFull) {
+          if (mouse.reveal > 0.03) {
+            showDrones = true;
+            const lens = lensHalf("data");
+            hw = lens.hw * mouse.reveal;
+            hh = lens.hh * mouse.reveal;
+            droneAlpha = Math.min(1, mouse.reveal * 1.35);
+            inverse = true;
+          }
+        } else if (isExpanding) {
+          showDrones = easeFull < 0.92;
+          const fullHw = w * 0.62;
+          const fullHh = h * 0.64;
+          const portal = lensHalf("portal");
+          hw = portal.hw * mouse.reveal * (1 - easeFull) + fullHw * easeFull;
+          hh = portal.hh * mouse.reveal * (1 - easeFull) + fullHh * easeFull;
+          cx = mouse.sx * (1 - easeFull) + w * 0.5 * easeFull;
+          cy = mouse.sy * (1 - easeFull) + h * 0.5 * easeFull;
+          droneAlpha = (1 - easeFull) * 0.95;
+        } else if (mouse.reveal > 0.03) {
+          showDrones = true;
+          const portal = lensHalf("portal");
+          hw = portal.hw * mouse.reveal;
+          hh = portal.hh * mouse.reveal;
+          droneAlpha = Math.min(1, mouse.reveal * 1.35);
+        }
+
+        ctx.save();
+        quadDrones.forEach((d) => {
+          // Puerto base en las letras de YARQ (desde donde despegan y a donde regresan)
+          const dockX = yarqOrigin.x + (d.slot - 1.5) * (yarqHalf.x * 0.45);
+          const dockY = yarqOrigin.y;
+
+          const hoverY = showDrones ? Math.sin(t * 3.1 + d.phase) * 2.4 : 0;
+          const tx = showDrones ? cx + d.sx * hw : dockX;
+          const ty = showDrones ? cy + d.sy * hh + hoverY : dockY;
+
+          const ease = showDrones ? 0.24 : 0.16;
+          const prevX = d.x;
+          const prevY = d.y;
+          d.x += (tx - d.x) * ease;
+          d.y += (ty - d.y) * ease;
+          d.vx = d.x - prevX;
+          d.vy = d.y - prevY;
+
+          const distDock = Math.hypot(d.x - dockX, d.y - dockY);
+          const vis = showDrones
+            ? droneAlpha * Math.min(1, distDock / 24)
+            : Math.min(1, distDock / 40) * 0.55;
+          if (vis < 0.03) return;
+
+          // Estela propulsora breve solo mientras despegan desde YARQ o se desplazan rápido
+          const speed = Math.hypot(d.vx, d.vy);
+          if (speed > 2.2) {
+            const trGrad = ctx.createLinearGradient(d.x, d.y, d.x - d.vx * 3.5, d.y - d.vy * 3.5);
+            trGrad.addColorStop(0, `rgba(56, 189, 248, ${(0.5 * vis).toFixed(3)})`);
+            trGrad.addColorStop(1, "rgba(56, 189, 248, 0)");
+            ctx.strokeStyle = trGrad;
+            ctx.lineWidth = 1.25;
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(d.x - d.vx * 3.5, d.y - d.vy * 3.5);
+            ctx.stroke();
+          }
+
+          ctx.save();
+          ctx.translate(d.x, d.y);
+          ctx.globalAlpha = vis;
+
+          // Halo sutil de levitación bajo el micro-dron
+          const glow = ctx.createRadialGradient(0, 2, 0.5, 0, 2, 11);
+          glow.addColorStop(0, "rgba(56, 189, 248, 0.48)");
+          glow.addColorStop(1, "rgba(56, 189, 248, 0)");
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(0, 2, 11, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Brazos y rotores laterales miniatura (estética dron aeroespacial limpio)
+          ctx.strokeStyle = inverse ? "rgba(15, 23, 42, 0.78)" : "rgba(224, 242, 254, 0.88)";
+          ctx.lineWidth = 1.05;
+          ctx.beginPath();
+          ctx.moveTo(-6.5, 0);
+          ctx.lineTo(6.5, 0);
+          ctx.stroke();
+
+          // Discos de rotor levitando a ambos lados
+          ctx.strokeStyle = "rgba(56, 189, 248, 0.72)";
+          ctx.lineWidth = 0.85;
+          ctx.beginPath();
+          ctx.moveTo(-8.5, -1.6);
+          ctx.lineTo(-4.5, -1.6);
+          ctx.moveTo(4.5, -1.6);
+          ctx.lineTo(8.5, -1.6);
+          ctx.stroke();
+
+          // Chasis romboidal compacto de cerámica-titanio
+          ctx.fillStyle = inverse ? "#0f172a" : "#f8fafc";
+          ctx.strokeStyle = inverse ? "rgba(56, 189, 248, 0.9)" : "rgba(15, 23, 42, 0.75)";
+          ctx.lineWidth = 0.85;
+          ctx.beginPath();
+          ctx.moveTo(0, -3.4);
+          ctx.lineTo(3.6, 0);
+          ctx.lineTo(0, 3.4);
+          ctx.lineTo(-3.6, 0);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          // Núcleo emisor cian central
+          ctx.fillStyle = "#38bdf8";
+          ctx.beginPath();
+          ctx.arc(0, 0, 1.35, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.restore();
+        });
+        ctx.restore();
+      }
+
+      // 1 si el cuadrante del revelador blanco cubre el logo YARQ en modo color; 0 en cualquier otro caso
+      let lastLensOverlap = 0;
+      function computeLensOverlap() {
+        if (!fullReality || fullReveal < 0.995 || mouse.reveal < 0.05) return 0;
+        const lens = lensHalf("data");
+        const hw = lens.hw * mouse.reveal;
+        const hh = lens.hh * mouse.reveal;
+        const ovX = Math.min(mouse.sx + hw, yarqOrigin.x + yarqHalf.x) - Math.max(mouse.sx - hw, yarqOrigin.x - yarqHalf.x);
+        const ovY = Math.min(mouse.sy + hh, yarqOrigin.y + yarqHalf.y) - Math.max(mouse.sy - hh, yarqOrigin.y - yarqHalf.y);
+        return ovX > 0 && ovY > 0 ? 1 : 0;
+      }
+
+      function drawFrame() {
+        const nowMs = performance.now();
+        if (lastFrameMs) frameEma += (nowMs - lastFrameMs - frameEma) * 0.05;
+        lastFrameMs = nowMs;
+        if (frameEma > 60) lowQuality = true;
+        else if (frameEma < 36) lowQuality = false;
+
+        ctx.clearRect(0, 0, w, h);
+
+        intro = Math.min(1, intro + 0.012);
+        dive += (diveTarget - dive) * 0.1;
+        fullReveal += ((fullReality ? 1 : 0) - fullReveal) * 0.055;
+        mouse.x += (mouse.tx - mouse.x) * 0.035;
+        mouse.reveal += ((mouse.active ? 1 : 0) - mouse.reveal) * 0.12;
+        if (mouse.active) {
+          mouse.sx += (mouse.px - mouse.sx) * 0.5;
+          mouse.sy += (mouse.py - mouse.sy) * 0.5;
+        }
+
+        // Inmersión física al scrollear: más terreno ecológico y arquitectura sobre un océano con textura viva
+        const diveEase = dive * dive * (3 - 2 * dive);
+        const vanishY = h * (0.58 - diveEase * 0.24);
+        const fov = Math.min(w, 1440) * (0.5 + diveEase * 0.12);
+        const camY = (h - vanishY) * (1.42 - diveEase * 0.56);
+        const camX = mouse.x * 10;
+        const centerX = w * 0.5;
+
+        const farZ = -130 + 6600;
+        const farScale = fov / (fov + farZ);
+        const exactCoastY = vanishY + camY * farScale;
+
+        const grid: Projected[][] = [];
+        for (let rz = 0; rz < ROWS; rz++) {
+          const row: Projected[] = [];
+          const u = rz / (ROWS - 1);
+          const z = -130 + Math.pow(u, 2.15) * 6600;
+          const depthNorm = 1 - u;
+          const scale = fov / (fov + z);
+          const waveAtten = 0.22 + 0.78 * Math.pow(depthNorm, 0.65);
+
+          for (let cx = 0; cx < COLS; cx++) {
+            const baseGx = (cx - (COLS - 1) / 2) * SEP_X * (1 + u * 3.9) - camX;
+            const ph1 = cx * 0.22 + rz * 0.16 - t * 1.35;
+            const ph2 = cx * 0.15 - rz * 0.28 + t * 0.95;
+            const ph3 = (cx + rz) * 0.11 - t * 0.7;
+
+            let y =
+              (Math.sin(ph1) * 42 + Math.cos(ph2) * 32 + Math.sin(ph3) * 18) * waveAtten;
+            const gx = baseGx + (Math.cos(ph1) * 14 + Math.sin(ph2) * 10) * waveAtten;
+
+            const baseSx = centerX + gx * scale;
+            const baseSy = vanishY + (camY + y) * scale;
+
+            let rip = 0;
+            if (mouse.active) {
+              const dx = baseSx - mouse.px;
+              const dy = baseSy - mouse.py;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 175) {
+                rip = 1 - dist / 175;
+                y -= Math.sin(rip * Math.PI) * 42 * Math.max(0.3, waveAtten);
+              }
+            }
+
+            const sx = centerX + gx * scale;
+            const sy = vanishY + (camY + y) * scale;
+            const syDeep = vanishY + (camY + y + 50 * waveAtten) * scale;
+            const elev = Math.max(0, Math.min(1, (-y + 72) / 144));
+
+            row.push({ sx, sy, syDeep, scale, elev, depthNorm, rip });
+          }
+          grid.push(row);
+        }
+
+        const nodes = computeHorizonNodes(exactCoastY);
+
+        const overlapNow = computeLensOverlap();
+        if (overlapNow !== lastLensOverlap) {
+          lastLensOverlap = overlapNow;
+          window.dispatchEvent(new CustomEvent("yarq:lens", { detail: { mix: overlapNow } }));
+        }
+
+        ctx.save();
+        ctx.globalAlpha = intro;
+        drawAbstractWorld(exactCoastY, grid, nodes);
+        drawLiquidRealityPortal(exactCoastY, grid, nodes);
+        drawQuadrantDrones();
+
+        // Transición luminosa de inmersión al scrollear: en reposo (dive=0) el hero queda 100% limpio
+        if (diveEase > 0.01) {
+          const seamTop = h * (0.76 - diveEase * 0.45);
+          const waterGrad = ctx.createLinearGradient(0, seamTop, 0, h);
+          waterGrad.addColorStop(0, "rgba(232, 245, 254, 0)");
+          waterGrad.addColorStop(0.55, `rgba(224, 242, 254, ${(diveEase * 0.42).toFixed(3)})`);
+          waterGrad.addColorStop(1, `rgba(236, 246, 253, ${(diveEase * 0.92).toFixed(3)})`);
+          ctx.fillStyle = waterGrad;
+          ctx.fillRect(0, Math.max(0, seamTop), w, h - Math.max(0, seamTop));
+
+          // Línea sutil de refracción superficial al cruzar el agua
+          const surfaceY = h * (0.88 - diveEase * 0.56);
+          ctx.save();
+          ctx.beginPath();
+          for (let x = 0; x <= w; x += 28) {
+            const wy =
+              surfaceY +
+              Math.sin(x * 0.012 + t * 2.2) * (4 + diveEase * 7) +
+              Math.cos(x * 0.028 - t * 1.6) * 2.5;
+            if (x === 0) ctx.moveTo(x, wy);
+            else ctx.lineTo(x, wy);
+          }
+          ctx.strokeStyle = `rgba(6, 182, 212, ${(0.28 * Math.sin(diveEase * Math.PI)).toFixed(3)})`;
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        ctx.restore();
+
+        if (!reduce) {
+          t += 0.015;
+          raf = requestAnimationFrame(drawFrame);
+        }
+      }
+
+      drawFrame();
+
+      if (!reduce) {
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) cancelAnimationFrame(raf);
+          else raf = requestAnimationFrame(drawFrame);
+        });
+      }
+    });
+  }
+</script>
+
+<style>
+  .datasea-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>

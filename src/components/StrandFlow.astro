@@ -1,0 +1,240 @@
+---
+import { strandNodes } from "../lib/identity";
+
+interface Props {
+  variant?: "hero" | "inline";
+}
+
+const { variant = "hero" } = Astro.props;
+const sequence = [...strandNodes, ...strandNodes];
+const uid = `strand-${variant}`;
+---
+
+<div
+  class={`strand strand--${variant}`}
+  role="img"
+  aria-label="Ciclo completo de un producto digital: diagnóstico, diseño, desarrollo, lanzamiento, operación y automatización"
+>
+  <svg class="strand__wire" viewBox="0 0 1200 96" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id={`${uid}-grad`} x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.12"></stop>
+        <stop offset="25%" stop-color="#0ea5b7" stop-opacity="0.72"></stop>
+        <stop offset="55%" stop-color="#38bdf8" stop-opacity="0.88"></stop>
+        <stop offset="80%" stop-color="#0284c7" stop-opacity="0.65"></stop>
+        <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.12"></stop>
+      </linearGradient>
+    </defs>
+
+    <!-- Hilo armónico secundario -->
+    <path
+      class="strand__path-ghost"
+      d="M0 54 C 120 22, 220 82, 340 50 S 560 22, 680 54 S 900 84, 1020 50 S 1140 34, 1200 54"
+      fill="none"
+      stroke={`url(#${uid}-grad)`}
+      stroke-width="1"
+      stroke-opacity="0.35"
+      vector-effect="non-scaling-stroke"
+    ></path>
+
+    <!-- Hilo principal continuo -->
+    <path
+      class="strand__path"
+      d="M0 48 C 90 16, 170 80, 260 48 S 430 16, 520 48 S 690 80, 780 48 S 950 16, 1040 48 S 1140 66, 1200 48"
+      fill="none"
+      stroke={`url(#${uid}-grad)`}
+      stroke-width="1.5"
+      vector-effect="non-scaling-stroke"
+    ></path>
+
+    <!-- Pulsos de señal -->
+    <circle class="strand__pulse" r="4" fill="#06b6d4">
+      <animateMotion
+        dur="7.5s"
+        repeatCount="indefinite"
+        path="M0 48 C 90 16, 170 80, 260 48 S 430 16, 520 48 S 690 80, 780 48 S 950 16, 1040 48 S 1140 66, 1200 48"
+      ></animateMotion>
+    </circle>
+    <circle class="strand__pulse strand__pulse--alt" r="2.8" fill="#38bdf8">
+      <animateMotion
+        dur="11s"
+        begin="-3.5s"
+        repeatCount="indefinite"
+        path="M0 54 C 120 22, 220 82, 340 50 S 560 22, 680 54 S 900 84, 1020 50 S 1140 34, 1200 54"
+      ></animateMotion>
+    </circle>
+  </svg>
+
+  <div class="strand__track" aria-hidden="true">
+    <div class="strand__rail strand__rail--a">
+      {
+        sequence.map((n, i) => (
+          <span class="strand__node" data-i={i % strandNodes.length}>
+            <span class="strand__pill">
+              <i class="strand__dot" />
+              <span class="strand__code">{n.code}</span>
+              <span class="strand__label">{n.label}</span>
+            </span>
+          </span>
+        ))
+      }
+    </div>
+    <div class="strand__rail strand__rail--b" aria-hidden="true">
+      {
+        sequence.map((n, i) => (
+          <span class="strand__node" data-i={i % strandNodes.length}>
+            <span class="strand__pill">
+              <i class="strand__dot" />
+              <span class="strand__code">{n.code}</span>
+              <span class="strand__label">{n.label}</span>
+            </span>
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .strand {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  }
+
+  .strand--hero {
+    min-height: 5.5rem;
+    margin-block: 0.75rem 0.5rem;
+  }
+
+  .strand--inline {
+    min-height: 4.75rem;
+  }
+
+  .strand__wire {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .strand__path {
+    stroke-dasharray: 6 6;
+    animation: strand-dash 18s linear infinite;
+  }
+
+  .strand__track {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: max-content;
+    animation: strand-scroll 34s linear infinite;
+  }
+
+  .strand__rail {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.5rem, 3.5vw, 2.75rem);
+    padding-inline: clamp(0.75rem, 2vw, 1.5rem);
+    min-height: inherit;
+  }
+
+  .strand__node {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .strand__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.42rem 0.85rem 0.42rem 0.65rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(240, 249, 252, 0.68));
+    border: 1px solid rgba(14, 165, 183, 0.18);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.95) inset,
+      0 8px 24px rgba(15, 23, 42, 0.045);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .strand__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.18);
+    flex-shrink: 0;
+  }
+
+  .strand__code {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent-strong);
+    opacity: 0.85;
+  }
+
+  .strand__label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  @keyframes strand-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes strand-dash {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: -120;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .strand__track,
+    .strand__path {
+      animation: none;
+    }
+
+    .strand__track {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .strand__rail--b,
+    .strand__pulse {
+      display: none;
+    }
+
+    .strand__rail--a {
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .strand__node:nth-child(n + 7) {
+      display: none;
+    }
+  }
+</style>

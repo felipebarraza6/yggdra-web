@@ -1,0 +1,163 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<canvas
+  class={`ag-canvas ${className}`.trim()}
+  data-antigravity
+  aria-hidden="true"
+></canvas>
+
+<script>
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canvases = document.querySelectorAll<HTMLCanvasElement>("[data-antigravity]");
+
+  if (!reduce && canvases.length > 0) {
+    canvases.forEach((canvas) => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      let w = 0;
+      let h = 0;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let raf = 0;
+      let lastScrollY = window.scrollY;
+      let scrollVel = 0;
+
+      const palette = [
+        "rgba(2, 132, 199, 0.36)",
+        "rgba(6, 182, 212, 0.38)",
+        "rgba(124, 58, 237, 0.32)",
+        "rgba(15, 23, 42, 0.28)",
+      ];
+
+      const formulas = [
+        "∇·E = ρ/ε₀",
+        "∑ f(x)",
+        "Δt → 0",
+        "λ = 0.994",
+        "φ = 1.618",
+        "∂ψ/∂t",
+        "∫ Ω dV",
+        "O(log n)",
+        "σ² = 0.04",
+        "π ≈ 3.1416",
+        "99.98%",
+        "01.06",
+      ];
+
+      type Glyph = {
+        x: number;
+        y: number;
+        vx: number;
+        vy: number;
+        depth: number;
+        color: string;
+        phase: number;
+        speed: number;
+        text: string;
+        alpha: number;
+      };
+
+      let glyphs: Glyph[] = [];
+
+      function resize() {
+        w = Math.max(320, window.innerWidth);
+        h = Math.max(360, window.innerHeight);
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const targetCount = Math.min(26, Math.max(12, Math.floor((w * h) / 55000)));
+        if (glyphs.length !== targetCount) {
+          glyphs = Array.from({ length: targetCount }, (_, i) => {
+            const depth = 0.4 + Math.random() * 0.8;
+            return {
+              x: Math.random() * w,
+              y: Math.random() * h,
+              vx: (Math.random() - 0.5) * 0.14 * depth,
+              vy: (-0.06 - Math.random() * 0.12) * depth,
+              depth,
+              color: palette[i % palette.length],
+              phase: Math.random() * Math.PI * 2,
+              speed: 0.006 + Math.random() * 0.008,
+              text: formulas[i % formulas.length],
+              alpha: 0.16 + Math.random() * 0.16,
+            };
+          });
+        }
+      }
+
+      const onScroll = () => {
+        const y = window.scrollY;
+        const delta = y - lastScrollY;
+        lastScrollY = y;
+        scrollVel = Math.max(-20, Math.min(20, scrollVel + delta * 0.14));
+      };
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", resize, { passive: true });
+      resize();
+
+      function tick() {
+        ctx.clearRect(0, 0, w, h);
+        scrollVel *= 0.88;
+        if (Math.abs(scrollVel) < 0.02) scrollVel = 0;
+
+        // En el hero mantenemos el cielo completamente limpio; las fórmulas aparecen sutilmente al bajar
+        const scrollFade = Math.min(1, Math.max(0, (window.scrollY - 120) / 360));
+        if (scrollFade > 0.01) {
+          ctx.font = '500 10.5px "JetBrains Mono", ui-monospace, monospace';
+          for (let i = 0; i < glyphs.length; i++) {
+            const g = glyphs[i];
+            g.phase += g.speed;
+            g.x += g.vx + Math.sin(g.phase) * 0.12;
+            g.y += g.vy - scrollVel * 0.22 * g.depth;
+
+            if (g.y < -24) {
+              g.y = h + 24;
+              g.x = Math.random() * w;
+            } else if (g.y > h + 24) {
+              g.y = -24;
+              g.x = Math.random() * w;
+            }
+            if (g.x < -40) g.x = w + 40;
+            if (g.x > w + 40) g.x = -40;
+
+            const a = (g.alpha + Math.sin(g.phase * 1.2) * 0.05) * scrollFade;
+            ctx.globalAlpha = Math.max(0, Math.min(0.45, a));
+            ctx.fillStyle = g.color;
+            ctx.fillText(g.text, g.x, g.y);
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        raf = requestAnimationFrame(tick);
+      }
+
+      raf = requestAnimationFrame(tick);
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) cancelAnimationFrame(raf);
+        else raf = requestAnimationFrame(tick);
+      });
+    });
+  }
+</script>
+
+<style>
+  .ag-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>

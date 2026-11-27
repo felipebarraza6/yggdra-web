@@ -1,37 +1,35 @@
-# yggdra-web (landing YARQ)
+# yggdra-web (landing Y ARQ)
 
-Landing y portafolio técnico de **YARQ** (Y ARQ): backend multi-tenant,
-API compartida, CI con impacto, productos, agentes y puerta API → sectores.
+Página de servicio y portafolio técnico de **Y ARQ** (YARQ): backend
+multi-tenant, API compartida, CI con impacto, productos y automatizaciones.
 
 - URL: https://felipebarraza6.github.io/yggdra-web/
-- Marca: **YARQ** / **Y ARQ**
+- Marca: **Y ARQ** / **YARQ**
+- Identidad: laboratorio blanco — flujo continuo, glass limpio, sin revelar lo interno
 - Backend: **privado** — este repo no publica código, rutas internas ni secretos
-- **Alcance:** solo YARQ y las apps del inventario (consumidoras o en migración).
+- **Alcance:** solo Y ARQ y las apps del inventario (consumidoras o en migración).
   Nada de repos ajenos al ecosistema.
 
-Texto en **español de Chile** (registro comercial-técnico). La home explica
-adopción de clientes; las secciones profundizan contratos, orquestación,
-CI/CD y telemetría.
+Texto en **español de Chile** (registro comercial-técnico). La home es la
+página de servicio de la infraestructura; las secciones profundas cubren
+contratos, módulos y fichas de producto.
 
 ## Conceptos
 
 | Concepto | Significado en el sitio |
 |----------|-------------------------|
 | Y / ARQ | Marca display (YARQ en prosa) |
-| Adopción | Cómo entran clientes al tronco |
-| YARQ | API multi-tenant: raíces, tronco, CI, ramas |
+| Servicio | Infraestructura multi-tenant que sostiene productos |
+| Flujo | Hilo continuo: aislamiento → API → entrega → observación → respaldo → agentes |
 | Productos | Apps del inventario que demuestran el tronco |
-| Agentes | Muninn (+ Fly) orquestados sobre la operación |
-| Puerta API | Qué puedes entrar y a qué sectores llegar |
+| Automatizaciones | Agentes y flujos sobre la misma operación |
 | Raíces | Infraestructura y aislamiento |
 | Tronco | API, módulos, OpenAPI |
 | Ramas | Aplicaciones consumidoras |
-| Nornas | Orquestación e impacto |
-| Bifröst | Integraciones y despliegue |
 
 ## Rutas
 
-- `/` — landing de impacto + profundidad técnica
+- `/` — página de servicio (flujo, servicios, impacto)
 - `/apps/` y `/apps/<id>/` — inventario y ficha por aplicación
 - `/modulos/` y `/modulos/<id>/` — módulos/sectores y quién los usa
 
@@ -88,7 +86,7 @@ npm run build
 npm run check
 ```
 
-Local típico: `http://127.0.0.1:4323/yggdra-web/` (el puerto puede variar).
+Local típico: `http://127.0.0.1:4321/yggdra-web/` (el puerto puede variar).
 
 ## TODO — clientes por confirmar
 
